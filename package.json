@@ -1,10 +1,11 @@
 {
-  "name": "web-vitals",
+  "name": "@axiomhq/web-vitals",
   "version": "0.1.0",
   "description": "Web-Vital helpers for Axiom.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc",
+    "format": "prettier --write index.ts"
   },
   "repository": {
     "type": "git",
@@ -22,5 +23,13 @@
   "bugs": {
     "url": "https://github.com/axiomhq/web-vitals/issues"
   },
-  "homepage": "https://github.com/axiomhq/web-vitals#readme"
+  "homepage": "https://github.com/axiomhq/web-vitals#readme",
+  "dependencies": {
+    "next": "^12.1.5"
+  },
+  "devDependencies": {
+    "@types/node": "^17.0.29",
+    "prettier": "2.6.2",
+    "typescript": "^4.6.4"
+  }
 }
