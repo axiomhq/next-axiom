@@ -1,5 +1,5 @@
 {
-  "name": "@axiomhq/vercel-web-vitals",
+  "name": "@axiomhq/vercel-next",
   "version": "0.1.0",
   "description": "Send Web-Vitals from Vercel to Axiom.",
   "main": "index.js",
@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/axiomhq/web-vitals.git"
+    "url": "git+https://github.com/axiomhq/vercel-next.git"
   },
   "keywords": [
     "web-vitals",
@@ -22,9 +22,9 @@
   "author": "Axiom <info@axiom.co>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/axiomhq/web-vitals/issues"
+    "url": "https://github.com/axiomhq/vercel-next/issues"
   },
-  "homepage": "https://github.com/axiomhq/web-vitals#readme",
+  "homepage": "https://github.com/axiomhq/vercel-next#readme",
   "peerDependencies": {
     "next": "^12.1.5"
   },
