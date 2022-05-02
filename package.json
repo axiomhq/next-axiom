@@ -25,7 +25,7 @@
     "url": "https://github.com/axiomhq/web-vitals/issues"
   },
   "homepage": "https://github.com/axiomhq/web-vitals#readme",
-  "dependencies": {
+  "peerDependencies": {
     "next": "^12.1.5"
   },
   "devDependencies": {
