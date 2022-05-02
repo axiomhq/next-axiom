@@ -1,4 +1,4 @@
-# @axiomhq/web-vitals [![CI](https://github.com/axiomhq/web-vitals/actions/workflows/ci.yml/badge.svg)](https://github.com/axiomhq/web-vitals/actions/workflows/ci.yml)
+# @axiomhq/vercel-web-vitals [![CI](https://github.com/axiomhq/vercel-web-vitals/actions/workflows/ci.yml/badge.svg)](https://github.com/axiomhq/vercel-web-vitals/actions/workflows/ci.yml)
 
 Send Web-Vitals from Vercel to [Axiom](https://axiom.co).
 
@@ -9,7 +9,7 @@ Send Web-Vitals from Vercel to [Axiom](https://axiom.co).
 3. Wrap your NextJS config in `withAxiomProxy` like this in `next.config.js`:
 
 ```js
-const { withAxiomProxy } = require('@axiomhq/web-vitals');
+const { withAxiomProxy } = require('@axiomhq/vercel-web-vitals');
 
 module.exports = withAxiomProxy({
   // ... your existing config
@@ -20,5 +20,5 @@ This will proxy the Axiom ingest call to improve deliverability.
 
 3. Go to `pages/_app.js` or `pages/_app.ts` and add the following line:
 ```js
-export { reportWebVitals } from '@axiomhq/web-vitals';
+export { reportWebVitals } from '@axiomhq/vercel-web-vitals';
 ```

@@ -1,7 +1,7 @@
 {
-  "name": "@axiomhq/web-vitals",
+  "name": "@axiomhq/vercel-web-vitals",
   "version": "0.1.0",
-  "description": "Web-Vital helpers for Axiom.",
+  "description": "Send Web-Vitals from Vercel to Axiom.",
   "main": "index.js",
   "scripts": {
     "build": "tsc",
