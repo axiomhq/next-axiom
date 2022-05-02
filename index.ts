@@ -1,5 +1,5 @@
-import { NextConfig } from "next";
-import { NextWebVitalsMetric } from "next/app";
+import { NextConfig } from 'next';
+import { NextWebVitalsMetric } from 'next/app';
 
 export function withAxiomProxy(nextConfig: NextConfig): NextConfig {
   return {
@@ -7,16 +7,14 @@ export function withAxiomProxy(nextConfig: NextConfig): NextConfig {
     rewrites: async () => {
       const rewrites = await nextConfig.rewrites?.();
 
-      const ingestEndpoint =
-        process.env.AXIOM_INGEST_ENDPOINT ||
-        process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT;
+      const ingestEndpoint = process.env.AXIOM_INGEST_ENDPOINT || process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT;
       if (!ingestEndpoint) {
         return rewrites || []; // nothing to do
       }
 
       const axiomRewrites = [
         {
-          source: "/axiom/script",
+          source: '/axiom/script',
           destination: ingestEndpoint,
         },
       ];
@@ -36,7 +34,7 @@ export function withAxiomProxy(nextConfig: NextConfig): NextConfig {
 // Usage:
 // export { reportWebVitals } from "@axiomhq/web-vitals";
 export function reportWebVitals(metric: NextWebVitalsMetric) {
-  const url = "/axiom/script";
+  const url = '/axiom/script';
   const body = JSON.stringify({
     route: window.__NEXT_DATA__.page,
     ...metric,
@@ -45,6 +43,6 @@ export function reportWebVitals(metric: NextWebVitalsMetric) {
   if (navigator.sendBeacon) {
     navigator.sendBeacon(url, body);
   } else {
-    fetch(url, { body, method: "POST", keepalive: true });
+    fetch(url, { body, method: 'POST', keepalive: true });
   }
 }
