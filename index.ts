@@ -7,7 +7,9 @@ export function withAxiomProxy(nextConfig: NextConfig): NextConfig {
     rewrites: async () => {
       const rewrites = await nextConfig.rewrites?.();
 
-      const ingestEndpoint = process.env.AXIOM_INGEST_ENDPOINT || process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT;
+      const ingestEndpoint =
+        process.env.AXIOM_INGEST_ENDPOINT ||
+        process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT;
       if (!ingestEndpoint) {
         return rewrites || []; // nothing to do
       }
