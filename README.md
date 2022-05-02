@@ -1,5 +1,7 @@
 # @axiomhq/vercel-web-vitals [![CI](https://github.com/axiomhq/vercel-web-vitals/actions/workflows/ci.yml/badge.svg)](https://github.com/axiomhq/vercel-web-vitals/actions/workflows/ci.yml)
 
+![](./web-vitals-dashboard.png)
+
 Send Web-Vitals from Vercel to [Axiom](https://axiom.co).
 
 ## Get started with NextJS
@@ -18,7 +20,9 @@ module.exports = withAxiomProxy({
 
 This will proxy the Axiom ingest call to improve deliverability.
 
-3. Go to `pages/_app.js` or `pages/_app.ts` and add the following line:
+4. Go to `pages/_app.js` or `pages/_app.ts` and add the following line:
 ```js
 export { reportWebVitals } from '@axiomhq/vercel-web-vitals';
 ```
+
+5. Deploy your site and watch data coming into your Axiom dashboard
