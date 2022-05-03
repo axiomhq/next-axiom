@@ -1,9 +1,6 @@
 name: CI
 
-on:
-  push:
-    branches:
-      - main
+on: push
 
 jobs:
   check-format:
@@ -32,3 +29,22 @@ jobs:
           node-version: ${{ matrix.node }}
       - run: npm install
       - run: npm run build
+  publish:
+    name: Publish
+    needs: 
+      - check-format
+      - build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODEVERSION }}
+          cache: "npm"
+          registry-url: "https://registry.npmjs.org"
+      - run: npm install
+      - run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTOMATION_TOKEN }}
+      - uses: softprops/action-gh-release@v1
