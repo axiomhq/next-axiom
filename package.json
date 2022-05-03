@@ -8,13 +8,13 @@
     "Arne Bahlo <arne@axiom.co>"
   ],
   "engines": {
-    "node": ">=14"
+    "node": ">=15"
   },
   "main": "index.js",
   "types": "index.d.ts",
   "scripts": {
     "build": "tsc",
-    "prepublish": "npm run build",
+    "prepare": "npm run build",
     "format": "prettier --write index.ts",
     "check-format": "prettier -c index.ts"
   },
