@@ -14,7 +14,7 @@ export function withAxiomProxy(nextConfig: NextConfig): NextConfig {
 
       const axiomRewrites = [
         {
-          source: '/axiom/script',
+          source: '/axiom/web-vitals',
           destination: ingestEndpoint,
         },
       ];
@@ -34,7 +34,7 @@ export function withAxiomProxy(nextConfig: NextConfig): NextConfig {
 // Usage:
 // export { reportWebVitals } from "@axiomhq/web-vitals";
 export function reportWebVitals(metric: NextWebVitalsMetric) {
-  const url = '/axiom/script';
+  const url = '/axiom/web-vitals';
   const body = JSON.stringify({
     route: window.__NEXT_DATA__.page,
     ...metric,
