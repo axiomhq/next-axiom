@@ -31,13 +31,21 @@ export function withAxiomProxy(nextConfig: NextConfig): NextConfig {
   };
 }
 
+let collectedMetrics: any[] = [];
+
 // Usage:
 // export { reportWebVitals } from "@axiomhq/web-vitals";
 export function reportWebVitals(metric: NextWebVitalsMetric) {
+  
+  collectedMetrics.push(metric)
+  debounce(sendMetrics)
+}
+
+function sendMetrics () {
   const url = '/axiom/web-vitals';
   const body = JSON.stringify({
     route: window.__NEXT_DATA__.page,
-    ...metric,
+    ...collectedMetrics,
   });
 
   if (navigator.sendBeacon) {
@@ -45,4 +53,16 @@ export function reportWebVitals(metric: NextWebVitalsMetric) {
   } else {
     fetch(url, { body, method: 'POST', keepalive: true });
   }
+  // clear collectedMetrics
+  collectedMetrics = []
+}
+
+function debounce(func: Function, timeout = 1000) {
+  let timer: NodeJS.Timeout;
+  
+  return (...args: any) => {
+    clearTimeout(timer);
+    
+    timer = setTimeout(() => { func.apply(this, args); }, timeout);
+  };
 }
