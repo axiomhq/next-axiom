@@ -4,7 +4,7 @@ on: push
 
 jobs:
   check-format:
-    name: Check format
+    name: Check format & Test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -13,6 +13,7 @@ jobs:
           node-version: 17
       - run: npm install
       - run: npm run check-format
+      - run: npm test
   build:
     name: Build
     runs-on: ubuntu-latest

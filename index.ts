@@ -1,5 +1,6 @@
 import { NextConfig } from 'next';
 import { NextWebVitalsMetric } from 'next/app';
+const _debounce = require('lodash/debounce');
 
 export function withAxiomProxy(nextConfig: NextConfig): NextConfig {
   return {
@@ -31,21 +32,28 @@ export function withAxiomProxy(nextConfig: NextConfig): NextConfig {
   };
 }
 
-let collectedMetrics: any[] = [];
-
-// Usage:
-// export { reportWebVitals } from "@axiomhq/web-vitals";
-export function reportWebVitals(metric: NextWebVitalsMetric) {
-  
-  collectedMetrics.push(metric)
-  debounce(sendMetrics)
+export function getCurrentPage() {
+  // TODO: find a way to mock this in tests
+  // return window.__NEXT_DATA__.page
+  return '/';
 }
 
-function sendMetrics () {
+const debounceSendMetrics = _debounce(sendMetrics, 1000);
+let collectedMetrics: NextWebVitalsMetric[] = [];
+
+// Usage:
+// import { reportWebVitals } from "@axiomhq/web-vitals";
+export function reportWebVitals(metric: NextWebVitalsMetric) {
+  metric['route'] = getCurrentPage();
+  collectedMetrics.push(metric);
+  debounceSendMetrics();
+}
+
+function sendMetrics() {
   const url = '/axiom/web-vitals';
   const body = JSON.stringify({
-    route: window.__NEXT_DATA__.page,
-    ...collectedMetrics,
+    // route: window.__NEXT_DATA__.page,
+    webVitals: collectedMetrics,
   });
 
   if (navigator.sendBeacon) {
@@ -54,15 +62,5 @@ function sendMetrics () {
     fetch(url, { body, method: 'POST', keepalive: true });
   }
   // clear collectedMetrics
-  collectedMetrics = []
-}
-
-function debounce(func: Function, timeout = 1000) {
-  let timer: NodeJS.Timeout;
-  
-  return (...args: any) => {
-    clearTimeout(timer);
-    
-    timer = setTimeout(() => { func.apply(this, args); }, timeout);
-  };
+  collectedMetrics = [];
 }
