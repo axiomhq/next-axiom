@@ -34,7 +34,7 @@
   },
   "homepage": "https://github.com/axiomhq/vercel-next#readme",
   "peerDependencies": {
-    "next": "^12.1.5"
+    "next": "^12.1.4"
   },
   "devDependencies": {
     "@types/node": "^17.0.29",
