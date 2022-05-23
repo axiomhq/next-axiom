@@ -1,6 +1,5 @@
 import { NextConfig } from 'next';
 import { NextWebVitalsMetric } from 'next/app';
-import sendMetrics from './sendMetrics';
 const _debounce = require('lodash/debounce');
 
 export function withAxiomProxy(nextConfig: NextConfig): NextConfig {
@@ -34,10 +33,10 @@ export function withAxiomProxy(nextConfig: NextConfig): NextConfig {
 }
 
 export function getCurrentPage() {
-  return window.__NEXT_DATA__.page
+  return window.__NEXT_DATA__.page;
 }
 
-const debounceSendMetrics = _debounce(() => sendMetrics(collectedMetrics), 1000);
+const debounceSendMetrics = _debounce(() => sendMetrics(), 1000);
 let collectedMetrics: NextWebVitalsMetric[] = [];
 
 // Usage:
@@ -46,4 +45,19 @@ export function reportWebVitals(metric: NextWebVitalsMetric) {
   metric['route'] = getCurrentPage();
   collectedMetrics.push(metric);
   debounceSendMetrics();
+}
+
+export function sendMetrics() {
+  const url = '/axiom/web-vitals';
+  const body = JSON.stringify({
+    webVitals: collectedMetrics,
+  });
+
+  if (navigator.sendBeacon) {
+    navigator.sendBeacon(url, body);
+  } else {
+    fetch(url, { body, method: 'POST', keepalive: true });
+  }
+  // clear collectedMetrics
+  collectedMetrics = [];
 }
