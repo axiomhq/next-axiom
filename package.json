@@ -15,8 +15,8 @@
   "scripts": {
     "build": "tsc",
     "prepare": "npm run build",
-    "format": "prettier --write index.ts",
-    "check-format": "prettier -c index.ts",
+    "format": "prettier --write index.ts __tests__/*.ts",
+    "check-format": "prettier -c index.ts __tests__/*.ts",
     "test": "jest"
   },
   "repository": {

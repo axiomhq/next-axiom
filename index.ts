@@ -52,7 +52,6 @@ export function reportWebVitals(metric: NextWebVitalsMetric) {
 function sendMetrics() {
   const url = '/axiom/web-vitals';
   const body = JSON.stringify({
-    // route: window.__NEXT_DATA__.page,
     webVitals: collectedMetrics,
   });
 
