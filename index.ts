@@ -2,6 +2,8 @@ import { NextConfig } from 'next';
 import { NextWebVitalsMetric } from 'next/app';
 const _debounce = require('lodash/debounce');
 
+export declare type WebVitalsMetric = NextWebVitalsMetric & { route: string };
+
 export function withAxiomProxy(nextConfig: NextConfig): NextConfig {
   return {
     ...nextConfig,
@@ -33,17 +35,16 @@ export function withAxiomProxy(nextConfig: NextConfig): NextConfig {
 }
 
 export function getCurrentPage() {
-  return window.__NEXT_DATA__.page;
+  return window.__NEXT_DATA__?.page;
 }
 
 const debounceSendMetrics = _debounce(() => sendMetrics(), 1000);
-let collectedMetrics: NextWebVitalsMetric[] = [];
+let collectedMetrics: WebVitalsMetric[] = [];
 
 // Usage:
 // export { reportWebVitals } from "@axiomhq/web-vitals";
 export function reportWebVitals(metric: NextWebVitalsMetric) {
-  metric['route'] = getCurrentPage();
-  collectedMetrics.push(metric);
+  collectedMetrics.push({ route: getCurrentPage(), ...metric });
   debounceSendMetrics();
 }
 

@@ -20,6 +20,7 @@ test('debounce sendMetrics', async () => {
   ];
 
   metricsMatrix[0].forEach(reportWebVitals);
+  expect(fetch).toBeCalledTimes(0);
   // skip 100ms and send another webVital
   jest.advanceTimersByTime(100);
   metricsMatrix[1].forEach(reportWebVitals);
