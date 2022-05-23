@@ -42,7 +42,7 @@ const debounceSendMetrics = _debounce(sendMetrics, 1000);
 let collectedMetrics: NextWebVitalsMetric[] = [];
 
 // Usage:
-// import { reportWebVitals } from "@axiomhq/web-vitals";
+// export { reportWebVitals } from "@axiomhq/web-vitals";
 export function reportWebVitals(metric: NextWebVitalsMetric) {
   metric['route'] = getCurrentPage();
   collectedMetrics.push(metric);
