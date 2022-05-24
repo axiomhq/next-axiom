@@ -34,17 +34,13 @@ export function withAxiomProxy(nextConfig: NextConfig): NextConfig {
   };
 }
 
-export function getCurrentPage() {
-  return window.__NEXT_DATA__?.page;
-}
-
 const debounceSendMetrics = _debounce(() => sendMetrics(), 1000);
 let collectedMetrics: WebVitalsMetric[] = [];
 
 // Usage:
 // export { reportWebVitals } from "@axiomhq/web-vitals";
 export function reportWebVitals(metric: NextWebVitalsMetric) {
-  collectedMetrics.push({ route: getCurrentPage(), ...metric });
+  collectedMetrics.push({ route: window.__NEXT_DATA__?.page, ...metric });
   debounceSendMetrics();
 }
 

@@ -19,14 +19,18 @@ test('debounce sendMetrics', async () => {
     [{ id: '4', startTime: 4012, value: 4, name: 'FCP', label: 'web-vital' }],
   ];
 
+  // report first set of web-vitals
   metricsMatrix[0].forEach(reportWebVitals);
-  expect(fetch).toBeCalledTimes(0);
-  // skip 100ms and send another webVital
+  // skip 100ms and report another webVital
   jest.advanceTimersByTime(100);
   metricsMatrix[1].forEach(reportWebVitals);
+  // ensure fetch has not been called yet for any the previously reported
+  // web-vitals
+  expect(fetch).toBeCalledTimes(0);
+  // skip ahead of time to send the previous webvitals
+  jest.advanceTimersByTime(1000);
 
   // send the last set of webVitals and wait for them to be sent
-  jest.advanceTimersByTime(1000);
   metricsMatrix[2].forEach(reportWebVitals);
   jest.advanceTimersByTime(1000);
 

@@ -3,3 +3,6 @@
 /*.nix
 /.prettierrc
 /.github
+/__tests__
+/jest.config.ts
+/tsconfig.json
