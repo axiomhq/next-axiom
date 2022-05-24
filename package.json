@@ -1,11 +1,12 @@
 {
   "name": "@axiomhq/vercel-next",
   "description": "Send Web-Vitals from Vercel to Axiom.",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "author": "Axiom, Inc.",
   "license": "MIT",
   "contributors": [
-    "Arne Bahlo <arne@axiom.co>"
+    "Arne Bahlo <arne@axiom.co>",
+    "Islam Shehata <islam@axiom.co>"
   ],
   "engines": {
     "node": ">=15"
@@ -15,8 +16,9 @@
   "scripts": {
     "build": "tsc",
     "prepare": "npm run build",
-    "format": "prettier --write index.ts",
-    "check-format": "prettier -c index.ts"
+    "format": "prettier --write index.ts __tests__/*.ts",
+    "check-format": "prettier -c index.ts __tests__/*.ts",
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -37,8 +39,16 @@
     "next": "^12.1.4"
   },
   "devDependencies": {
+    "@types/jest": "^27.5.1",
     "@types/node": "^17.0.29",
+    "jest": "^28.1.0",
+    "jest-environment-jsdom": "^28.1.0",
     "prettier": "2.6.2",
+    "ts-jest": "^28.0.2",
+    "ts-node": "^10.8.0",
     "typescript": "^4.6.4"
+  },
+  "dependencies": {
+    "lodash": "^4.17.21"
   }
 }
