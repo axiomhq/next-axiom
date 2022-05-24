@@ -5,7 +5,8 @@
   "author": "Axiom, Inc.",
   "license": "MIT",
   "contributors": [
-    "Arne Bahlo <arne@axiom.co>"
+    "Arne Bahlo <arne@axiom.co>",
+    "Islam Shehata <islam@axiom.co>"
   ],
   "engines": {
     "node": ">=15"
