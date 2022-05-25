@@ -1,6 +1,6 @@
 {
-  "name": "@axiomhq/vercel-next",
-  "description": "Send Web-Vitals from Vercel to Axiom.",
+  "name": "next-axiom",
+  "description": "Send WebVitals from your Next.js project to Axiom.",
   "version": "0.4.0",
   "author": "Axiom, Inc.",
   "license": "MIT",
@@ -22,7 +22,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/axiomhq/vercel-next.git"
+    "url": "git+https://github.com/axiomhq/next-axiom.git"
   },
   "keywords": [
     "web-vitals",
@@ -32,9 +32,9 @@
     "nextjs"
   ],
   "bugs": {
-    "url": "https://github.com/axiomhq/vercel-next/issues"
+    "url": "https://github.com/axiomhq/next-axiom/issues"
   },
-  "homepage": "https://github.com/axiomhq/vercel-next#readme",
+  "homepage": "https://github.com/axiomhq/next-axiom#readme",
   "peerDependencies": {
     "next": "^12.1.4"
   },
