@@ -4,7 +4,7 @@ const _debounce = require('lodash/debounce');
 
 export declare type WebVitalsMetric = NextWebVitalsMetric & { route: string };
 
-export function withAxiomProxy(nextConfig: NextConfig): NextConfig {
+export function withAxiom(nextConfig: NextConfig): NextConfig {
   return {
     ...nextConfig,
     rewrites: async () => {

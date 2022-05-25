@@ -8,12 +8,12 @@ Send Web-Vitals from Vercel to [Axiom](https://axiom.co).
 
 1. Make sure you have the [Axiom Vercel integration](https://www.axiom.co/vercel) installed
 2. In your Vercel project, run `npm install --save next-axiom`
-3. Wrap your NextJS config in `withAxiomProxy` like this in `next.config.js`:
+3. Wrap your NextJS config in `withAxiom` like this in `next.config.js`:
 
 ```js
-const { withAxiomProxy } = require('next-axiom');
+const { withAxiom } = require('next-axiom');
 
-module.exports = withAxiomProxy({
+module.exports = withAxiom({
   // ... your existing config
 })
 ```
