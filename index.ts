@@ -37,14 +37,12 @@ export function withAxiom(nextConfig: NextConfig): NextConfig {
 const debounceSendMetrics = _debounce(() => sendMetrics(), 1000);
 let collectedMetrics: WebVitalsMetric[] = [];
 
-// Usage:
-// export { reportWebVitals } from "@axiomhq/web-vitals";
 export function reportWebVitals(metric: NextWebVitalsMetric) {
   collectedMetrics.push({ route: window.__NEXT_DATA__?.page, ...metric });
   debounceSendMetrics();
 }
 
-export function sendMetrics() {
+function sendMetrics() {
   const url = '/axiom/web-vitals';
   const body = JSON.stringify({
     webVitals: collectedMetrics,
