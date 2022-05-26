@@ -16,8 +16,8 @@
   "scripts": {
     "build": "tsc",
     "prepare": "npm run build",
-    "format": "prettier --write index.ts __tests__/*.ts",
-    "check-format": "prettier -c index.ts __tests__/*.ts",
+    "format": "prettier --write index.ts logger.ts __tests__/*.ts",
+    "check-format": "prettier -c index.ts logger.ts __tests__/*.ts",
     "test": "jest"
   },
   "repository": {
@@ -49,6 +49,7 @@
     "typescript": "^4.6.4"
   },
   "dependencies": {
+    "cross-fetch": "^3.1.5",
     "lodash": "^4.17.21"
   }
 }

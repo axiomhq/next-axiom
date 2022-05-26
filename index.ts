@@ -1,5 +1,6 @@
 import { NextConfig } from 'next';
 import { NextWebVitalsMetric } from 'next/app';
+export { log } from './logger';
 const _debounce = require('lodash/debounce');
 
 export declare type WebVitalsMetric = NextWebVitalsMetric & { route: string };
@@ -48,7 +49,7 @@ function sendMetrics() {
     webVitals: collectedMetrics,
   });
 
-  if (navigator.sendBeacon) {
+  if (typeof window !== 'undefined' && navigator.sendBeacon) {
     navigator.sendBeacon(url, body);
   } else {
     fetch(url, { body, method: 'POST', keepalive: true });
