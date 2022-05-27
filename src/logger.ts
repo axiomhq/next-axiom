@@ -9,8 +9,6 @@ let collectedLogs: any[] = [];
 
 function _log(level: string, message: string, args: any = {}) {
   const l = { level, message, ...args };
-  // TODO: print to console?
-  console.log(l);
   collectedLogs.push(l);
   debouncedSendLogs();
 }

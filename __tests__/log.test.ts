@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 jest.mock('cross-fetch');
-import { log } from '../logger';
+import { log } from '../src/logger';
 import fetch from 'cross-fetch';
 
 jest.useFakeTimers();

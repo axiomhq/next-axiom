@@ -4,7 +4,7 @@
 
 import { jest } from '@jest/globals';
 import { NextWebVitalsMetric } from 'next/app';
-import { reportWebVitals } from '../index';
+import { reportWebVitals } from '../src/webVitals';
 
 global.fetch = jest.fn() as jest.Mock;
 jest.useFakeTimers();

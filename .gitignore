@@ -1,6 +1,7 @@
 /node_modules
 /tsconfig.tsbuildinfo
-/index.d.ts
-/index.js
-/index.js.map
+/src/*.d.ts
+/src/*.js
+/src/*.js.map
+/dist/
 /.vscode
