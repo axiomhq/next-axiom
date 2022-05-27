@@ -1,15 +1,15 @@
 /**
- * @jest-environment jsdom
+ * @jest-environment node
  */
 jest.mock('cross-fetch');
 import { log } from '../src/logger';
-import { getIngestURL, EndpointType } from '../src/config';
 import fetch from 'cross-fetch';
+import { EndpointType, getIngestURL } from '../src/config';
 
 jest.useFakeTimers();
 const url = getIngestURL(EndpointType.log);
 
-test('logging', async () => {
+test('logging in node env', async () => {
   log.info('hello, world!');
   log.debug('testing if this will work', { foo: 'bar', answer: 42 });
   expect(fetch).toBeCalledTimes(0);

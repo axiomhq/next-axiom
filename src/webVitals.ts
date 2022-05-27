@@ -1,5 +1,6 @@
 import { NextConfig } from 'next';
 import { NextWebVitalsMetric } from 'next/app';
+import { EndpointType, getIngestURL } from './config';
 export { log } from './logger';
 const _debounce = require('lodash/debounce');
 
@@ -11,7 +12,7 @@ export function withAxiom(nextConfig: NextConfig): NextConfig {
     rewrites: async () => {
       const rewrites = await nextConfig.rewrites?.();
 
-      const ingestEndpoint = process.env.AXIOM_INGEST_ENDPOINT || process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT;
+      const ingestEndpoint = getIngestURL(EndpointType.webVitals);
       if (!ingestEndpoint) {
         return rewrites || []; // nothing to do
       }
