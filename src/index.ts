@@ -9,15 +9,20 @@ export function withAxiom(nextConfig: NextConfig): NextConfig {
     rewrites: async () => {
       const rewrites = await nextConfig.rewrites?.();
 
-      const ingestEndpoint = getIngestURL(EndpointType.webVitals);
-      if (!ingestEndpoint) {
+      const webVitalsEndpoint = getIngestURL(EndpointType.webVitals);
+      const logsEndpoint = getIngestURL(EndpointType.log);
+      if (!webVitalsEndpoint) {
         return rewrites || []; // nothing to do
       }
 
       const axiomRewrites = [
         {
           source: '/axiom/web-vitals',
-          destination: ingestEndpoint,
+          destination: webVitalsEndpoint,
+        },
+        {
+          source: '/axiom/logs',
+          destination: logsEndpoint,
         },
       ];
 

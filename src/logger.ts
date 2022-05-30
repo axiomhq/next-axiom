@@ -1,8 +1,5 @@
 import fetch from 'cross-fetch';
-import { getIngestURL, EndpointType } from './config';
 const _debounce = require('lodash/debounce');
-
-const ingestEndpoint = getIngestURL(EndpointType.log);
 
 const debouncedSendLogs = _debounce(() => sendLogs(), 1000);
 
@@ -22,12 +19,13 @@ export const log = {
 };
 
 function sendLogs() {
+  const url = '/axiom/logs';
   const body = JSON.stringify(collectedLogs);
 
   if (typeof window !== 'undefined' && navigator.sendBeacon) {
-    navigator.sendBeacon(ingestEndpoint, body);
+    navigator.sendBeacon(url, body);
   } else {
-    fetch(ingestEndpoint, { body, method: 'POST', keepalive: true });
+    fetch(url, { body, method: 'POST', keepalive: true });
   }
   // clear collected logs
   collectedLogs = [];

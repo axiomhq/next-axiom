@@ -3,13 +3,12 @@
  */
 jest.mock('cross-fetch');
 import { log } from '../src/logger';
-import { getIngestURL, EndpointType } from '../src/config';
 import fetch from 'cross-fetch';
 
 jest.useFakeTimers();
-const url = getIngestURL(EndpointType.log);
 
 test('logging', async () => {
+  const url = '/axiom/logs';
   const time = new Date(Date.now()).toISOString();
   log.info('hello, world!', { _time: time });
   log.debug('testing if this will work', { foo: 'bar', answer: 42, _time: time });
