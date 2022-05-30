@@ -10,8 +10,9 @@ jest.useFakeTimers();
 const url = getIngestURL(EndpointType.log);
 
 test('logging', async () => {
-  log.info('hello, world!');
-  log.debug('testing if this will work', { foo: 'bar', answer: 42 });
+  const time = new Date(Date.now()).toISOString();
+  log.info('hello, world!', { _time: time });
+  log.debug('testing if this will work', { foo: 'bar', answer: 42, _time: time });
   expect(fetch).toBeCalledTimes(0);
 
   jest.advanceTimersByTime(1000);
@@ -19,8 +20,8 @@ test('logging', async () => {
 
   expect(fetch).toHaveBeenCalledWith(url, {
     body: JSON.stringify([
-      { level: 'info', message: 'hello, world!', _time: '' },
-      { level: 'debug', message: 'testing if this will work', foo: 'bar', answer: 42, _time: '' },
+      { level: 'info', message: 'hello, world!', _time: time },
+      { level: 'debug', message: 'testing if this will work', foo: 'bar', answer: 42, _time: time },
     ]),
     method: 'POST',
     keepalive: true,
