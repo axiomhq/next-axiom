@@ -11,7 +11,7 @@ export function withAxiom(nextConfig: NextConfig): NextConfig {
 
       const webVitalsEndpoint = getIngestURL(EndpointType.webVitals);
       const logsEndpoint = getIngestURL(EndpointType.log);
-      if (!webVitalsEndpoint) {
+      if (!webVitalsEndpoint && !logsEndpoint) {
         return rewrites || []; // nothing to do
       }
 
