@@ -1,6 +1,6 @@
 export enum EndpointType {
   webVitals = 'web-vitals',
-  log = 'log',
+  logs = 'logs',
 }
 
 export const getIngestURL = (t: EndpointType) => {

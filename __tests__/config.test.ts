@@ -5,6 +5,6 @@ test('reading ingest endpoint', () => {
   let url = getIngestURL(EndpointType.webVitals);
   expect(url).toEqual('https://axiom.co/api/test?type=web-vitals');
 
-  url = getIngestURL(EndpointType.log);
-  expect(url).toEqual('https://axiom.co/api/test?type=log');
+  url = getIngestURL(EndpointType.logs);
+  expect(url).toEqual('https://axiom.co/api/test?type=logs');
 });
