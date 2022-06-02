@@ -20,9 +20,28 @@ module.exports = withAxiom({
 
 This will proxy the Axiom ingest call to improve deliverability.
 
-4. Go to `pages/_app.js` or `pages/_app.ts` and add the following line:
+## Reporting WebVitals
+
+1. Go to `pages/_app.js` or `pages/_app.ts` and add the following line:
 ```js
 export { reportWebVitals } from 'next-axiom';
 ```
 
-5. Deploy your site and watch data coming into your Axiom dashboard
+## Sending Logs
+
+1. Import Axiom's logger
+
+```js
+import { log } from 'next-axiom';
+```
+
+2. Use the logger to send logs to Axiom, you can attach
+other metadata to your logs by passing them as parameters:
+```js
+log.info('hello, world!')
+log.debug('debugging information', {foo: 'bar', x: 'y'})
+log.warn('be careful!')
+log.error('ops!')
+```
+
+Deploy your site and watch data coming into your Axiom dashboard
