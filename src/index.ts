@@ -10,7 +10,9 @@ export function withAxiom(nextConfig: NextConfig): NextConfig {
       const rewrites = await nextConfig.rewrites?.();
 
       const webVitalsEndpoint = getIngestURL(EndpointType.webVitals);
+      console.log(webVitalsEndpoint);
       const logsEndpoint = getIngestURL(EndpointType.logs);
+      console.log(logsEndpoint);
       if (!webVitalsEndpoint && !logsEndpoint) {
         return rewrites || []; // nothing to do
       }

@@ -6,7 +6,10 @@ const debouncedSendLogs = _debounce(() => sendLogs(), 1000);
 let collectedLogs: any[] = [];
 
 function _log(level: string, message: string, args: any = {}) {
-  const l = { level, message, ...args, _time: new Date(Date.now()).toISOString() };
+  const l = { level, message, _time: new Date(Date.now()).toISOString() };
+  if (Object.keys(args).length > 0) {
+    l['fields'] = args;
+  }
   collectedLogs.push(l);
   debouncedSendLogs();
 }
