@@ -18,19 +18,19 @@ export const log = {
   error: (message: string, args: any = {}) => _log('error', message, args),
 };
 
-async function sendLogs() {
+function sendLogs() {
   let url = '/axiom/logs';
   // check if running in nodejs and add baseURL so that
   // fetch works correctly
   const isBrowser = typeof window !== 'undefined'
   if (!isBrowser) {
-    url = getIngestURL(EndpointType.logs);
+    url = getIngestURL(EndpointType.logs) + '&projectId=2479f8a6-031a-4582-8ca7-a6b2aa7bf82d&configurationId=icfg_3WhrV6ICara11U1rkAU8aQ26';
   }
   const body = JSON.stringify(collectedLogs);
 
   if (isBrowser && navigator.sendBeacon) {
     navigator.sendBeacon(url, body);
   } else {
-    await fetch(url, { body, method: 'POST', keepalive: true });
+    fetch(url, { body, method: 'POST', keepalive: true });
   }
 }
