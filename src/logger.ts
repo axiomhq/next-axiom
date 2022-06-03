@@ -4,10 +4,11 @@ import { EndpointType, getIngestURL } from './config';
 let collectedLogs: any[] = [];
 
 function _log(level: string, message: string, args: any = {}) {
-  const l = { level, message, _time: new Date(Date.now()).toISOString() };
+  const logEvent = { level, message, _time: new Date(Date.now()).toISOString() };
   if (Object.keys(args).length > 0) {
-    l['fields'] = args;
+    logEvent['fields'] = args;
   }
+  collectedLogs.push(logEvent);
   sendLogs();
 }
 
