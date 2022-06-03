@@ -9,11 +9,8 @@ export function withAxiom(nextConfig: NextConfig): NextConfig {
     rewrites: async () => {
       const rewrites = await nextConfig.rewrites?.();
 
-      const debug = '&projectId=2479f8a6-031a-4582-8ca7-a6b2aa7bf82d&configurationId=icfg_3WhrV6ICara11U1rkAU8aQ26';
       const webVitalsEndpoint = getIngestURL(EndpointType.webVitals);
-      console.log(webVitalsEndpoint);
-      const logsEndpoint = getIngestURL(EndpointType.logs) + debug;
-      console.log(logsEndpoint);
+      const logsEndpoint = getIngestURL(EndpointType.logs);
       if (!webVitalsEndpoint && !logsEndpoint) {
         return rewrites || []; // nothing to do
       }

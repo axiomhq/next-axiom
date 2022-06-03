@@ -24,7 +24,7 @@ function sendLogs() {
   // fetch works correctly
   const isBrowser = typeof window !== 'undefined'
   if (!isBrowser) {
-    url = getIngestURL(EndpointType.logs) + '&projectId=2479f8a6-031a-4582-8ca7-a6b2aa7bf82d&configurationId=icfg_3WhrV6ICara11U1rkAU8aQ26';
+    url = getIngestURL(EndpointType.logs);
   }
   const body = JSON.stringify(collectedLogs);
 
