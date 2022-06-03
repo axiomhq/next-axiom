@@ -1,8 +1,5 @@
 import fetch from 'cross-fetch';
 import { EndpointType, getIngestURL } from './config';
-const _debounce = require('lodash/debounce');
-
-const debouncedSendLogs = _debounce(() => sendLogs(), 1000);
 
 let collectedLogs: any[] = [];
 
@@ -11,8 +8,7 @@ function _log(level: string, message: string, args: any = {}) {
   if (Object.keys(args).length > 0) {
     l['fields'] = args;
   }
-  collectedLogs.push(l);
-  debouncedSendLogs();
+  sendLogs();
 }
 
 export const log = {
@@ -26,16 +22,15 @@ async function sendLogs() {
   let url = '/axiom/logs';
   // check if running in nodejs and add baseURL so that
   // fetch works correctly
-  if (typeof window !== "object") {
+  const isBrowser = typeof window !== 'undefined'
+  if (!isBrowser) {
     url = getIngestURL(EndpointType.logs);
   }
   const body = JSON.stringify(collectedLogs);
 
-  if (typeof window !== 'undefined' && navigator.sendBeacon) {
+  if (isBrowser && navigator.sendBeacon) {
     navigator.sendBeacon(url, body);
   } else {
     await fetch(url, { body, method: 'POST', keepalive: true });
   }
-  // clear collected logs
-  collectedLogs = [];
 }
