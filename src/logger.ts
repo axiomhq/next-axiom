@@ -1,4 +1,3 @@
-import fetch from 'cross-fetch';
 import { EndpointType, getIngestURL } from './config';
 
 async function _log(level: string, message: string, args: any = {}) {
@@ -16,7 +15,10 @@ async function _log(level: string, message: string, args: any = {}) {
   }
   const body = JSON.stringify([logEvent]);
 
-  if (isBrowser && navigator.sendBeacon) {
+  if (!isBrowser) {
+    const fetch = await require('node-fetch');
+    await fetch(url, { body, method: 'POST', keepalive: true });
+  } else if (isBrowser && navigator.sendBeacon) {
     navigator.sendBeacon(url, body);
   } else {
     await fetch(url, { body, method: 'POST', keepalive: true });
