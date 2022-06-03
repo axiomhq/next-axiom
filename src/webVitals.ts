@@ -13,7 +13,7 @@ export function reportWebVitals(metric: NextWebVitalsMetric) {
 }
 
 function sendMetrics() {
-  const url = '/axiom/web-vitals';
+  const url = '/_axiom/web-vitals';
   const body = JSON.stringify({
     webVitals: collectedMetrics,
   });

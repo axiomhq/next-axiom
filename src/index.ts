@@ -20,11 +20,11 @@ export function withAxiom(nextConfig: NextConfig): NextConfig {
 
       const axiomRewrites = [
         {
-          source: '/axiom/web-vitals',
+          source: '/_axiom/web-vitals',
           destination: webVitalsEndpoint,
         },
         {
-          source: '/axiom/logs',
+          source: '/_axiom/logs',
           destination: logsEndpoint,
         },
       ];

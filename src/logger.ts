@@ -19,7 +19,7 @@ export const log = {
 };
 
 function sendLogs() {
-  let url = '/axiom/logs';
+  let url = '/_axiom/logs';
   // check if running in nodejs and add baseURL so that
   // fetch works correctly
   const isBrowser = typeof window !== 'undefined'
