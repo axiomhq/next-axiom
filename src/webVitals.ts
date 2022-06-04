@@ -1,5 +1,9 @@
 import { NextWebVitalsMetric } from 'next/app';
+import { isBrowser, proxyPath } from './config';
+
 export { log } from './logger';
+
+const url = `${proxyPath}/web-vitals`;
 const _debounce = require('lodash/debounce');
 
 export declare type WebVitalsMetric = NextWebVitalsMetric & { route: string };
@@ -13,16 +17,15 @@ export function reportWebVitals(metric: NextWebVitalsMetric) {
 }
 
 function sendMetrics() {
-  const url = '/_axiom/web-vitals';
   const body = JSON.stringify({
     webVitals: collectedMetrics,
   });
 
-  if (typeof window !== 'undefined' && navigator.sendBeacon) {
+  if (isBrowser && navigator.sendBeacon) {
     navigator.sendBeacon(url, body);
   } else {
     fetch(url, { body, method: 'POST', keepalive: true });
   }
-  // clear collectedMetrics
+
   collectedMetrics = [];
 }

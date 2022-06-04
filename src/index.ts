@@ -1,5 +1,5 @@
 import { NextConfig } from 'next';
-import { EndpointType, getIngestURL } from './config';
+import { proxyPath, EndpointType, getIngestURL } from './config';
 export { reportWebVitals } from './webVitals';
 export { log } from './logger';
 
@@ -17,11 +17,11 @@ export function withAxiom(nextConfig: NextConfig): NextConfig {
 
       const axiomRewrites = [
         {
-          source: '/_axiom/web-vitals',
+          source: `${proxyPath}/web-vitals`,
           destination: webVitalsEndpoint,
         },
         {
-          source: '/_axiom/logs',
+          source: `${proxyPath}/logs`,
           destination: logsEndpoint,
         },
       ];
