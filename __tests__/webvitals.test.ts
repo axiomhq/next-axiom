@@ -34,7 +34,7 @@ test('debounce sendMetrics', async () => {
   metricsMatrix[2].forEach(reportWebVitals);
   jest.advanceTimersByTime(1000);
 
-  const url = '/axiom/web-vitals';
+  const url = '/_axiom/web-vitals';
   const payload = { method: 'POST', keepalive: true };
 
   expect(fetch).toHaveBeenCalledTimes(2);

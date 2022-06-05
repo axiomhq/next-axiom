@@ -14,8 +14,8 @@ async function _log(level: string, message: string, args: any = {}) {
   }
   const body = JSON.stringify([logEvent]);
 
-  if (typeof window === 'undefined') {
-    const fetch = await require('node-fetch');
+  if (typeof fetch === 'undefined') {
+    const fetch = await require('cross-fetch');
     await fetch(url, { body, method: 'POST', keepalive: true });
   } else if (isBrowser && navigator.sendBeacon) {
     navigator.sendBeacon(url, body);
