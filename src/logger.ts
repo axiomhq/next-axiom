@@ -3,6 +3,11 @@ import { proxyPath, isBrowser, EndpointType, getIngestURL } from './config';
 const url = isBrowser ? `${proxyPath}/logs` : getIngestURL(EndpointType.logs);
 
 async function _log(level: string, message: string, args: any = {}) {
+  if (!url) {
+    console.warn('axiom: NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT is not defined');
+    return;
+  }
+
   const logEvent = { level, message, _time: new Date(Date.now()).toISOString() };
   if (Object.keys(args).length > 0) {
     logEvent['fields'] = args;
