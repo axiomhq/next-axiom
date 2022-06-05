@@ -9,7 +9,7 @@ async function _log(level: string, message: string, args: any = {}) {
   }
   const body = JSON.stringify([logEvent]);
 
-  if (typeof fetch === 'undefined') {
+  if (typeof window === 'undefined') {
     const fetch = await require('node-fetch');
     await fetch(url, { body, method: 'POST', keepalive: true });
   } else if (isBrowser && navigator.sendBeacon) {
