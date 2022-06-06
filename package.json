@@ -1,7 +1,7 @@
 {
   "name": "next-axiom",
   "description": "Send WebVitals from your Next.js project to Axiom.",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "author": "Axiom, Inc.",
   "license": "MIT",
   "contributors": [
@@ -11,13 +11,13 @@
   "engines": {
     "node": ">=15"
   },
-  "main": "index.js",
-  "types": "index.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
     "prepare": "npm run build",
-    "format": "prettier --write index.ts __tests__/*.ts",
-    "check-format": "prettier -c index.ts __tests__/*.ts",
+    "format": "prettier --write src/*.ts __tests__/*.ts",
+    "check-format": "prettier -c src/*.ts __tests__/*.ts",
     "test": "jest"
   },
   "repository": {
@@ -49,6 +49,7 @@
     "typescript": "^4.6.4"
   },
   "dependencies": {
+    "cross-fetch": "^3.1.5",
     "lodash": "^4.17.21"
   }
 }

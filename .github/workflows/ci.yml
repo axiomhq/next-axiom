@@ -16,6 +16,8 @@ jobs:
   unittests:
     name: Check Tests
     runs-on: ubuntu-latest
+    env:
+      AXIOM_INGEST_ENDPOINT: https://example.co/api/test
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
