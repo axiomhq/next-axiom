@@ -1,8 +1,11 @@
 import { proxyPath, isBrowser, EndpointType, getIngestURL } from './config';
+import { debounce } from './debounce';
 
 const url = isBrowser ? `${proxyPath}/logs` : getIngestURL(EndpointType.logs);
+const debouncedSendLogs = debounce(sendLogs, 1000);
+let logEvents: any[] = [];
 
-async function _log(level: string, message: string, args: any = {}) {
+function _log(level: string, message: string, args: any = {}) {
   if (!url) {
     console.warn('axiom: NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT is not defined');
     return;
@@ -12,21 +15,35 @@ async function _log(level: string, message: string, args: any = {}) {
   if (Object.keys(args).length > 0) {
     logEvent['fields'] = args;
   }
-  const body = JSON.stringify([logEvent]);
 
-  if (typeof fetch === 'undefined') {
-    const fetch = await require('cross-fetch');
-    await fetch(url, { body, method: 'POST', keepalive: true });
-  } else if (isBrowser && navigator.sendBeacon) {
-    navigator.sendBeacon(url, body);
-  } else {
-    await fetch(url, { body, method: 'POST', keepalive: true });
+  // if is running on node, print to stdout, output will be pickedup with vercel
+  // otherwise send as json
+  if (!isBrowser) {
+    const body = JSON.stringify(logEvent);
+    console.log('AXIOM::LOG=' + body);
+    return;
   }
+
+  logEvents.push(logEvent);
+  debouncedSendLogs();
 }
 
 export const log = {
-  debug: async (message: string, args: any = {}) => await _log('debug', message, args),
-  info: async (message: string, args: any = {}) => await _log('info', message, args),
-  warn: async (message: string, args: any = {}) => await _log('warn', message, args),
-  error: async (message: string, args: any = {}) => await _log('error', message, args),
+  debug: (message: string, args: any = {}) => _log('debug', message, args),
+  info: (message: string, args: any = {}) => _log('info', message, args),
+  warn: (message: string, args: any = {}) => _log('warn', message, args),
+  error: (message: string, args: any = {}) => _log('error', message, args),
 };
+
+function sendLogs() {
+  const body = JSON.stringify(logEvents);
+
+  if (isBrowser && navigator.sendBeacon) {
+    navigator.sendBeacon(url, body);
+  } else {
+    fetch(url, { body, method: 'POST', keepalive: true });
+  }
+
+  // clear logs after they are pushed
+  logEvents = [];
+}
