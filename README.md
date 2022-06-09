@@ -46,4 +46,5 @@ log.error('oops!')
 Deploy your site and watch data coming into your Axiom dataset.
 
 :warning: If you log from a function, please call `await log.flush()` at the end
-to ensure log delivery.
+to ensure log delivery. When using a middleware, run `ev.waitUntil(log.flush())`
+instead.
