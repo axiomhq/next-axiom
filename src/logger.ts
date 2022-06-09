@@ -1,6 +1,6 @@
 require('isomorphic-fetch');
-import { proxyPath, isBrowser, EndpointType, getIngestURL } from './config';
-import { debounce } from './debounce';
+import { proxyPath, isBrowser, EndpointType, getIngestURL } from './shared';
+import { debounce } from './shared';
 
 const url = isBrowser ? `${proxyPath}/logs` : getIngestURL(EndpointType.logs);
 const debouncedSendLogs = debounce(sendLogs, 1000);
@@ -16,13 +16,13 @@ if (!isBrowser) {
 
   process.on('exit', async () => {
     if (logEvents.length == 0) {
-      console.warn('process.exit() was called with pending logs, to ensure delivery, call await log.flush()');
+      console.warn('axiom: process.exit() was called with pending logs. To ensure delivery, call `await log.flush()`');
     }
   });
 
   // ensure that beforeExit is called
-  process.on('SIGINT', () => {});
-  process.on('SIGTERM', () => {});
+  process.on('SIGINT', () => { });
+  process.on('SIGTERM', () => { });
 }
 
 function _log(level: string, message: string, args: any = {}) {
@@ -50,9 +50,9 @@ export const log = {
 
 async function sendLogs() {
   if (!logEvents.length) {
-    console.warn('no pending logs');
     return;
   }
+
   const body = JSON.stringify(logEvents);
 
   if (isBrowser && navigator.sendBeacon) {

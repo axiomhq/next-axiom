@@ -1,6 +1,6 @@
 import { NextWebVitalsMetric } from 'next/app';
-import { isBrowser, proxyPath } from './config';
-import { debounce } from './debounce';
+import { isBrowser, proxyPath } from './shared';
+import { debounce } from './shared';
 
 export { log } from './logger';
 

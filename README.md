@@ -45,10 +45,6 @@ log.error('oops!')
 
 Deploy your site and watch data coming into your Axiom dashboard.
 
-The log functions are asynchoronus functions, to ensure delivery of the logs
-make sure to flush them (e.g: when running on serverless/edge functions)
-by calling
-
-```js
-await log.flush()
-```
+Logs will be sent automatically on successful exit. 
+If you call `process.exit()` or throw an exception, make sure to call 
+`await log.flush()` first to ensure delivery.
