@@ -1,4 +1,4 @@
-import { getIngestURL, EndpointType } from '../src/config';
+import { getIngestURL, EndpointType } from '../src/shared';
 
 test('reading ingest endpoint', () => {
   process.env.AXIOM_INGEST_ENDPOINT = 'https://axiom.co/api/test';
