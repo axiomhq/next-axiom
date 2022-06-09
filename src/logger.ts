@@ -21,8 +21,8 @@ if (!isBrowser) {
   });
 
   // ensure that beforeExit is called
-  process.on('SIGINT', () => { });
-  process.on('SIGTERM', () => { });
+  process.on('SIGINT', () => {});
+  process.on('SIGTERM', () => {});
 }
 
 function _log(level: string, message: string, args: any = {}) {

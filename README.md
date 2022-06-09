@@ -43,7 +43,7 @@ log.warn('be careful!')
 log.error('oops!')
 ```
 
-Deploy your site and watch data coming into your Axiom dashboard.
+Deploy your site and watch data coming into your Axiom dataset.
 
 Logs will be sent automatically on successful exit. 
 If you call `process.exit()` or throw an exception, make sure to call 
