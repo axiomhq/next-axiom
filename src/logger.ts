@@ -25,9 +25,7 @@ export const log = {
   info: (message: string, args: any = {}) => _log('info', message, args),
   warn: (message: string, args: any = {}) => _log('warn', message, args),
   error: (message: string, args: any = {}) => _log('error', message, args),
-  flush: async () => {
-    await sendLogs();
-  },
+  flush: sendLogs,
 };
 
 async function sendLogs() {
