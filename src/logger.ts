@@ -26,7 +26,7 @@ export const log = {
   warn: (message: string, args: any = {}) => _log('warn', message, args),
   error: (message: string, args: any = {}) => _log('error', message, args),
   flush: async () => {
-    await sendLogs()
+    await sendLogs();
   },
 };
 
@@ -51,6 +51,6 @@ async function sendLogs() {
       await fetch(url, { body, method, keepalive });
     }
   } catch (e) {
-    console.error(`Failed to send logs to Axiom: ${e}`)
+    console.error(`Failed to send logs to Axiom: ${e}`);
   }
 }
