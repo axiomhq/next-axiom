@@ -1,3 +1,4 @@
+require('isomorphic-fetch');
 import { proxyPath, isBrowser, EndpointType, getIngestURL } from './config';
 import { debounce } from './debounce';
 
@@ -9,14 +10,14 @@ let logEvents: any[] = [];
 // otherwise send as json.
 if (!isBrowser) {
   process.on('beforeExit', async () => {
-    await sendLogs()
-    process.exit(0) // if you don't close yourself this will run forever
+    await sendLogs();
+    process.exit(0); // if you don't close yourself this will run forever
   });
 
   ['SIGINT', 'SIGTERM'].forEach(function (sig) {
     process.on(sig, function () {
-        debounce(sendLogs, 0);
-        console.log('signal: ' + sig);
+      debounce(sendLogs, 0);
+      console.log('signal: ' + sig);
     });
   });
 }
@@ -44,7 +45,7 @@ export const log = {
 };
 
 async function sendLogs() {
-  if (!logEvents.length) { 
+  if (!logEvents.length) {
     return;
   }
   const body = JSON.stringify(logEvents);
