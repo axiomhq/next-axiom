@@ -7,7 +7,7 @@ let logEvents: any[] = [];
 
 // if is running on node, print to stdout, output will be pickedup with vercel
 // otherwise send as json.
-if (!isBrowser) {
+if (!isBrowser && typeof process.on === 'function') {
   process.on('beforeExit', async () => {
     await log.flush();
     process.exit(0); // if you don't close yourself this will run forever
