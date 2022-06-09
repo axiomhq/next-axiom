@@ -4,6 +4,7 @@ import { debounce } from './shared';
 const url = isBrowser ? `${proxyPath}/logs` : getIngestURL(EndpointType.logs);
 const debouncedSendLogs = debounce(sendLogs, 1000);
 let logEvents: any[] = [];
+const promises: Promise<any>[] = [];
 
 // if is running on node, print to stdout, output will be pickedup with vercel
 // otherwise send as json.
@@ -44,7 +45,10 @@ export const log = {
   info: (message: string, args: any = {}) => _log('info', message, args),
   warn: (message: string, args: any = {}) => _log('warn', message, args),
   error: (message: string, args: any = {}) => _log('error', message, args),
-  flush: async () => await sendLogs(),
+  flush: async () => {
+    await sendLogs()
+    await Promise.all(promises);
+  },
 };
 
 async function sendLogs() {
@@ -61,7 +65,7 @@ async function sendLogs() {
   try {
     if (typeof fetch === 'undefined') {
       const fetch = await require('cross-fetch');
-      await fetch(url, { body, method, keepalive });
+      promises.push(fetch(url, { body, method, keepalive }));
     } else if (isBrowser && navigator.sendBeacon) {
       navigator.sendBeacon(url, body);
     } else {
