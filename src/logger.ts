@@ -52,17 +52,23 @@ async function sendLogs() {
     return;
   }
 
+  const method = 'POST';
+  const keepalive = true;
   const body = JSON.stringify(logEvents);
 
-  if (typeof fetch === 'undefined') {
-    const fetch = await require('cross-fetch');
-    await fetch(url, { body, method: 'POST', keepalive: true });
-  } else if (isBrowser && navigator.sendBeacon) {
-    navigator.sendBeacon(url, body);
-  } else {
-    await fetch(url, { body, method: 'POST', keepalive: true });
-  }
+  try {
+    if (typeof fetch === 'undefined') {
+      const fetch = await require('cross-fetch');
+      await fetch(url, { body, method, keepalive });
+    } else if (isBrowser && navigator.sendBeacon) {
+      navigator.sendBeacon(url, body);
+    } else {
+      await fetch(url, { body, method, keepalive });
+    }
 
-  // clear logs after they are pushed
-  logEvents = [];
+    // clear logs after they are pushed
+    logEvents = [];
+  } catch (e) {
+    console.error(`Failed to send logs to Axiom: ${e}`)
+  }
 }
