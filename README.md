@@ -43,11 +43,7 @@ log.warn('be careful!')
 log.error('oops!')
 ```
 
-Deploy your site and watch data coming into your Axiom dashboard.
+Deploy your site and watch data coming into your Axiom dataset.
 
-The log functions are asynchoronus functions, make sure to wait for them
-when its appropriate, like when running on serverless/edge functions:
-
-```js
-await log.info('function will wait for the log to be sent')
-```
+:warning: If you log from a function, please call `await log.flush()` at the end
+to ensure log delivery.

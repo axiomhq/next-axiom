@@ -2,6 +2,6 @@
 import { log } from 'next-axiom'
 
 export default async function handler(req, res) {
-  await log.info('Hello from function', { url: req.url });
+  log.info('Hello from function', { url: req.url });
   res.status(200).json({ name: 'John Doe' })
 }

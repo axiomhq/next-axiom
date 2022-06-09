@@ -1,5 +1,5 @@
 import { NextConfig } from 'next';
-import { proxyPath, EndpointType, getIngestURL } from './config';
+import { proxyPath, EndpointType, getIngestURL } from './shared';
 export { reportWebVitals } from './webVitals';
 export { log } from './logger';
 
