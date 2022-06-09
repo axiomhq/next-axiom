@@ -10,7 +10,7 @@ const promises: Promise<any>[] = [];
 // otherwise send as json.
 if (!isBrowser) {
   process.on('beforeExit', async () => {
-    await sendLogs();
+    await log.flush();
     process.exit(0); // if you don't close yourself this will run forever
   });
 
