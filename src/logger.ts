@@ -55,6 +55,8 @@ async function sendLogs() {
   const method = 'POST';
   const keepalive = true;
   const body = JSON.stringify(logEvents);
+  // clear pending logs
+  logEvents = [];
 
   try {
     if (typeof fetch === 'undefined') {
@@ -65,9 +67,6 @@ async function sendLogs() {
     } else {
       await fetch(url, { body, method, keepalive });
     }
-
-    // clear logs after they are pushed
-    logEvents = [];
   } catch (e) {
     console.error(`Failed to send logs to Axiom: ${e}`)
   }
