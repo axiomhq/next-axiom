@@ -1,4 +1,3 @@
-require('isomorphic-fetch');
 import { proxyPath, isBrowser, EndpointType, getIngestURL } from './shared';
 import { debounce } from './shared';
 
@@ -21,8 +20,8 @@ if (!isBrowser) {
   });
 
   // ensure that beforeExit is called
-  process.on('SIGINT', () => {});
-  process.on('SIGTERM', () => {});
+  process.on('SIGINT', () => { });
+  process.on('SIGTERM', () => { });
 }
 
 function _log(level: string, message: string, args: any = {}) {
@@ -55,7 +54,10 @@ async function sendLogs() {
 
   const body = JSON.stringify(logEvents);
 
-  if (isBrowser && navigator.sendBeacon) {
+  if (typeof fetch === 'undefined') {
+    const fetch = await require('cross-fetch');
+    await fetch(url, { body, method: 'POST', keepalive: true });
+  } else if (isBrowser && navigator.sendBeacon) {
     navigator.sendBeacon(url, body);
   } else {
     await fetch(url, { body, method: 'POST', keepalive: true });
