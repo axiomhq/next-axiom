@@ -5,25 +5,6 @@ const url = isBrowser ? `${proxyPath}/logs` : getIngestURL(EndpointType.logs);
 const debouncedSendLogs = debounce(sendLogs, 1000);
 let logEvents: any[] = [];
 
-// if is running on node, print to stdout, output will be pickedup with vercel
-// otherwise send as json.
-if (!isBrowser && typeof process.on === 'function') {
-  process.on('beforeExit', async () => {
-    await log.flush();
-    process.exit(0); // if you don't close yourself this will run forever
-  });
-
-  process.on('exit', async () => {
-    if (logEvents.length == 0) {
-      console.warn('axiom: process.exit() was called with pending logs. To ensure delivery, call `await log.flush()`');
-    }
-  });
-
-  // ensure that beforeExit is called
-  process.on('SIGINT', () => { });
-  process.on('SIGTERM', () => { });
-}
-
 function _log(level: string, message: string, args: any = {}) {
   if (!url) {
     console.warn('axiom: NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT is not defined');
