@@ -2,7 +2,7 @@ import { log } from 'next-axiom'
 import useSWR from 'swr'
 
 export async function getStaticProps(context) {
-  await log.info('Hello from SSR', { context })
+  log.info('Hello from SSR', { context })
   return {
     props: {},
   }
@@ -10,7 +10,7 @@ export async function getStaticProps(context) {
 
 const fetcher = async (...args) => {
   console.log('Fetching', args)
-  await log.info('Hello from SWR', { args });
+  log.info('Hello from SWR', { args });
   const res = await fetch(...args);
   return await res.json();
 }
