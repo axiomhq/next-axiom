@@ -45,6 +45,5 @@ log.error('oops!')
 
 Deploy your site and watch data coming into your Axiom dataset.
 
-Logs will be sent automatically on successful exit. 
-If you call `process.exit()` or throw an exception, make sure to call 
-`await log.flush()` first to ensure delivery.
+:warning: If you log from a function, please call `await log.flush()` at the end
+to ensure log delivery.
