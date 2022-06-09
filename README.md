@@ -45,9 +45,10 @@ log.error('oops!')
 
 Deploy your site and watch data coming into your Axiom dashboard.
 
-The log functions are asynchoronus functions, make sure to wait for them
-when its appropriate, like when running on serverless/edge functions:
+The log functions are asynchoronus functions, to ensure delivery of the logs
+make sure to flush them (e.g: when running on serverless/edge functions)
+by calling
 
 ```js
-await log.info('function will wait for the log to be sent')
+await log.flush()
 ```

@@ -14,12 +14,15 @@ if (!isBrowser) {
     process.exit(0); // if you don't close yourself this will run forever
   });
 
-  ['SIGINT', 'SIGTERM'].forEach(function (sig) {
-    process.on(sig, function () {
-      debounce(sendLogs, 0);
-      console.log('signal: ' + sig);
-    });
+  process.on('exit', async () => {
+    if (logEvents.length == 0) {
+      console.warn('process.exit() was called with pending logs, to ensure delivery, call await log.flush()');
+    }
   });
+
+  // ensure that beforeExit is called
+  process.on('SIGINT', () => {});
+  process.on('SIGTERM', () => {});
 }
 
 function _log(level: string, message: string, args: any = {}) {
@@ -42,10 +45,12 @@ export const log = {
   info: (message: string, args: any = {}) => _log('info', message, args),
   warn: (message: string, args: any = {}) => _log('warn', message, args),
   error: (message: string, args: any = {}) => _log('error', message, args),
+  flush: async () => await sendLogs(),
 };
 
 async function sendLogs() {
   if (!logEvents.length) {
+    console.warn('no pending logs');
     return;
   }
   const body = JSON.stringify(logEvents);
