@@ -9,7 +9,7 @@ import { reportWebVitals } from '../src/webVitals';
 global.fetch = jest.fn() as jest.Mock;
 jest.useFakeTimers();
 
-test('debounce sendMetrics', async () => {
+test('throttled sendMetrics', async () => {
   let metricsMatrix: NextWebVitalsMetric[][] = [
     [
       { id: '1', startTime: 1234, value: 1, name: 'FCP', label: 'web-vital' },

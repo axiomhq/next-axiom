@@ -19,10 +19,23 @@ export const getIngestURL = (t: EndpointType) => {
   return url.toString();
 };
 
-export const debounce = (fn: Function, ms = 300) => {
-  let timeoutId: ReturnType<typeof setTimeout>;
-  return async function (this: any, ...args: any[]) {
-    clearTimeout(timeoutId);
-    timeoutId = setTimeout(async () => await fn.apply(this, args), ms);
+export const throttle = (fn: Function, wait: number) => {
+  let lastFn: ReturnType<typeof setTimeout>, lastTime: number;
+  return function (this: any) {
+    const context = this,
+      args = arguments;
+
+    // First call, set lastTime
+    if (lastTime == null) {
+      lastTime = Date.now();
+    }
+
+    clearTimeout(lastFn);
+    lastFn = setTimeout(() => {
+      if (Date.now() - lastTime >= wait) {
+        fn.apply(context, args);
+        lastTime = Date.now();
+      }
+    }, Math.max(wait - (Date.now() - lastTime), 0));
   };
 };

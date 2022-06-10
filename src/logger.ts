@@ -1,8 +1,8 @@
 import { proxyPath, isBrowser, EndpointType, getIngestURL } from './shared';
-import { debounce } from './shared';
+import { throttle } from './shared';
 
 const url = isBrowser ? `${proxyPath}/logs` : getIngestURL(EndpointType.logs);
-const debouncedSendLogs = debounce(sendLogs, 1000);
+const throttledSendLogs = throttle(sendLogs, 1000);
 let logEvents: any[] = [];
 
 function _log(level: string, message: string, args: any = {}) {
@@ -17,7 +17,7 @@ function _log(level: string, message: string, args: any = {}) {
   }
 
   logEvents.push(logEvent);
-  debouncedSendLogs();
+  throttledSendLogs();
 }
 
 export const log = {

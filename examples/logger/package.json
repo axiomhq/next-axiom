@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "next": "12.1.4",
-    "next-axiom": "github:axiomhq/next-axiom#main",
+    "next-axiom": "file:../../",
     "react": "18.0.0",
     "react-dom": "18.0.0",
     "swr": "^1.3.0"
