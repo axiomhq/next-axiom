@@ -1,4 +1,4 @@
-import { proxyPath, isBrowser, EndpointType, getIngestURL } from './shared';
+import { proxyPath, isBrowser, EndpointType, getIngestURL, isVercel } from './shared';
 import { throttle } from './shared';
 
 const url = isBrowser ? `${proxyPath}/logs` : getIngestURL(EndpointType.logs);
@@ -16,8 +16,13 @@ function _log(level: string, message: string, args: any = {}) {
     logEvent['fields'] = args;
   }
 
-  logEvents.push(logEvent);
-  throttledSendLogs();
+  if (isVercel) {
+    const body = JSON.stringify(logEvent);
+    console.log(`AXIOM::LOG=${body}`);
+  } else {
+    logEvents.push(logEvent);
+    throttledSendLogs();
+  }
 }
 
 export const log = {
