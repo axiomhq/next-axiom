@@ -29,20 +29,6 @@ export { reportWebVitals } from 'next-axiom';
 
 ## Sending Logs
 
-:warning: If you log from a function, please call `await log.flush()` at the end
-to ensure log delivery. When using a middleware, run `ev.waitUntil(log.flush())`
-instead.
-
-### Running on Vercel platform
-
-When you send logs from a function or middleware running on vercel platform, you don't have to the logs will be printed to stdout
-with a unique prefix `AXIOM::LOG=`, that allows Axiom to parse those structured logs as inteded. 
-
-Allowing the functiond to finish its work without waiting for the logs to be sent.
-
-:warning: If you log from a function running on vercel, no need to await or flush the logs. In case of vercel
-functions, the logs are **not** sent in async mode.
-
 1. Import Axiom's logger
 ```js
 import { log } from 'next-axiom';
@@ -58,3 +44,24 @@ log.error('oops!')
 ```
 
 Deploy your site and watch data coming into your Axiom dataset.
+
+
+## Flushing logs
+
+If your functions/backend are not running on Vercel platform, then you would have to flush the
+logs to ensure delivery.
+
+:warning: If you log from a function, please call `await log.flush()` at the end
+to ensure log delivery.
+
+:warning: When using a middleware, run `ev.waitUntil(log.flush())` instead.
+
+```js
+export default async function handler(req, res) {
+  log.info('Hello from function');
+  log.debug('current url', { url: req.url })
+  // flush logs to ensure delivery
+  await log.flush()
+  res.status(200).json({ name: 'John Doe' })
+}
+```
