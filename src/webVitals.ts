@@ -1,5 +1,5 @@
 import { NextWebVitalsMetric } from 'next/app';
-import { isBrowser, proxyPath } from './shared';
+import { isBrowser, proxyPath, isEnvVarsSet } from './shared';
 import { throttle } from './shared';
 
 export { log } from './logger';
@@ -13,6 +13,11 @@ let collectedMetrics: WebVitalsMetric[] = [];
 
 export function reportWebVitals(metric: NextWebVitalsMetric) {
   collectedMetrics.push({ route: window.__NEXT_DATA__?.page, ...metric });
+  // if Axiom env vars are not set, do nothing,
+  // otherwise devs will get errors on dev environments
+  if (!isEnvVarsSet) {
+    return;
+  }
   throttledSendMetrics();
 }
 
