@@ -22,7 +22,9 @@ function _log(level: string, message: string, args: any = {}) {
     logEvent['fields'] = args;
   }
 
-  if (isVercel) {
+  // If this is running on a Vercel function, it should print to console with `AXIOM::LOG=`
+  // and this will be parsed correctly as a structured log in Axiom.
+  if (!isBrowser && isVercel) {
     const body = JSON.stringify(logEvent);
     console.log(`AXIOM::LOG=${body}`);
   } else {
