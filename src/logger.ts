@@ -11,7 +11,7 @@ function _log(level: string, message: string, args: any = {}) {
     // to avoid network errors in development environments
     let fields = '';
     if (Object.keys(args).length) {
-      fields = args
+      fields = args;
     }
     console.log(`${level} - ${message}`, fields);
     return;
