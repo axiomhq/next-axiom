@@ -1,4 +1,4 @@
-import { proxyPath, isBrowser, EndpointType, getIngestURL } from './shared';
+import { proxyPath, isBrowser, EndpointType, getIngestURL, isEnvVarsSet } from './shared';
 import { throttle } from './shared';
 
 const url = isBrowser ? `${proxyPath}/logs` : getIngestURL(EndpointType.logs);
@@ -6,8 +6,14 @@ const throttledSendLogs = throttle(sendLogs, 1000);
 let logEvents: any[] = [];
 
 function _log(level: string, message: string, args: any = {}) {
-  if (!url) {
-    console.warn('axiom: NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT is not defined');
+  if (!isEnvVarsSet) {
+    // if AXIOM ingesting url is not set, fallback to printing to console
+    // to avoid network errors in development environments
+    let fields = '';
+    if (Object.keys(args).length) {
+      fields = args;
+    }
+    console.log(`${level} - ${message}`, fields);
     return;
   }
 

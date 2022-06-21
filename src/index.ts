@@ -12,6 +12,11 @@ export function withAxiom(nextConfig: NextConfig): NextConfig {
       const webVitalsEndpoint = getIngestURL(EndpointType.webVitals);
       const logsEndpoint = getIngestURL(EndpointType.logs);
       if (!webVitalsEndpoint && !logsEndpoint) {
+        console.warn(
+          'axiom - Envvars not detected. If this is production please see https://github.com/axiomhq/next-axiom for help'
+        );
+        console.warn('axiom - Sending Web Vitals to /dev/null');
+        console.warn('axiom - Sending logs to console');
         return rewrites || []; // nothing to do
       }
 
