@@ -1,4 +1,4 @@
-import { proxyPath, isBrowser, EndpointType, getIngestURL, isVercel, isEnvVarsSet } from './shared';
+import { proxyPath, isBrowser, EndpointType, getIngestURL, isVercelBackend, isEnvVarsSet } from './shared';
 import { throttle } from './shared';
 
 const url = isBrowser ? `${proxyPath}/logs` : getIngestURL(EndpointType.logs);
@@ -24,7 +24,7 @@ function _log(level: string, message: string, args: any = {}) {
 
   // If this is running on a Vercel function, it should print to console with `AXIOM::LOG=`
   // and this will be parsed correctly as a structured log in Axiom.
-  if ((!isBrowser && isVercel) || process.env.AWS_LAMBDA_FUNCTION_NAME) {
+  if (isVercelBackend) {
     const body = JSON.stringify(logEvent);
     console.log(`AXIOM::LOG=${body}`);
   } else {

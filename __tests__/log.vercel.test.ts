@@ -3,7 +3,7 @@
  */
 process.env.AXIOM_INGEST_ENDPOINT = 'https://example.co/api/test';
 // mock vercel environment
-process.env.NEXT_PUBLIC_VERCEL_ENV = 'test';
+process.env.VERCEL = '1';
 import { log } from '../src/logger';
 
 global.fetch = jest.fn() as jest.Mock;
