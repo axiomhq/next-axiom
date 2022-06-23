@@ -3,7 +3,6 @@ export const proxyPath = '/_axiom';
 export const isBrowser = typeof window !== 'undefined';
 export const isEnvVarsSet = process.env.AXIOM_INGEST_ENDPOINT || process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT;
 export const isVercelBackend = !isBrowser && process.env.VERCEL == '1';
-console.log('isVercelBackend', isVercelBackend);
 
 export enum EndpointType {
   webVitals = 'web-vitals',
