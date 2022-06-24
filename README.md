@@ -33,8 +33,29 @@ export { reportWebVitals } from 'next-axiom';
 ```js
 import { log } from 'next-axiom';
 ```
+2. Wrap your function using `withAxiom` like this:
+```js
+// serverless function
+async function handler(req, res) {
+  log.info("hello from function")
+  res.status(200).text('hi')
+}
 
-2. Use the logger to send logs to Axiom, you can attach other metadata to your 
+export default withAxiom(handler)
+```
+```js
+// middleware function
+import { NextResponse } from 'next/server'
+
+async function handler(req, ev) {
+  log.info("hello from middleware")
+  return NextResponse.next();
+}
+
+export default withAxiom(handler)
+```
+
+3. Use the logger to send logs to Axiom, you can attach other metadata to your 
 logs by passing them as parameters:
 ```js
 log.info('hello, world!')
@@ -45,11 +66,10 @@ log.error('oops!')
 
 Deploy your site and watch data coming into your Axiom dataset.
 
-:warning: If you log from a function, please call `await log.flush()` at the end
-to ensure log delivery. When using a middleware, run `ev.waitUntil(log.flush())`
-instead.
+## Configuration
 
-3. When env vars are not detected, Pretty printing is enabled by default, to disable it set the environment variable:
+When env vars are not detected, Pretty printing to console is enabled by 
+default, to disable it set the environment variable:
 ```
 AXIOM_PRETTY_PRINT_ENABLED=false
 ```
