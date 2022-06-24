@@ -1,6 +1,6 @@
 import { withAxiom } from '../src/index';
 import { NextApiRequest, NextApiResponse } from 'next';
-import 'cross-fetch/polyfill';
+import 'whatwg-fetch';
 import { NextFetchEvent, NextRequest, NextResponse } from 'next/server';
 
 test('withAxiom(NextConfig)', async () => {

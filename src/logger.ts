@@ -43,7 +43,7 @@ async function sendLogs() {
 
   try {
     if (typeof fetch === 'undefined') {
-      const fetch = await require('cross-fetch');
+      const fetch = await require('whatwg-fetch');
       await fetch(url, { body, method, keepalive });
     } else if (isBrowser && navigator.sendBeacon) {
       navigator.sendBeacon(url, body);
