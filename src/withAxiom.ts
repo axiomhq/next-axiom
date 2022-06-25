@@ -1,4 +1,4 @@
-import { NextConfig, NextApiHandler } from 'next';
+import { NextConfig, NextApiHandler, NextApiResponse } from 'next';
 import { proxyPath, EndpointType, getIngestURL } from './shared';
 import { NextMiddleware } from 'next/server';
 
@@ -44,14 +44,58 @@ function withAxiomNextConfig(nextConfig: NextConfig): NextConfig {
   };
 }
 
+// Sending logs after res.{json,send,end} is very unreliable.
+// This function overwrites these functions and makes sure logs are sent out
+// before the response is sent.
+function interceptNextApiResponse(res: NextApiResponse): [NextApiResponse, Promise<void>[]] {
+  const allPromises: Promise<void>[] = [];
+
+  const resSend = res.send;
+  res.send = (body: any) => {
+    allPromises.push(
+      (async () => {
+        await log.flush();
+        resSend(body);
+      })()
+    );
+  };
+
+  const resJson = res.json;
+  res.json = (json: any) => {
+    allPromises.push(
+      (async () => {
+        await log.flush();
+        resJson(json);
+      })()
+    );
+  };
+
+  const resEnd = res.end;
+  res.end = (cb?: () => undefined): NextApiResponse => {
+    allPromises.push(
+      (async () => {
+        await log.flush();
+        resEnd(cb);
+      })()
+    );
+    return res;
+  };
+
+  return [res, allPromises];
+}
+
 function withAxiomNextApiHandler(handler: NextApiHandler): NextApiHandler {
   return async (req, res) => {
+    const [wrappedRes, allPromises] = interceptNextApiResponse(res);
+
     try {
-      await handler(req, res);
+      await handler(req, wrappedRes);
       await log.flush();
+      await Promise.all(allPromises);
     } catch (error) {
       log.error('Error in API handler', { error });
       await log.flush();
+      await Promise.all(allPromises);
       throw error;
     }
   };
