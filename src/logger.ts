@@ -1,4 +1,4 @@
-import { proxyPath, isBrowser, EndpointType, getIngestURL, isEnvVarsSet } from './shared';
+import { proxyPath, isBrowser, EndpointType, getIngestURL, isEnvVarsSet, isNoPrettyPrint } from './shared';
 import { throttle } from './shared';
 
 const url = isBrowser ? `${proxyPath}/logs` : getIngestURL(EndpointType.logs);
@@ -9,11 +9,7 @@ function _log(level: string, message: string, args: any = {}) {
   if (!isEnvVarsSet) {
     // if AXIOM ingesting url is not set, fallback to printing to console
     // to avoid network errors in development environments
-    let fields = '';
-    if (Object.keys(args).length) {
-      fields = args;
-    }
-    prettyPrint(level, message, fields);
+    prettyPrint(level, message, args);
     return;
   }
 
@@ -78,14 +74,23 @@ const levelColors = {
   },
 };
 
-function prettyPrint(level: string, message: string, fields: any = {}, indent = 2) {
+export function prettyPrint(level: string, message: string, fields: any = {}) {
+  const hasFields = Object.keys(fields).length > 0;
+  // check whether pretty print is disabled
+  if (isNoPrettyPrint) {
+    let msg = `${level} - ${message}`;
+    if (hasFields) {
+      msg += ' ' + JSON.stringify(fields);
+    }
+    console.log(msg);
+    return;
+  }
   // print indented message, instead of [object]
   // We use the %o modifier instead of JSON.stringify because stringify will print the
   // object as normal text, it loses all the functionality the browser gives for viewing
   // objects in the console, such as expanding and collapsing the object.
   let msgString = '';
   let args = [level, message];
-  const hasFields = Object.keys(fields).length > 0;
 
   if (isBrowser) {
     msgString = '%c%s - %s';

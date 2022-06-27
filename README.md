@@ -48,3 +48,8 @@ Deploy your site and watch data coming into your Axiom dataset.
 :warning: If you log from a function, please call `await log.flush()` at the end
 to ensure log delivery. When using a middleware, run `ev.waitUntil(log.flush())`
 instead.
+
+3. When env vars are not detected, Pretty printing is enabled by default, to disable it set the environment variable:
+```
+AXIOM_PRETTY_PRINT_ENABLED=false
+```

@@ -2,6 +2,7 @@ export const proxyPath = '/_axiom';
 
 export const isBrowser = typeof window !== 'undefined';
 export const isEnvVarsSet = process.env.AXIOM_INGEST_ENDPOINT || process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT;
+export const isNoPrettyPrint = process.env.AXIOM_NO_PRETTY_PRINT == 'true' ? true : false;
 
 export enum EndpointType {
   webVitals = 'web-vitals',
