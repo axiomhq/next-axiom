@@ -1,4 +1,4 @@
-import { proxyPath, isBrowser, EndpointType, getIngestURL, isEnvVarsSet, isPrettyPrintEnabled } from './shared';
+import { proxyPath, isBrowser, EndpointType, getIngestURL, isEnvVarsSet, isNoPrettyPrint } from './shared';
 import { throttle } from './shared';
 
 const url = isBrowser ? `${proxyPath}/logs` : getIngestURL(EndpointType.logs);
@@ -76,8 +76,8 @@ const levelColors = {
 
 export function prettyPrint(level: string, message: string, fields: any = {}) {
   const hasFields = Object.keys(fields).length > 0;
-  // check whether pretty print is enabled
-  if (!isPrettyPrintEnabled) {
+  // check whether pretty print is disabled
+  if (isNoPrettyPrint) {
     let msg = `${level} - ${message}`;
     if (hasFields) {
       msg += ' ' + JSON.stringify(fields);
