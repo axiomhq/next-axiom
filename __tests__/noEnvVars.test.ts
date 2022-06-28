@@ -9,6 +9,7 @@ import { NextWebVitalsMetric } from 'next/app';
 import { log } from '../src/logger';
 import { reportWebVitals } from '../src/webVitals';
 
+jest.useFakeTimers();
 global.fetch = jest.fn() as jest.Mock;
 const mockedLog = jest.spyOn(global.console, 'log').mockImplementation();
 

@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server'
-import { log } from 'next-axiom'
+import { log, withAxiom } from 'next-axiom'
 
-export async function middleware(_req, ev) {
+async function middleware(_req, ev) {
   log.info("Hello from middleware", { 'bar': 'baz' });
-  ev.waitUntil(log.flush())
   return NextResponse.next()
 }
+
+export default withAxiom(middleware)
