@@ -69,7 +69,25 @@ log.warn('be careful!')
 log.error('oops!')
 ```
 
+If you have fields you want to log with all messages, you can create an 
+intermediate logger like this:
+```js
+const logger = log.with({ scope: 'user' })
+logger.info('User logged in', { userId: 42 })
+// { 
+//   "level": "info", 
+//   "_time": "2022-07-04T09:49:42Z", 
+//   "message": "User logged in", 
+//   "fields": {
+//     "scope": "user",
+//     "userId": 42,
+//   }
+// }
+```
+
 4. Deploy your site and watch data coming into your Axiom dataset.
+
+> **Note**: Logs are only sent to Axiom from production deployments.
 
 ### Configuration
 

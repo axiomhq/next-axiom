@@ -27,8 +27,34 @@ export const log = {
   info: (message: string, args: any = {}) => _log('info', message, args),
   warn: (message: string, args: any = {}) => _log('warn', message, args),
   error: (message: string, args: any = {}) => _log('error', message, args),
+  with: (args: any) => new Logger(args),
   flush: sendLogs,
 };
+
+class Logger {
+  args: any = {};
+
+  constructor(args: any = {}) {
+    this.args = args;
+  }
+
+  debug(message: string, args: any = {}) {
+    _log('debug', message, { ...this.args, ...args });
+  }
+  info(message: string, args: any = {}) {
+    _log('info', message, { ...this.args, ...args });
+  }
+  warn(message: string, args: any = {}) {
+    _log('warn', message, { ...this.args, ...args });
+  }
+  error(message: string, args: any = {}) {
+    _log('error', message, { ...this.args, ...args });
+  }
+
+  with(args: any) {
+    return new Logger({ ...this.args, ...args });
+  }
+}
 
 async function sendLogs() {
   if (!logEvents.length) {
