@@ -50,6 +50,10 @@ class Logger {
   error(message: string, args: any = {}) {
     _log('error', message, { ...this.args, ...args });
   }
+
+  with(args: any) {
+    return new Logger({ ...this.args, ...args });
+  }
 }
 
 async function sendLogs() {
