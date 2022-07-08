@@ -122,10 +122,10 @@ function isNextConfig(param: WithAxiomParam): param is NextConfig {
 }
 
 function isApiHandler(param: WithAxiomParam): param is NextApiHandler {
-  // This is pretty hacky, but if you call withAxiom in a serverless function,
-  // the environment variable will be set.
-  // The middleware runs on CloudFlare workers which doesn't expose that env.
-  return typeof param == 'function' && !!process.env.LAMBDA_TASK_ROOT;
+  // Middleware is called from `worker.js` in Vercel and from
+  // `evalmachine.<anonymous>` in local development.
+  const caller = getCaller();
+  return typeof param == 'function' && caller != 'worker.js' && caller != 'evalmachine.<anonymous>';
 }
 
 // withAxiom can be called either with NextConfig, which will add proxy rewrites
@@ -139,4 +139,26 @@ export function withAxiom<T extends WithAxiomParam>(param: T): T {
   } else {
     return withAxiomNextMiddleware(param) as T;
   }
+}
+
+// TODO: Can we remove this function and find a better way to distinguish
+// between NextApiHandler and NextMiddleware on both Vercel & local?
+function getCaller() {
+  const pst = Error.prepareStackTrace;
+  Error.prepareStackTrace = function (_, stack) {
+    Error.prepareStackTrace = pst;
+    return stack;
+  };
+
+  let stack = new Error().stack as unknown as NodeJS.CallSite[];
+
+  let startIdx = 0;
+  while (startIdx < stack.length - 1) {
+    if (stack[startIdx].getFileName() === __filename) {
+      break;
+    }
+    startIdx++;
+  }
+
+  return stack[startIdx].getFileName();
 }
