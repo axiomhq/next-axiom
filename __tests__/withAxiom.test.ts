@@ -25,3 +25,23 @@ test('withAxiom(NextMiddleware)', async () => {
   expect(handler).toBeInstanceOf(Function);
   // TODO: Make sure we don't have a NextApiHandler
 });
+
+test('withAxiom(NextConfig) with fallback rewrites (regression test for #21)', async () => {
+  process.env.AXIOM_INGEST_ENDPOINT = 'http://localhost';
+
+  const rewrites = async () => {
+    return {
+      fallback: [
+        {
+          source: '/:bar',
+          destination: '/foo/:bar',
+        },
+      ],
+    };
+  };
+
+  const config = withAxiom({
+    rewrites: rewrites as any,
+  });
+  await config.rewrites();
+});
