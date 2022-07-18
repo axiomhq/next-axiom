@@ -124,6 +124,9 @@ function isNextConfig(param: WithAxiomParam): param is NextConfig {
 
 function isApiHandler(param: WithAxiomParam): param is NextApiHandler {
   const isFunction = typeof param == 'function';
+  if (!isFunction) {
+    return false;
+  }
 
   // check if running locally
   if (process.env.NODE_ENV === 'development') {
