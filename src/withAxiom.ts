@@ -108,6 +108,7 @@ function withAxiomNextMiddleware(handler: NextMiddleware): NextMiddleware {
       ev.waitUntil(log.flush());
       return res;
     } catch (error) {
+      console.log('Error in edge function', error);
       log.error('Error in middleware', { error });
       ev.waitUntil(log.flush());
       throw error;
@@ -123,9 +124,14 @@ function isNextConfig(param: WithAxiomParam): param is NextConfig {
 
 function isApiHandler(param: WithAxiomParam): param is NextApiHandler {
   const isFunction = typeof param == 'function';
+
+  // check if running locally
+  if (process.env.NODE_ENV === 'development') {
+    const isLocalWorker = caller() == 'evalmachine.<anonymous>';
+    return isFunction && !isLocalWorker;
+  }
   const isLambda = !!process.env.LAMBDA_TASK_ROOT;
-  const isLocalWorker = caller() == 'evalmachine.<anonymous>';
-  return isFunction && (isLambda || !isLocalWorker);
+  return isFunction && isLambda;
 }
 
 // withAxiom can be called either with NextConfig, which will add proxy rewrites
