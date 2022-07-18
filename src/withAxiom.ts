@@ -101,7 +101,7 @@ function withAxiomNextApiHandler(handler: NextApiHandler): NextApiHandler {
   };
 }
 
-function withAxiomNextMiddleware(handler: NextMiddleware): NextMiddleware {
+function withAxiomNextEdgeFunction(handler: NextMiddleware): NextMiddleware {
   return async (req, ev) => {
     try {
       const res = await handler(req, ev);
@@ -143,7 +143,7 @@ export function withAxiom<T extends WithAxiomParam>(param: T): T {
   } else if (isApiHandler(param)) {
     return withAxiomNextApiHandler(param) as T;
   } else {
-    return withAxiomNextMiddleware(param) as T;
+    return withAxiomNextEdgeFunction(param) as T;
   }
 }
 
