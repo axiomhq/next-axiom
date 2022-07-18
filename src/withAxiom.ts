@@ -37,7 +37,7 @@ function withAxiomNextConfig(nextConfig: NextConfig): NextConfig {
       } else if (Array.isArray(rewrites)) {
         return rewrites.concat(axiomRewrites);
       } else {
-        rewrites.afterFiles = rewrites.afterFiles.concat(axiomRewrites);
+        rewrites.afterFiles = (rewrites.afterFiles || []).concat(axiomRewrites);
         return rewrites;
       }
     },
