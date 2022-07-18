@@ -122,10 +122,10 @@ function isNextConfig(param: WithAxiomParam): param is NextConfig {
 }
 
 function isApiHandler(param: WithAxiomParam): param is NextApiHandler {
-  // Middleware is called from `worker.js` in Vercel and from
-  // `evalmachine.<anonymous>` in local development.
-  const caller = getCaller();
-  return typeof param == 'function' && caller != 'worker.js' && caller != 'evalmachine.<anonymous>';
+  const isFunction = typeof param == 'function';
+  const isLambda = !!process.env.LAMBDA_TASK_ROOT;
+  const isLocalWorker = caller() == 'evalmachine.<anonymous>';
+  return isFunction && (isLambda || !isLocalWorker);
 }
 
 // withAxiom can be called either with NextConfig, which will add proxy rewrites
@@ -143,7 +143,7 @@ export function withAxiom<T extends WithAxiomParam>(param: T): T {
 
 // TODO: Can we remove this function and find a better way to distinguish
 // between NextApiHandler and NextMiddleware on both Vercel & local?
-function getCaller() {
+function caller() {
   const pst = Error.prepareStackTrace;
   Error.prepareStackTrace = function (_, stack) {
     Error.prepareStackTrace = pst;
