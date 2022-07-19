@@ -101,14 +101,14 @@ function withAxiomNextApiHandler(handler: NextApiHandler): NextApiHandler {
   };
 }
 
-function withAxiomNextMiddleware(handler: NextMiddleware): NextMiddleware {
+function withAxiomNextEdgeFunction(handler: NextMiddleware): NextMiddleware {
   return async (req, ev) => {
     try {
       const res = await handler(req, ev);
       ev.waitUntil(log.flush());
       return res;
     } catch (error) {
-      log.error('Error in middleware', { error });
+      log.error('Error in edge function', { error });
       ev.waitUntil(log.flush());
       throw error;
     }
@@ -122,10 +122,18 @@ function isNextConfig(param: WithAxiomParam): param is NextConfig {
 }
 
 function isApiHandler(param: WithAxiomParam): param is NextApiHandler {
-  // This is pretty hacky, but if you call withAxiom in a serverless function,
-  // the environment variable will be set.
-  // The middleware runs on CloudFlare workers which doesn't expose that env.
-  return typeof param == 'function' && !!process.env.LAMBDA_TASK_ROOT;
+  const isFunction = typeof param == 'function';
+  if (!isFunction) {
+    return false;
+  }
+
+  // check if running locally
+  if (process.env.NODE_ENV === 'development') {
+    const isLocalWorker = caller() == 'evalmachine.<anonymous>';
+    return !isLocalWorker;
+  }
+  const isLambda = !!process.env.LAMBDA_TASK_ROOT;
+  return isLambda;
 }
 
 // withAxiom can be called either with NextConfig, which will add proxy rewrites
@@ -137,6 +145,28 @@ export function withAxiom<T extends WithAxiomParam>(param: T): T {
   } else if (isApiHandler(param)) {
     return withAxiomNextApiHandler(param) as T;
   } else {
-    return withAxiomNextMiddleware(param) as T;
+    return withAxiomNextEdgeFunction(param) as T;
   }
+}
+
+// TODO: Can we remove this function and find a better way to distinguish
+// between NextApiHandler and NextMiddleware on both Vercel & local?
+function caller() {
+  const pst = Error.prepareStackTrace;
+  Error.prepareStackTrace = function (_, stack) {
+    Error.prepareStackTrace = pst;
+    return stack;
+  };
+
+  let stack = new Error().stack as unknown as NodeJS.CallSite[];
+
+  let startIdx = 0;
+  while (startIdx < stack.length - 1) {
+    if (stack[startIdx].getFileName() === __filename) {
+      break;
+    }
+    startIdx++;
+  }
+
+  return stack[startIdx].getFileName();
 }
