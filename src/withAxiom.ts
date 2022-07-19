@@ -130,10 +130,10 @@ function isApiHandler(param: WithAxiomParam): param is NextApiHandler {
   // check if running locally
   if (process.env.NODE_ENV === 'development') {
     const isLocalWorker = caller() == 'evalmachine.<anonymous>';
-    return isFunction && !isLocalWorker;
+    return !isLocalWorker;
   }
   const isLambda = !!process.env.LAMBDA_TASK_ROOT;
-  return isFunction && isLambda;
+  return isLambda;
 }
 
 // withAxiom can be called either with NextConfig, which will add proxy rewrites
