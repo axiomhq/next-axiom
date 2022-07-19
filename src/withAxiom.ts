@@ -108,8 +108,7 @@ function withAxiomNextEdgeFunction(handler: NextMiddleware): NextMiddleware {
       ev.waitUntil(log.flush());
       return res;
     } catch (error) {
-      console.log('Error in edge function', error);
-      log.error('Error in middleware', { error });
+      log.error('Error in edge function', { error });
       ev.waitUntil(log.flush());
       throw error;
     }
