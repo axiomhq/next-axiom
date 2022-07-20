@@ -106,16 +106,24 @@ function withAxiomNextApiHandler(handler: NextApiHandler): NextApiHandler {
 
 function withAxiomNextEdgeFunction(handler: NextMiddleware): NextMiddleware {
   return async (req, ev) => {
+    const startTime = new Date().getTime();
     try {
       const res = await handler(req, ev);
       ev.waitUntil(log.flush());
+      logEdgeReport(startTime);
       return res;
     } catch (error) {
       log.error('Error in edge function', { error });
       ev.waitUntil(log.flush());
+      logEdgeReport(startTime);
       throw error;
     }
   };
+}
+
+function logEdgeReport(startTime: number) {
+  const duration = new Date().getTime() - startTime;
+  console.log(`EDGE_FUNC_REPORT:: Duration: ${duration} ms`);
 }
 
 type WithAxiomParam = NextConfig | NextApiHandler | NextMiddleware;
