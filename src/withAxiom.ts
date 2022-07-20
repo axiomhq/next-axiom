@@ -1,7 +1,9 @@
 import { NextConfig, NextApiHandler, NextApiResponse } from 'next';
 import { proxyPath, EndpointType, getIngestURL } from './shared';
-import { NextMiddleware } from 'next/server';
-import { log } from './logger';
+import { NextFetchEvent, NextMiddleware, NextRequest } from 'next/server';
+
+import { log, Logger } from './logger';
+import { NextMiddlewareResult } from 'next/dist/server/web/types';
 
 declare global {
   var EdgeRuntime: string;
@@ -104,6 +106,12 @@ function withAxiomNextApiHandler(handler: NextApiHandler): NextApiHandler {
   };
 }
 
+export type AxiomRequest = NextRequest & { log: Logger };
+export type AxiomMiddleware = (
+  request: AxiomRequest,
+  event: NextFetchEvent
+) => NextMiddlewareResult | Promise<NextMiddlewareResult>;
+
 function withAxiomNextEdgeFunction(handler: NextMiddleware): NextMiddleware {
   return async (req, ev) => {
     const startTime = new Date().getTime();
@@ -118,8 +126,14 @@ function withAxiomNextEdgeFunction(handler: NextMiddleware): NextMiddleware {
         statusCode: '',
       },
     };
+    const logger = log.with({
+      request: report.request,
+    });
+    const axiomRequest = req as AxiomRequest;
+    axiomRequest.log = logger;
+
     try {
-      const res = await handler(req, ev);
+      const res = await handler(axiomRequest, ev);
       report.request.statusCode = res?.status.toString() || '';
       ev.waitUntil(log.flush());
       logEdgeReport(startTime, report);
