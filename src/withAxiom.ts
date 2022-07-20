@@ -136,13 +136,13 @@ function withAxiomNextEdgeFunction(handler: NextMiddleware): NextMiddleware {
       const res = await handler(axiomRequest, ev);
       report.request.statusCode = res?.status.toString() || '';
       ev.waitUntil(log.flush());
-      logEdgeReport(startTime, report);
+      // logEdgeReport(startTime, report);
       return res;
     } catch (error) {
       log.error('Error in edge function', { error });
       report.request.statusCode = '500';
       ev.waitUntil(log.flush());
-      logEdgeReport(startTime, report);
+      // logEdgeReport(startTime, report);
       throw error;
     }
   };

@@ -1,3 +1,4 @@
+import { NextRequest } from 'next/server';
 import { proxyPath, isBrowser, EndpointType, getIngestURL, isEnvVarsSet, isNoPrettyPrint } from './shared';
 import { throttle } from './shared';
 
