@@ -4,11 +4,13 @@ export const config = {
     runtime: 'experimental-edge',
 };
 
-function handler() {
+function handler(req) {
+    
     log.debug("message from edge", { foo: 'bar' })
 
     return new Response(
         JSON.stringify({
+            req,
             message: 'Hello, world!',
         }),
         {

@@ -107,23 +107,37 @@ function withAxiomNextApiHandler(handler: NextApiHandler): NextApiHandler {
 function withAxiomNextEdgeFunction(handler: NextMiddleware): NextMiddleware {
   return async (req, ev) => {
     const startTime = new Date().getTime();
+    const report = {
+      request: {
+        ip: req.ip,
+        geo: req.geo,
+        host: req.nextUrl.host,
+        method: req.method,
+        path: req.nextUrl.pathname,
+        scheme: req.nextUrl.protocol.replace(':', ''),
+        statusCode: '',
+      },
+    };
     try {
       const res = await handler(req, ev);
+      report.request.statusCode = res?.status.toString() || '';
       ev.waitUntil(log.flush());
-      logEdgeReport(startTime);
+      logEdgeReport(startTime, report);
       return res;
     } catch (error) {
       log.error('Error in edge function', { error });
+      report.request.statusCode = '500';
       ev.waitUntil(log.flush());
-      logEdgeReport(startTime);
+      logEdgeReport(startTime, report);
       throw error;
     }
   };
 }
 
-function logEdgeReport(startTime: number) {
+function logEdgeReport(startTime: number, report: any) {
   const duration = new Date().getTime() - startTime;
-  console.log(`EDGE_FUNC_REPORT:: Duration: ${duration} ms`);
+  report.durationMs = duration.toString();
+  console.log(`AXIOM_EDGE_REPORT::${JSON.stringify(report)}`);
 }
 
 type WithAxiomParam = NextConfig | NextApiHandler | NextMiddleware;
