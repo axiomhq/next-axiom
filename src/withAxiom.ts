@@ -118,12 +118,13 @@ function withAxiomNextEdgeFunction(handler: NextMiddleware): NextMiddleware {
     const report = {
       request: {
         ip: req.ip,
-        geo: req.geo,
+        region: req.geo?.region,
         host: req.nextUrl.host,
         method: req.method,
         path: req.nextUrl.pathname,
         scheme: req.nextUrl.protocol.replace(':', ''),
         statusCode: 0,
+        userAgent: req.headers.get('user-agent'),
       },
     };
     const logger = log.with({
