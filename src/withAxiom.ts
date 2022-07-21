@@ -110,7 +110,7 @@ export type AxiomMiddleware = (
 
 function withAxiomNextEdgeFunction(handler: NextMiddleware): NextMiddleware {
   return async (req, ev) => {
-    const startTime = new Date().getTime();
+    const startTime = process.hrtime();
     const report = {
       request: {
         ip: req.ip,
@@ -144,10 +144,13 @@ function withAxiomNextEdgeFunction(handler: NextMiddleware): NextMiddleware {
   };
 }
 
-function logEdgeReport(startTime: number, report: any) {
-  const endTime = new Date().getTime();
-  report.durationMs = endTime - startTime;
-  console.log(`startTime: ${startTime} || endtime: ${endTime} || duration ${report.durationMs}`);
+const NS_PER_SEC = 1e9;
+const MS_PER_NS = 1e-6;
+
+function logEdgeReport(startTime: [number, number], report: any) {
+  const diff = process.hrtime(startTime);
+  report.durationMs = (diff[0] * NS_PER_SEC + diff[1]) * MS_PER_NS;
+  console.log(`startTime: ${diff[0]}ns || endtime: ${diff[1]}ns || duration ${report.durationMs}ms`);
   console.log(`AXIOM_EDGE_REPORT::${JSON.stringify(report)}`);
 }
 
