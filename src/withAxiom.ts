@@ -145,7 +145,7 @@ function withAxiomNextEdgeFunction(handler: NextMiddleware): NextMiddleware {
 }
 
 function logEdgeReport(startTime: number, report: any) {
-  report.duration = new Date().getTime() - startTime;
+  report.durationMs = new Date().getTime() - startTime;
   console.log(`AXIOM_EDGE_REPORT::${JSON.stringify(report)}`);
 }
 
