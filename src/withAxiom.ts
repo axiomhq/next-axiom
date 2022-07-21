@@ -1,8 +1,11 @@
 import { NextConfig, NextApiHandler, NextApiResponse } from 'next';
 import { proxyPath, EndpointType, getIngestURL } from './shared';
 import { NextMiddleware } from 'next/server';
-
 import { log } from './logger';
+
+declare global {
+  var EdgeRuntime: string;
+}
 
 function withAxiomNextConfig(nextConfig: NextConfig): NextConfig {
   return {
@@ -123,17 +126,8 @@ function isNextConfig(param: WithAxiomParam): param is NextConfig {
 
 function isApiHandler(param: WithAxiomParam): param is NextApiHandler {
   const isFunction = typeof param == 'function';
-  if (!isFunction) {
-    return false;
-  }
 
-  // check if running locally
-  if (process.env.NODE_ENV === 'development') {
-    const isLocalWorker = caller() == 'evalmachine.<anonymous>';
-    return !isLocalWorker;
-  }
-  const isLambda = !!process.env.LAMBDA_TASK_ROOT;
-  return isLambda;
+  return isFunction && typeof globalThis.EdgeRuntime === 'undefined';
 }
 
 // withAxiom can be called either with NextConfig, which will add proxy rewrites
@@ -147,26 +141,4 @@ export function withAxiom<T extends WithAxiomParam>(param: T): T {
   } else {
     return withAxiomNextEdgeFunction(param) as T;
   }
-}
-
-// TODO: Can we remove this function and find a better way to distinguish
-// between NextApiHandler and NextMiddleware on both Vercel & local?
-function caller() {
-  const pst = Error.prepareStackTrace;
-  Error.prepareStackTrace = function (_, stack) {
-    Error.prepareStackTrace = pst;
-    return stack;
-  };
-
-  let stack = new Error().stack as unknown as NodeJS.CallSite[];
-
-  let startIdx = 0;
-  while (startIdx < stack.length - 1) {
-    if (stack[startIdx].getFileName() === __filename) {
-      break;
-    }
-    startIdx++;
-  }
-
-  return stack[startIdx].getFileName();
 }
