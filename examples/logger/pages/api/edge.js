@@ -1,4 +1,4 @@
-import { log, withAxiom } from 'next-axiom'
+import { withAxiom } from 'next-axiom'
 
 export const config = {
     runtime: 'experimental-edge',
@@ -6,7 +6,7 @@ export const config = {
 
 function handler(req) {
     
-    log.debug("message from edge", { foo: 'bar' })
+    req.log.debug("message from edge", { foo: 'bar' })
 
     return new Response(
         JSON.stringify({

@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server'
-import { log, withAxiom } from 'next-axiom'
+import { withAxiom } from 'next-axiom'
 
 async function middleware(_req, ev) {
-  log.info("Hello from middleware", { 'bar': 'baz' });
+  req.log.info("Hello from middleware", { 'bar': 'baz' });
   return NextResponse.next()
 }
 

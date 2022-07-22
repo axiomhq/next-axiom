@@ -85,6 +85,21 @@ logger.info('User logged in', { userId: 42 })
 // }
 ```
 
+In order to attach request information to Edge function logs use `req.log`
+instead of importing the loger. e.g:
+
+```js
+// pages/api/some_edge_function.js
+
+function handler(req) {
+    ...
+
+    req.log.debug('User logged in', { userId: 42 })
+
+    ...
+}
+```
+
 4. Deploy your site and watch data coming into your Axiom dataset.
 
 > **Note**: Logs are only sent to Axiom from production deployments.

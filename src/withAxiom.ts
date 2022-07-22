@@ -110,7 +110,6 @@ export type AxiomMiddleware = (
 
 function withAxiomNextEdgeFunction(handler: NextMiddleware): NextMiddleware {
   return async (req, ev) => {
-    const startTime = new Date().getTime();
     const report = {
       request: {
         ip: req.ip,
@@ -133,23 +132,14 @@ function withAxiomNextEdgeFunction(handler: NextMiddleware): NextMiddleware {
       const res = await handler(axiomRequest, ev);
       report.request.statusCode = res?.status || 0;
       ev.waitUntil(log.flush());
-      logEdgeReport(startTime, report);
       return res;
     } catch (error) {
       log.error('Error in edge function', { error });
       report.request.statusCode = 500;
       ev.waitUntil(log.flush());
-      logEdgeReport(startTime, report);
       throw error;
     }
   };
-}
-
-function logEdgeReport(startTime: number, report: any) {
-  const endTime = new Date().getTime();
-  report.durationMs = endTime - startTime;
-  console.log(`startTime: ${startTime} || endtime: ${endTime} || duration ${report.durationMs}`);
-  console.log(`AXIOM_EDGE_REPORT::${JSON.stringify(report)}`);
 }
 
 type WithAxiomParam = NextConfig | NextApiHandler | NextMiddleware;
