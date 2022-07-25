@@ -1,5 +1,7 @@
-import { log } from 'next-axiom'
+import { Logger } from 'next-axiom'
 import useSWR from 'swr'
+
+const log = new Logger()
 
 export async function getStaticProps(context) {
   log.info('Hello from SSR', { context })

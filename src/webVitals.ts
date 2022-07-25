@@ -1,8 +1,6 @@
 import { NextWebVitalsMetric } from 'next/app';
 import { isBrowser, proxyPath, isEnvVarsSet, throttle } from './shared';
 
-export { log } from './logger';
-
 const url = `${proxyPath}/web-vitals`;
 
 export declare type WebVitalsMetric = NextWebVitalsMetric & { route: string };
