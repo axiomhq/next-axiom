@@ -114,45 +114,36 @@ export type AxiomMiddleware = (
 
 function withAxiomNextEdgeFunction(handler: NextMiddleware): NextMiddleware {
   return async (req, ev) => {
-    const startTime = new Date().getTime();
     const report = {
-      request: {
-        ip: req.ip,
-        region: req.geo?.region,
-        host: req.nextUrl.host,
-        method: req.method,
-        path: req.nextUrl.pathname,
-        scheme: req.nextUrl.protocol.replace(':', ''),
-        statusCode: 0,
-        userAgent: req.headers.get('user-agent'),
-      },
+      startTime: new Date().getTime(),
+      ip: req.ip,
+      region: req.geo?.region,
+      host: req.nextUrl.host,
+      method: req.method,
+      path: req.nextUrl.pathname,
+      scheme: req.nextUrl.protocol.replace(':', ''),
+      statusCode: 0,
+      userAgent: req.headers.get('user-agent'),
     };
-    const logger = log.with({
-      request: report.request,
-    });
     const axiomRequest = req as AxiomRequest;
-    axiomRequest.log = logger;
 
     try {
       const res = await handler(axiomRequest, ev);
-      report.request.statusCode = res?.status || 0;
+      report.statusCode = res?.status || 0;
       ev.waitUntil(log.flush());
-      logEdgeReport(startTime, report);
+      logEdgeReport(report);
       return res;
     } catch (error) {
       log.error('Error in edge function', { error });
-      report.request.statusCode = 500;
+      report.statusCode = 500;
       ev.waitUntil(log.flush());
-      logEdgeReport(startTime, report);
+      logEdgeReport(report);
       throw error;
     }
   };
 }
 
-function logEdgeReport(startTime: number, report: any) {
-  const endTime = new Date().getTime();
-  report.durationMs = endTime - startTime;
-  console.log(`startTime: ${startTime} || endtime: ${endTime} || duration ${report.durationMs}`);
+function logEdgeReport(report: any) {
   console.log(`AXIOM_EDGE_REPORT::${JSON.stringify(report)}`);
 }
 
