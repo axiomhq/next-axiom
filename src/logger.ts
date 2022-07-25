@@ -1,84 +1,108 @@
+import { NextRequest } from 'next/server';
 import { proxyPath, isBrowser, EndpointType, getIngestURL, isEnvVarsSet, isNoPrettyPrint } from './shared';
 import { throttle } from './shared';
 
 const url = isBrowser ? `${proxyPath}/logs` : getIngestURL(EndpointType.logs);
-const throttledSendLogs = throttle(sendLogs, 1000);
-let logEvents: any[] = [];
 
-function _log(level: string, message: string, args: any = {}) {
-  if (!isEnvVarsSet) {
-    // if AXIOM ingesting url is not set, fallback to printing to console
-    // to avoid network errors in development environments
-    prettyPrint(level, message, args);
-    return;
-  }
-
-  const logEvent = { level, message, _time: new Date(Date.now()).toISOString() };
-  if (Object.keys(args).length > 0) {
-    logEvent['fields'] = args;
-  }
-
-  logEvents.push(logEvent);
-  throttledSendLogs();
+interface LogEvent {
+  level: string;
+  message: string;
+  fields: {};
+  _time: string;
+  request?: any;
 }
 
-export const log = {
-  debug: (message: string, args: any = {}) => _log('debug', message, args),
-  info: (message: string, args: any = {}) => _log('info', message, args),
-  warn: (message: string, args: any = {}) => _log('warn', message, args),
-  error: (message: string, args: any = {}) => _log('error', message, args),
-  with: (args: any) => new Logger(args),
-  flush: sendLogs,
-};
-
 export class Logger {
-  args: any = {};
+  public logEvents: any[] = [];
+  throttledSendLogs = throttle(this.sendLogs, 1000);
 
-  constructor(args: any = {}) {
-    this.args = args;
-  }
+  constructor(private args: any = {}, private req: NextRequest | null = null, private waitForFlush: Boolean = false) {}
 
   debug(message: string, args: any = {}) {
-    _log('debug', message, { ...this.args, ...args });
+    this._log('debug', message, { ...this.args, ...args });
   }
   info(message: string, args: any = {}) {
-    _log('info', message, { ...this.args, ...args });
+    this._log('info', message, { ...this.args, ...args });
   }
   warn(message: string, args: any = {}) {
-    _log('warn', message, { ...this.args, ...args });
+    this._log('warn', message, { ...this.args, ...args });
   }
   error(message: string, args: any = {}) {
-    _log('error', message, { ...this.args, ...args });
+    this._log('error', message, { ...this.args, ...args });
   }
 
   with(args: any) {
-    return new Logger({ ...this.args, ...args });
-  }
-}
-
-async function sendLogs() {
-  if (!logEvents.length) {
-    return;
+    return new Logger({ ...this.args, ...args }, this.req, this.waitForFlush);
   }
 
-  const method = 'POST';
-  const keepalive = true;
-  const body = JSON.stringify(logEvents);
-  // clear pending logs
-  logEvents = [];
+  withRequest(req: NextRequest) {
+    return new Logger({ ...this.args }, req, this.waitForFlush);
+  }
 
-  try {
-    if (typeof fetch === 'undefined') {
-      const fetch = await require('whatwg-fetch');
-      await fetch(url, { body, method, keepalive });
-    } else if (isBrowser && navigator.sendBeacon) {
-      navigator.sendBeacon(url, body);
-    } else {
-      await fetch(url, { body, method, keepalive });
+  _log(level: string, message: string, args: any = {}) {
+    const logEvent: LogEvent = { level, message, _time: new Date(Date.now()).toISOString(), fields: {} };
+    if (Object.keys(args).length > 0) {
+      logEvent['fields'] = args;
     }
-  } catch (e) {
-    console.error(`Failed to send logs to Axiom: ${e}`);
+
+    if (this.req != null) {
+      logEvent['request'] = {
+        ip: this.req.ip,
+        region: this.req.geo?.region,
+        host: this.req.nextUrl.host,
+        method: this.req.method,
+        path: this.req.nextUrl.pathname,
+        scheme: this.req.nextUrl.protocol.replace(':', ''),
+        userAgent: this.req.headers.get('user-agent'),
+      };
+    }
+
+    this.logEvents.push(logEvent);
+    if (!this.waitForFlush) {
+      this.throttledSendLogs();
+    }
   }
+
+  attachResponseStatus(status: number) {
+    this.logEvents.map((log) => {
+      log.request.satusCode = status;
+    });
+  }
+
+  async sendLogs() {
+    if (!this.logEvents.length) {
+      return;
+    }
+
+    if (!isEnvVarsSet) {
+      // if AXIOM ingesting url is not set, fallback to printing to console
+      // to avoid network errors in development environments
+      this.logEvents.forEach((ev) => prettyPrint(ev));
+      this.logEvents = [];
+      return;
+    }
+
+    const method = 'POST';
+    const keepalive = true;
+    const body = JSON.stringify(this.logEvents);
+    // clear pending logs
+    this.logEvents = [];
+
+    try {
+      if (typeof fetch === 'undefined') {
+        const fetch = await require('whatwg-fetch');
+        await fetch(url, { body, method, keepalive });
+      } else if (isBrowser && navigator.sendBeacon) {
+        navigator.sendBeacon(url, body);
+      } else {
+        await fetch(url, { body, method, keepalive });
+      }
+    } catch (e) {
+      console.error(`Failed to send logs to Axiom: ${e}`);
+    }
+  }
+
+  flush = this.sendLogs;
 }
 
 const levelColors = {
@@ -100,13 +124,13 @@ const levelColors = {
   },
 };
 
-export function prettyPrint(level: string, message: string, fields: any = {}) {
-  const hasFields = Object.keys(fields).length > 0;
+export function prettyPrint(ev: LogEvent) {
+  const hasFields = Object.keys(ev.fields).length > 0;
   // check whether pretty print is disabled
   if (isNoPrettyPrint) {
-    let msg = `${level} - ${message}`;
+    let msg = `${ev.level} - ${ev.message}`;
     if (hasFields) {
-      msg += ' ' + JSON.stringify(fields);
+      msg += ' ' + JSON.stringify(ev.fields);
     }
     console.log(msg);
     return;
@@ -116,19 +140,24 @@ export function prettyPrint(level: string, message: string, fields: any = {}) {
   // object as normal text, it loses all the functionality the browser gives for viewing
   // objects in the console, such as expanding and collapsing the object.
   let msgString = '';
-  let args = [level, message];
+  let args: any[] = [ev.level, ev.message];
 
   if (isBrowser) {
     msgString = '%c%s - %s';
-    args = [`color: ${levelColors[level].browser};`, ...args];
+    args = [`color: ${levelColors[ev.level].browser};`, ...args];
   } else {
-    msgString = `\x1b[${levelColors[level].terminal}m%s\x1b[0m - %s`;
+    msgString = `\x1b[${levelColors[ev.level].terminal}m%s\x1b[0m - %s`;
   }
   // we check if the fields object is not empty, otherwise its printed as <empty string>
   // or just "".
   if (hasFields) {
     msgString += ' %o';
-    args.push(fields);
+    args.push(ev.fields);
+  }
+
+  if (ev.request) {
+    msgString += ' %o';
+    args.push(ev.request);
   }
 
   console.log.apply(console, [msgString, ...args]);
