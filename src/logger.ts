@@ -8,7 +8,7 @@ interface LogEvent {
   message: string;
   fields: {};
   _time: string;
-  request?: any;
+  request?: RequestReport;
 }
 
 export interface RequestReport {
@@ -27,11 +27,7 @@ export class Logger {
   public logEvents: any[] = [];
   throttledSendLogs = throttle(this.sendLogs, 1000);
 
-  constructor(
-    private args: any = {},
-    private req: RequestReport | null = null,
-    private autoFlush: Boolean = true
-  ) {}
+  constructor(private args: any = {}, private req: RequestReport | null = null, private autoFlush: Boolean = true) {}
 
   debug(message: string, args: any = {}) {
     this._log('debug', message, { ...this.args, ...args });
