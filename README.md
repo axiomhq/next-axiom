@@ -31,26 +31,25 @@ export { reportWebVitals } from 'next-axiom'
 
 ## Sending Logs
 
-1. Import Axiom's logger
-```js
-import { log } from 'next-axiom';
-```
-2. If you want to log from a function, wrap it using `withAxiom` like this:
+
+
+1. Wrap your functions using `withAxiom`, then you can use `req.log` like this:
 ```js
 // serverless function
 async function handler(req, res) {
-  log.info("hello from function")
+  req.log.info("hello from function")
   res.status(200).text('hi')
 }
 
 export default withAxiom(handler)
 ```
+
 ```js
 // middleware function
 import { NextResponse } from 'next/server'
 
 async function handler(req, ev) {
-  log.info("hello from middleware")
+  req.log.info("hello from middleware")
   return NextResponse.next()
 }
 
@@ -85,14 +84,15 @@ logger.info('User logged in', { userId: 42 })
 // }
 ```
 
-In order to attach request information to Edge function logs use `req.log`
-instead of importing the loger. e.g:
+In the frontend pages you can import `log` directly from `next-axiom`
 
 ```js
-// pages/api/some_edge_function.js
-function handler(req) {
+import { log } from `next-axiom`;
+
+// pages/index.js
+function home() {
     ...
-    req.log.debug('User logged in', { userId: 42 })
+    log.debug('User logged in', { userId: 42 })
     ...
 }
 ```
