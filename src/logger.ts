@@ -105,6 +105,8 @@ export class Logger {
   flush = this.sendLogs;
 }
 
+export const log = new Logger();
+
 const levelColors = {
   info: {
     terminal: '32',
