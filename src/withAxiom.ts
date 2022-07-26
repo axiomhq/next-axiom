@@ -101,14 +101,16 @@ export type AxiomApiHandler = (
 ) => NextApiHandler | Promise<NextApiHandler> | Promise<void>;
 
 function withAxiomNextApiHandler(handler: NextApiHandler): NextApiHandler {
+  console.log('this is a lambda api endpoint');
   return async (req, res) => {
     const report: RequestReport = {
       startTime: new Date().getTime(),
       path: req.url!,
       method: req.method!,
       host: req.headers['host'] || '',
-      scheme: req.headers['host']?.split('://')[0] || '',
-      ip: '',
+      userAgent: req.headers['user-agent'] || '',
+      scheme: 'https',
+      ip: req.headers['X-Forwarded-For'] ? req.headers['X-Forwarded-For'][0] : '',
       region: '',
     };
     const logger = new Logger({}, report, false);
