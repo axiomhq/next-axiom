@@ -122,14 +122,15 @@ function withAxiomNextEdgeFunction(handler: NextMiddleware): NextMiddleware {
       method: req.method,
       path: req.nextUrl.pathname,
       scheme: req.nextUrl.protocol.replace(':', ''),
-      statusCode: 0,
       userAgent: req.headers.get('user-agent'),
     };
     const axiomRequest = req as AxiomRequest;
 
     try {
       const res = await handler(axiomRequest, ev);
-      report.statusCode = res?.status || 0;
+      if (res) {
+        report.statusCode = res.status
+      }
       ev.waitUntil(log.flush());
       logEdgeReport(report);
       return res;
