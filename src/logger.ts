@@ -1,4 +1,3 @@
-import { NextRequest } from 'next/server';
 import { proxyPath, isBrowser, EndpointType, getIngestURL, isEnvVarsSet, isNoPrettyPrint } from './shared';
 import { throttle } from './shared';
 
@@ -12,11 +11,27 @@ interface LogEvent {
   request?: any;
 }
 
+export interface RequestReport {
+  startTime: number;
+  statusCode?: number;
+  ip?: string;
+  region?: string;
+  path: string;
+  host: string;
+  method: string;
+  scheme: string;
+  userAgent?: string | null;
+}
+
 export class Logger {
   public logEvents: any[] = [];
   throttledSendLogs = throttle(this.sendLogs, 1000);
 
-  constructor(private args: any = {}, private req: NextRequest | null = null, private waitForFlush: Boolean = false) {}
+  constructor(
+    private args: any = {},
+    private req: RequestReport | null = null,
+    private waitForFlush: Boolean = false
+  ) {}
 
   debug(message: string, args: any = {}) {
     this._log('debug', message, { ...this.args, ...args });
@@ -35,7 +50,7 @@ export class Logger {
     return new Logger({ ...this.args, ...args }, this.req, this.waitForFlush);
   }
 
-  withRequest(req: NextRequest) {
+  withRequest(req: RequestReport) {
     return new Logger({ ...this.args }, req, this.waitForFlush);
   }
 
@@ -46,15 +61,7 @@ export class Logger {
     }
 
     if (this.req != null) {
-      logEvent['request'] = {
-        ip: this.req.ip,
-        region: this.req.geo?.region,
-        host: this.req.nextUrl.host,
-        method: this.req.method,
-        path: this.req.nextUrl.pathname,
-        scheme: this.req.nextUrl.protocol.replace(':', ''),
-        userAgent: this.req.headers.get('user-agent'),
-      };
+      logEvent['request'] = this.req;
     }
 
     this.logEvents.push(logEvent);
