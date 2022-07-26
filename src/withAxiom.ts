@@ -9,6 +9,18 @@ declare global {
   var EdgeRuntime: string;
 }
 
+interface RequestReport {
+  startTime: number;
+  statusCode?: number;
+  ip?: string;
+  region?: string;
+  path: string;
+  host: string;
+  method: string;
+  scheme: string;
+  userAgent?: string | null;
+}
+
 function withAxiomNextConfig(nextConfig: NextConfig): NextConfig {
   return {
     ...nextConfig,
@@ -114,7 +126,7 @@ export type AxiomMiddleware = (
 
 function withAxiomNextEdgeFunction(handler: NextMiddleware): NextMiddleware {
   return async (req, ev) => {
-    const report = {
+    const report: RequestReport = {
       startTime: new Date().getTime(),
       ip: req.ip,
       region: req.geo?.region,
