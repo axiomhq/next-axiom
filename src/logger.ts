@@ -71,8 +71,9 @@ export class Logger {
   }
 
   attachResponseStatus(status: number) {
-    this.logEvents.map((log) => {
-      log.request.satusCode = status;
+    this.logEvents = this.logEvents.map((log) => {
+      log.request.statusCode = status;
+      return log;
     });
   }
 
