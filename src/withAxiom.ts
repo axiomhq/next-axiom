@@ -129,7 +129,7 @@ function withAxiomNextEdgeFunction(handler: NextMiddleware): NextMiddleware {
     try {
       const res = await handler(axiomRequest, ev);
       if (res) {
-        report.statusCode = res.status
+        report.statusCode = res.status;
       }
       ev.waitUntil(log.flush());
       logEdgeReport(report);
