@@ -1,10 +1,22 @@
 import { NextConfig, NextApiHandler, NextApiResponse } from 'next';
-import { proxyPath, EndpointType, getIngestURL } from './shared';
 import { NextMiddleware } from 'next/server';
+import { proxyPath, EndpointType, getIngestURL } from './shared';
 import { log } from './logger';
 
 declare global {
   var EdgeRuntime: string;
+}
+
+interface RequestReport {
+  startTime: number;
+  statusCode?: number;
+  ip?: string;
+  region?: string;
+  path: string;
+  host: string;
+  method: string;
+  scheme: string;
+  userAgent?: string | null;
 }
 
 function withAxiomNextConfig(nextConfig: NextConfig): NextConfig {
@@ -106,16 +118,37 @@ function withAxiomNextApiHandler(handler: NextApiHandler): NextApiHandler {
 
 function withAxiomNextEdgeFunction(handler: NextMiddleware): NextMiddleware {
   return async (req, ev) => {
+    const report: RequestReport = {
+      startTime: new Date().getTime(),
+      ip: req.ip,
+      region: req.geo?.region,
+      host: req.nextUrl.host,
+      method: req.method,
+      path: req.nextUrl.pathname,
+      scheme: req.nextUrl.protocol.replace(':', ''),
+      userAgent: req.headers.get('user-agent'),
+    };
+
     try {
       const res = await handler(req, ev);
+      if (res) {
+        report.statusCode = res.status;
+      }
       ev.waitUntil(log.flush());
+      logEdgeReport(report);
       return res;
     } catch (error) {
       log.error('Error in edge function', { error });
+      report.statusCode = 500;
       ev.waitUntil(log.flush());
+      logEdgeReport(report);
       throw error;
     }
   };
+}
+
+function logEdgeReport(report: any) {
+  console.log(`AXIOM_EDGE_REPORT::${JSON.stringify(report)}`);
 }
 
 type WithAxiomParam = NextConfig | NextApiHandler | NextMiddleware;
