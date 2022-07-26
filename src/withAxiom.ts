@@ -107,10 +107,10 @@ function withAxiomNextApiHandler(handler: NextApiHandler): NextApiHandler {
       path: req.url!,
       method: req.method!,
       host: req.headers['host'] || '',
-      scheme: req.headers['host']?.split("://")[0] || '',
+      scheme: req.headers['host']?.split('://')[0] || '',
       ip: '',
-      region: ''
-    }
+      region: '',
+    };
     const logger = new Logger({}, report, false);
     const axiomRequest = req as AxiomAPIRequest;
     axiomRequest.log = logger;
