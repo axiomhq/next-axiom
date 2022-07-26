@@ -1,22 +1,13 @@
-import { NextConfig, NextApiHandler, NextApiResponse } from 'next';
-import { NextMiddleware } from 'next/server';
+// import { NextConfig, NextApiHandler, NextApiResponse } from 'next';
+// import { NextFetchEvent, NextMiddleware, NextRequest } from 'next/server';
+import { NextConfig, NextApiHandler, NextApiResponse, NextApiRequest } from 'next';
+import { NextFetchEvent, NextMiddleware, NextRequest } from 'next/server';
+import { NextMiddlewareResult } from 'next/dist/server/web/types';
+import { Logger, RequestReport } from './logger';
 import { proxyPath, EndpointType, getIngestURL } from './shared';
-import { log } from './logger';
 
 declare global {
   var EdgeRuntime: string;
-}
-
-interface RequestReport {
-  startTime: number;
-  statusCode?: number;
-  ip?: string;
-  region?: string;
-  path: string;
-  host: string;
-  method: string;
-  scheme: string;
-  userAgent?: string | null;
 }
 
 function withAxiomNextConfig(nextConfig: NextConfig): NextConfig {
@@ -28,6 +19,7 @@ function withAxiomNextConfig(nextConfig: NextConfig): NextConfig {
       const webVitalsEndpoint = getIngestURL(EndpointType.webVitals);
       const logsEndpoint = getIngestURL(EndpointType.logs);
       if (!webVitalsEndpoint && !logsEndpoint) {
+        const log = new Logger();
         log.warn(
           'axiom: Envvars not detected. If this is production please see https://github.com/axiomhq/next-axiom for help'
         );
@@ -62,14 +54,14 @@ function withAxiomNextConfig(nextConfig: NextConfig): NextConfig {
 // Sending logs after res.{json,send,end} is very unreliable.
 // This function overwrites these functions and makes sure logs are sent out
 // before the response is sent.
-function interceptNextApiResponse(res: NextApiResponse): [NextApiResponse, Promise<void>[]] {
+function interceptNextApiResponse(req: AxiomAPIRequest, res: NextApiResponse): [NextApiResponse, Promise<void>[]] {
   const allPromises: Promise<void>[] = [];
 
   const resSend = res.send;
   res.send = (body: any) => {
     allPromises.push(
       (async () => {
-        await log.flush();
+        await req.log.flush();
         resSend(body);
       })()
     );
@@ -79,7 +71,7 @@ function interceptNextApiResponse(res: NextApiResponse): [NextApiResponse, Promi
   res.json = (json: any) => {
     allPromises.push(
       (async () => {
-        await log.flush();
+        await req.log.flush();
         resJson(json);
       })()
     );
@@ -89,7 +81,7 @@ function interceptNextApiResponse(res: NextApiResponse): [NextApiResponse, Promi
   res.end = (cb?: () => undefined): NextApiResponse => {
     allPromises.push(
       (async () => {
-        await log.flush();
+        await req.log.flush();
         resEnd(cb);
       })()
     );
@@ -99,22 +91,50 @@ function interceptNextApiResponse(res: NextApiResponse): [NextApiResponse, Promi
   return [res, allPromises];
 }
 
+export type AxiomAPIRequest = NextApiRequest & { log: Logger };
+export type AxiomApiHandler = (
+  request: AxiomAPIRequest,
+  response: NextApiResponse
+) => NextApiHandler | Promise<NextApiHandler> | Promise<void>;
+
 function withAxiomNextApiHandler(handler: NextApiHandler): NextApiHandler {
+  console.log('this is a lambda api endpoint');
   return async (req, res) => {
-    const [wrappedRes, allPromises] = interceptNextApiResponse(res);
+    const report: RequestReport = {
+      startTime: new Date().getTime(),
+      path: req.url!,
+      method: req.method!,
+      host: req.headers['host'] || '',
+      userAgent: req.headers['user-agent'] || '',
+      scheme: 'https',
+      ip: req.headers['X-Forwarded-For'] ? req.headers['X-Forwarded-For'][0] : '',
+      region: '',
+    };
+    const logger = new Logger({}, report, false);
+    const axiomRequest = req as AxiomAPIRequest;
+    axiomRequest.log = logger;
+    const [wrappedRes, allPromises] = interceptNextApiResponse(axiomRequest, res);
 
     try {
-      await handler(req, wrappedRes);
-      await log.flush();
+      await handler(axiomRequest, wrappedRes);
+      logger.attachResponseStatus(wrappedRes.statusCode);
+      await logger.flush();
       await Promise.all(allPromises);
     } catch (error) {
-      log.error('Error in API handler', { error });
-      await log.flush();
+      logger.error('Error in API handler', { error });
+      logger.attachResponseStatus(500);
+      await logger.flush();
       await Promise.all(allPromises);
       throw error;
     }
   };
 }
+
+export type AxiomRequest = NextRequest & { log: Logger };
+export type AxiomMiddleware = (
+  request: AxiomRequest,
+  event: NextFetchEvent
+) => NextMiddlewareResult | Promise<NextMiddlewareResult>;
 
 function withAxiomNextEdgeFunction(handler: NextMiddleware): NextMiddleware {
   return async (req, ev) => {
@@ -129,18 +149,22 @@ function withAxiomNextEdgeFunction(handler: NextMiddleware): NextMiddleware {
       userAgent: req.headers.get('user-agent'),
     };
 
+    const logger = new Logger({}, report, false);
+    const axiomRequest = req as AxiomRequest;
+    axiomRequest.log = logger;
+
     try {
-      const res = await handler(req, ev);
-      if (res) {
-        report.statusCode = res.status;
+      const res = await handler(axiomRequest, ev);
+      if (res?.status) {
+        logger.attachResponseStatus(res?.status);
       }
-      ev.waitUntil(log.flush());
+      ev.waitUntil(logger.flush());
       logEdgeReport(report);
       return res;
     } catch (error) {
-      log.error('Error in edge function', { error });
-      report.statusCode = 500;
-      ev.waitUntil(log.flush());
+      logger.error('Error in edge function', { error });
+      logger.attachResponseStatus(500);
+      ev.waitUntil(logger.flush());
       logEdgeReport(report);
       throw error;
     }

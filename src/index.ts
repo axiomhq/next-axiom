@@ -1,3 +1,3 @@
 export { reportWebVitals } from './webVitals';
-export { log } from './logger';
+export { log, Logger } from './logger';
 export { withAxiom } from './withAxiom';
