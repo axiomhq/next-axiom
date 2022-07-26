@@ -139,7 +139,7 @@ function withAxiomNextEdgeFunction(handler: NextMiddleware): NextMiddleware {
       userAgent: req.headers.get('user-agent'),
     };
 
-    const logger = new Logger({}, report, true);
+    const logger = new Logger({}, report, false);
     const axiomRequest = req as AxiomRequest;
     axiomRequest.log = logger;
 
