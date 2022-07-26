@@ -30,7 +30,7 @@ export class Logger {
   constructor(
     private args: any = {},
     private req: RequestReport | null = null,
-    private waitForFlush: Boolean = false
+    private autoFlush: Boolean = true
   ) {}
 
   debug(message: string, args: any = {}) {
@@ -47,11 +47,11 @@ export class Logger {
   }
 
   with(args: any) {
-    return new Logger({ ...this.args, ...args }, this.req, this.waitForFlush);
+    return new Logger({ ...this.args, ...args }, this.req, this.autoFlush);
   }
 
   withRequest(req: RequestReport) {
-    return new Logger({ ...this.args }, req, this.waitForFlush);
+    return new Logger({ ...this.args }, req, this.autoFlush);
   }
 
   _log(level: string, message: string, args: any = {}) {
@@ -65,7 +65,7 @@ export class Logger {
     }
 
     this.logEvents.push(logEvent);
-    if (!this.waitForFlush) {
+    if (this.autoFlush) {
       this.throttledSendLogs();
     }
   }
