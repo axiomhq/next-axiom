@@ -102,17 +102,28 @@ export type AxiomApiHandler = (
 
 function withAxiomNextApiHandler(handler: NextApiHandler): NextApiHandler {
   return async (req, res) => {
-    const logger = new Logger();
+    const report: RequestReport = {
+      startTime: new Date().getTime(),
+      path: req.url!,
+      method: req.method!,
+      host: req.headers['host'] || '',
+      scheme: req.headers['host']?.split("://")[0] || '',
+      ip: '',
+      region: ''
+    }
+    const logger = new Logger({}, report, false);
     const axiomRequest = req as AxiomAPIRequest;
     axiomRequest.log = logger;
     const [wrappedRes, allPromises] = interceptNextApiResponse(axiomRequest, res);
 
     try {
       await handler(axiomRequest, wrappedRes);
+      logger.attachResponseStatus(200);
       await logger.flush();
       await Promise.all(allPromises);
     } catch (error) {
       logger.error('Error in API handler', { error });
+      logger.attachResponseStatus(500);
       await logger.flush();
       await Promise.all(allPromises);
       throw error;
