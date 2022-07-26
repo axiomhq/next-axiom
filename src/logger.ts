@@ -31,7 +31,7 @@ export const log = {
   flush: sendLogs,
 };
 
-export class Logger {
+class Logger {
   args: any = {};
 
   constructor(args: any = {}) {
