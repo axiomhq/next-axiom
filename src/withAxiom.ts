@@ -3,24 +3,12 @@
 import { NextConfig, NextApiHandler, NextApiResponse, NextApiRequest } from 'next';
 import { NextFetchEvent, NextMiddleware, NextRequest } from 'next/server';
 import { NextMiddlewareResult } from 'next/dist/server/web/types';
-import { Logger } from './logger';
+import { Logger, RequestReport } from './logger';
 import { proxyPath, EndpointType, getIngestURL } from './shared';
 import { Rewrite } from 'next/dist/lib/load-custom-routes';
 
 declare global {
   var EdgeRuntime: string;
-}
-
-interface RequestReport {
-  startTime: number;
-  statusCode?: number;
-  ip?: string;
-  region?: string;
-  path: string;
-  host: string;
-  method: string;
-  scheme: string;
-  userAgent?: string | null;
 }
 
 function withAxiomNextConfig(nextConfig: NextConfig): NextConfig {
@@ -151,13 +139,15 @@ function withAxiomNextEdgeFunction(handler: NextMiddleware): NextMiddleware {
       userAgent: req.headers.get('user-agent'),
     };
 
-    const logger = new Logger({}, req, true);
+    const logger = new Logger({}, report, true);
     const axiomRequest = req as AxiomRequest;
     axiomRequest.log = logger;
 
     try {
       const res = await handler(axiomRequest, ev);
-      logger.attachResponseStatus(res?.status || 0);
+      if (res?.status) {
+        logger.attachResponseStatus(res?.status);
+      }
       ev.waitUntil(logger.flush());
       logEdgeReport(report);
       return res;
