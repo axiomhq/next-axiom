@@ -1,3 +1,5 @@
+import { NextApiResponse } from 'next';
+import { NextResponse } from 'next/server';
 import { proxyPath, isBrowser, EndpointType, getIngestURL, isEnvVarsSet, isNoPrettyPrint } from './shared';
 import { throttle } from './shared';
 
@@ -9,6 +11,7 @@ interface LogEvent {
   fields: {};
   _time: string;
   request?: RequestReport;
+  response?: ResponseReport;
 }
 
 export interface RequestReport {
@@ -21,6 +24,12 @@ export interface RequestReport {
   method: string;
   scheme: string;
   userAgent?: string | null;
+}
+
+export interface ResponseReport {
+  statusCode: number;
+  contentType: string;
+  contentLength: string;
 }
 
 export class Logger {
@@ -66,10 +75,29 @@ export class Logger {
     }
   }
 
-  attachResponseStatus(status: number) {
+  attachResponseStatus(res: NextResponse | Response) {
     this.logEvents = this.logEvents.map((log) => {
       if (log.request) {
-        log.request.statusCode = status;
+        log.request.statusCode = res.status;
+        log.response = {
+          statusCode: res.status,
+          contentType: res.headers.get('content-type') || '',
+          contentLength: res.headers.get('content-length') || '',
+        }
+      }
+      return log;
+    });
+  }
+
+  attachAPIResponseStatus(res: NextApiResponse) {
+    this.logEvents = this.logEvents.map((log) => {
+      if (log.request) {
+        log.request.statusCode = res.statusCode;
+        log.response = {
+          statusCode: res.statusCode,
+          contentType: res.getHeader('content-type')?.toString() || '',
+          contentLength: res.getHeader('content-length')?.toString() || '',
+        }
       }
       return log;
     });

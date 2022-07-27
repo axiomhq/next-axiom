@@ -101,16 +101,15 @@ export type AxiomApiHandler = (
 ) => NextApiHandler | Promise<NextApiHandler> | Promise<void>;
 
 function withAxiomNextApiHandler(handler: NextApiHandler): NextApiHandler {
-  console.log('this is a lambda api endpoint');
   return async (req, res) => {
     const report: RequestReport = {
       startTime: new Date().getTime(),
       path: req.url!,
       method: req.method!,
-      host: req.headers['host'] || '',
-      userAgent: req.headers['user-agent'] || '',
+      host: getHeaderOrDefault(req, 'host', ''),
+      userAgent: getHeaderOrDefault(req, 'user-agent', ''),
       scheme: 'https',
-      ip: req.headers['X-Forwarded-For'] ? req.headers['X-Forwarded-For'][0] : '',
+      ip: getHeaderOrDefault(req, 'x-forwarded-for', ''),
       region: '',
     };
     const logger = new Logger({}, report, false);
@@ -120,12 +119,12 @@ function withAxiomNextApiHandler(handler: NextApiHandler): NextApiHandler {
 
     try {
       await handler(axiomRequest, wrappedRes);
-      logger.attachResponseStatus(wrappedRes.statusCode);
+      logger.attachAPIResponseStatus(wrappedRes);
       await logger.flush();
       await Promise.all(allPromises);
-    } catch (error) {
+    } catch (error: any) {
       logger.error('Error in API handler', { error });
-      logger.attachResponseStatus(500);
+      logger.attachResponseStatus(error['response']);
       await logger.flush();
       await Promise.all(allPromises);
       throw error;
@@ -158,15 +157,16 @@ function withAxiomNextEdgeFunction(handler: NextMiddleware): NextMiddleware {
 
     try {
       const res = await handler(axiomRequest, ev);
-      if (res?.status) {
-        logger.attachResponseStatus(res?.status);
+      if (res) {
+        res.headers.get('content-type')
+        logger.attachResponseStatus(res);
       }
       ev.waitUntil(logger.flush());
       logEdgeReport(report);
       return res;
-    } catch (error) {
+    } catch (error: any) {
       logger.error('Error in edge function', { error });
-      logger.attachResponseStatus(500);
+      logger.attachResponseStatus(error['res']);
       ev.waitUntil(logger.flush());
       logEdgeReport(report);
       throw error;
@@ -202,3 +202,6 @@ export function withAxiom<T extends WithAxiomParam>(param: T): T {
     return withAxiomNextEdgeFunction(param) as T;
   }
 }
+
+const getHeaderOrDefault = (req: NextApiRequest, headerName: string, defaultValue: any) => 
+  req.headers[headerName] ? req.headers[headerName] : defaultValue
