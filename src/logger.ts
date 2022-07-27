@@ -24,7 +24,7 @@ export interface RequestReport {
 }
 
 export class Logger {
-  public logEvents: any[] = [];
+  public logEvents: LogEvent[] = [];
   throttledSendLogs = throttle(this.sendLogs, 1000);
 
   constructor(private args: any = {}, private req: RequestReport | null = null, private autoFlush: Boolean = true) {}
@@ -68,7 +68,9 @@ export class Logger {
 
   attachResponseStatus(status: number) {
     this.logEvents = this.logEvents.map((log) => {
-      log.request.statusCode = status;
+      if (log.request) {
+        log.request.statusCode = status;
+      }
       return log;
     });
   }
