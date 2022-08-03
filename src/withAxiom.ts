@@ -110,7 +110,6 @@ function withAxiomNextApiHandler(handler: NextApiHandler): NextApiHandler {
       userAgent: getHeaderOrDefault(req, 'user-agent', ''),
       scheme: 'https',
       ip: getHeaderOrDefault(req, 'x-forwarded-for', ''),
-      region: '',
     };
     const logger = new Logger({}, report, false);
     const axiomRequest = req as AxiomAPIRequest;
@@ -158,7 +157,6 @@ function withAxiomNextEdgeFunction(handler: NextMiddleware): NextMiddleware {
     try {
       const res = await handler(axiomRequest, ev);
       if (res) {
-        res.headers.get('content-type')
         logger.attachResponseStatus(res);
       }
       ev.waitUntil(logger.flush());
@@ -203,5 +201,5 @@ export function withAxiom<T extends WithAxiomParam>(param: T): T {
   }
 }
 
-const getHeaderOrDefault = (req: NextApiRequest, headerName: string, defaultValue: any) => 
-  req.headers[headerName] ? req.headers[headerName] : defaultValue
+const getHeaderOrDefault = (req: NextApiRequest, headerName: string, defaultValue: any) =>
+  req.headers[headerName] ? req.headers[headerName] : defaultValue;

@@ -28,8 +28,8 @@ export interface RequestReport {
 
 export interface ResponseReport {
   statusCode: number;
-  contentType: string;
-  contentLength: string;
+  contentType?: string;
+  contentLength?: string;
 }
 
 export class Logger {
@@ -81,9 +81,9 @@ export class Logger {
         log.request.statusCode = res.status;
         log.response = {
           statusCode: res.status,
-          contentType: res.headers.get('content-type') || '',
-          contentLength: res.headers.get('content-length') || '',
-        }
+          // contentType: res.headers.get('content-type')?.toString() || '',
+          // contentLength: res.headers.get('content-length')?.toString() || '',
+        };
       }
       return log;
     });
@@ -95,9 +95,9 @@ export class Logger {
         log.request.statusCode = res.statusCode;
         log.response = {
           statusCode: res.statusCode,
-          contentType: res.getHeader('content-type')?.toString() || '',
-          contentLength: res.getHeader('content-length')?.toString() || '',
-        }
+          // contentType: res.getHeader('content-type')?.toString() || '',
+          // contentLength: res.getHeader('content-length')?.toString() || '',
+        };
       }
       return log;
     });
@@ -194,6 +194,10 @@ export function prettyPrint(ev: LogEvent) {
   if (ev.request) {
     msgString += ' %o';
     args.push(ev.request);
+  }
+  if (ev.response) {
+    msgString += ' %o';
+    args.push(ev.response);
   }
 
   console.log.apply(console, [msgString, ...args]);
