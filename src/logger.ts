@@ -11,7 +11,6 @@ interface LogEvent {
   fields: {};
   _time: string;
   request?: RequestReport;
-  response?: ResponseReport;
 }
 
 export interface RequestReport {
@@ -24,12 +23,6 @@ export interface RequestReport {
   method: string;
   scheme: string;
   userAgent?: string | null;
-}
-
-export interface ResponseReport {
-  statusCode: number;
-  contentType?: string;
-  contentLength?: string;
 }
 
 export class Logger {
@@ -79,11 +72,6 @@ export class Logger {
     this.logEvents = this.logEvents.map((log) => {
       if (log.request) {
         log.request.statusCode = res.status;
-        log.response = {
-          statusCode: res.status,
-          // contentType: res.headers.get('content-type')?.toString() || '',
-          // contentLength: res.headers.get('content-length')?.toString() || '',
-        };
       }
       return log;
     });
@@ -93,11 +81,6 @@ export class Logger {
     this.logEvents = this.logEvents.map((log) => {
       if (log.request) {
         log.request.statusCode = res.statusCode;
-        log.response = {
-          statusCode: res.statusCode,
-          // contentType: res.getHeader('content-type')?.toString() || '',
-          // contentLength: res.getHeader('content-length')?.toString() || '',
-        };
       }
       return log;
     });
@@ -194,10 +177,6 @@ export function prettyPrint(ev: LogEvent) {
   if (ev.request) {
     msgString += ' %o';
     args.push(ev.request);
-  }
-  if (ev.response) {
-    msgString += ' %o';
-    args.push(ev.response);
   }
 
   console.log.apply(console, [msgString, ...args]);
