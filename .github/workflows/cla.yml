@@ -14,7 +14,7 @@ jobs:
         # Beta Release
         uses: contributor-assistant/github-action@v2.2.0
         env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.tOKEN }}
           # the below token should have repo scope and must be manually added by you in the repository's secret
           PERSONAL_ACCESS_TOKEN : ${{ secrets.PERSONAL_ACCESS_TOKEN }}
         with:
