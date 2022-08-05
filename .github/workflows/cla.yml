@@ -14,9 +14,9 @@ jobs:
         # Beta Release
         uses: contributor-assistant/github-action@v2.2.0
         env:
-          GITHUB_TOKEN: ${{ secrets.tOKEN }}
+          GITHUB_TOKEN: ${{ secrets.CLA_TOKEN }}
           # the below token should have repo scope and must be manually added by you in the repository's secret
-          PERSONAL_ACCESS_TOKEN : ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          PERSONAL_ACCESS_TOKEN : ${{ secrets.CLA_ACCESS_TOKEN }}
         with:
           path-to-signatures: 'signatures/cla.json'
           path-to-document: 'https://github.com/axiomhq/next-axiom/blob/main/CLA.md' # e.g. a CLA or a DCO document
