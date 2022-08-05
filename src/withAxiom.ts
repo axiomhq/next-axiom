@@ -118,6 +118,7 @@ function withAxiomNextApiHandler(handler: NextApiHandler): NextApiHandler {
 
     try {
       await handler(axiomRequest, wrappedRes);
+      console.log('status code value:', wrappedRes.statusCode);
       logger.attachAPIResponseStatus(wrappedRes);
       await logger.flush();
       await Promise.all(allPromises);
