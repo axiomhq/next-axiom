@@ -4,6 +4,8 @@
 
 Send Web-Vitals and logs from Next.js to [Axiom](https://axiom.co).
 
+does cla work?
+
 ## Get started
 
 1. Make sure you have the [Axiom Vercel integration](https://www.axiom.co/vercel) installed or export `NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT`
