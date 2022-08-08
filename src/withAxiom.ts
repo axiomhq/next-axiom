@@ -2,8 +2,8 @@ import { NextConfig, NextApiHandler, NextApiResponse, NextApiRequest } from 'nex
 import { NextFetchEvent, NextMiddleware, NextRequest } from 'next/server';
 import { NextMiddlewareResult } from 'next/dist/server/web/types';
 import { Logger, RequestReport } from './logger';
-import { proxyPath, EndpointType, getIngestURL } from './shared';
 import { Rewrite } from 'next/dist/lib/load-custom-routes';
+import { proxyPath, EndpointType, getIngestURL, vercelEnv, vercelRegion } from './shared';
 
 declare global {
   var EdgeRuntime: string;
@@ -111,6 +111,8 @@ function withAxiomNextApiHandler(handler: NextApiHandler): NextApiHandler {
       userAgent: getHeaderOrDefault(req, 'user-agent', ''),
       scheme: 'https',
       ip: getHeaderOrDefault(req, 'x-forwarded-for', ''),
+      environment: vercelEnv,
+      region: vercelRegion,
     };
     const logger = new Logger({}, report, false);
     const axiomRequest = req as AxiomAPIRequest;
@@ -148,6 +150,7 @@ function withAxiomNextEdgeFunction(handler: NextMiddleware): NextMiddleware {
       path: req.nextUrl.pathname,
       scheme: req.nextUrl.protocol.replace(':', ''),
       userAgent: req.headers.get('user-agent'),
+      environment: vercelEnv,
     };
 
     const logger = new Logger({}, report, false);

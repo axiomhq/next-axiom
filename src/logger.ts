@@ -21,6 +21,7 @@ export interface RequestReport {
   method: string;
   scheme: string;
   userAgent?: string | null;
+  environment?: string | null;
 }
 
 export class Logger {
