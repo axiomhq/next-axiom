@@ -62,6 +62,7 @@ function interceptNextApiResponse(req: AxiomAPIRequest, res: NextApiResponse): [
   res.send = (body: any) => {
     allPromises.push(
       (async () => {
+        req.log.attachResponseStatus(res.statusCode);
         await req.log.flush();
         resSend(body);
       })()
@@ -72,6 +73,7 @@ function interceptNextApiResponse(req: AxiomAPIRequest, res: NextApiResponse): [
   res.json = (json: any) => {
     allPromises.push(
       (async () => {
+        req.log.attachResponseStatus(res.statusCode);
         await req.log.flush();
         resJson(json);
       })()
@@ -82,6 +84,7 @@ function interceptNextApiResponse(req: AxiomAPIRequest, res: NextApiResponse): [
   res.end = (cb?: () => undefined): NextApiResponse => {
     allPromises.push(
       (async () => {
+        req.log.attachResponseStatus(res.statusCode);
         await req.log.flush();
         resEnd(cb);
       })()
@@ -116,8 +119,6 @@ function withAxiomNextApiHandler(handler: NextApiHandler): NextApiHandler {
 
     try {
       await handler(axiomRequest, wrappedRes);
-      console.log('status code value:', wrappedRes.statusCode);
-      logger.attachResponseStatus(wrappedRes.statusCode);
       await logger.flush();
       await Promise.all(allPromises);
     } catch (error: any) {
