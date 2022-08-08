@@ -1,4 +1,13 @@
-import { proxyPath, isBrowser, EndpointType, getIngestURL, isEnvVarsSet, isNoPrettyPrint } from './shared';
+import {
+  proxyPath,
+  isBrowser,
+  EndpointType,
+  getIngestURL,
+  isEnvVarsSet,
+  isNoPrettyPrint,
+  vercelEnv,
+  vercelRegion,
+} from './shared';
 import { throttle } from './shared';
 
 const url = isBrowser ? `${proxyPath}/logs` : getIngestURL(EndpointType.logs);
@@ -9,6 +18,7 @@ interface LogEvent {
   fields: {};
   _time: string;
   request?: RequestReport;
+  vercel?: VercelData;
 }
 
 export interface RequestReport {
@@ -21,7 +31,12 @@ export interface RequestReport {
   method: string;
   scheme: string;
   userAgent?: string | null;
-  environment?: string | null;
+}
+
+interface VercelData {
+  environment?: string;
+  region?: string;
+  route?: string;
 }
 
 export class Logger {
@@ -57,8 +72,14 @@ export class Logger {
       logEvent.fields = args;
     }
 
+    logEvent.vercel = {
+      environment: vercelEnv,
+      region: vercelRegion,
+    };
+
     if (this.req != null) {
       logEvent.request = this.req;
+      logEvent.vercel.route = this.req.path;
     }
 
     this.logEvents.push(logEvent);
