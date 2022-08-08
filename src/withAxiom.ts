@@ -1,5 +1,3 @@
-// import { NextConfig, NextApiHandler, NextApiResponse } from 'next';
-// import { NextFetchEvent, NextMiddleware, NextRequest } from 'next/server';
 import { NextConfig, NextApiHandler, NextApiResponse, NextApiRequest } from 'next';
 import { NextFetchEvent, NextMiddleware, NextRequest } from 'next/server';
 import { NextMiddlewareResult } from 'next/dist/server/web/types';
@@ -119,12 +117,12 @@ function withAxiomNextApiHandler(handler: NextApiHandler): NextApiHandler {
     try {
       await handler(axiomRequest, wrappedRes);
       console.log('status code value:', wrappedRes.statusCode);
-      logger.attachAPIResponseStatus(wrappedRes);
+      logger.attachResponseStatus(wrappedRes.statusCode);
       await logger.flush();
       await Promise.all(allPromises);
     } catch (error: any) {
       logger.error('Error in API handler', { error });
-      logger.attachResponseStatus(error['response']);
+      logger.attachResponseStatus(500);
       await logger.flush();
       await Promise.all(allPromises);
       throw error;
@@ -158,14 +156,14 @@ function withAxiomNextEdgeFunction(handler: NextMiddleware): NextMiddleware {
     try {
       const res = await handler(axiomRequest, ev);
       if (res) {
-        logger.attachResponseStatus(res);
+        logger.attachResponseStatus(res.status);
       }
       ev.waitUntil(logger.flush());
       logEdgeReport(report);
       return res;
     } catch (error: any) {
       logger.error('Error in edge function', { error });
-      logger.attachResponseStatus(error['res']);
+      logger.attachResponseStatus(500);
       ev.waitUntil(logger.flush());
       logEdgeReport(report);
       throw error;

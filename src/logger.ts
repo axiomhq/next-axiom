@@ -1,5 +1,3 @@
-import { NextApiResponse } from 'next';
-import { NextResponse } from 'next/server';
 import { proxyPath, isBrowser, EndpointType, getIngestURL, isEnvVarsSet, isNoPrettyPrint } from './shared';
 import { throttle } from './shared';
 
@@ -55,11 +53,11 @@ export class Logger {
   _log(level: string, message: string, args: any = {}) {
     const logEvent: LogEvent = { level, message, _time: new Date(Date.now()).toISOString(), fields: {} };
     if (Object.keys(args).length > 0) {
-      logEvent['fields'] = args;
+      logEvent.fields = args;
     }
 
     if (this.req != null) {
-      logEvent['request'] = this.req;
+      logEvent.request = this.req;
     }
 
     this.logEvents.push(logEvent);
@@ -68,19 +66,10 @@ export class Logger {
     }
   }
 
-  attachResponseStatus(res: NextResponse | Response) {
+  attachResponseStatus(statusCode: number) {
     this.logEvents = this.logEvents.map((log) => {
       if (log.request) {
-        log.request.statusCode = res.status;
-      }
-      return log;
-    });
-  }
-
-  attachAPIResponseStatus(res: NextApiResponse) {
-    this.logEvents = this.logEvents.map((log) => {
-      if (log.request) {
-        log.request.statusCode = res.statusCode;
+        log.request.statusCode = statusCode;
       }
       return log;
     });
