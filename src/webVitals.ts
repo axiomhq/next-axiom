@@ -25,10 +25,22 @@ function sendMetrics() {
     webVitals: collectedMetrics,
   });
 
+  function sendFallback() {
+    // Do not leak network errors; does not affect the running app
+    fetch(url, { body, method: 'POST', keepalive: true }).catch(console.error);
+  }
+
   if (isBrowser && navigator.sendBeacon) {
-    navigator.sendBeacon(url, body);
+    try {
+      // See https://github.com/vercel/next.js/pull/26601
+      // Navigator has to be bound to ensure it does not error in some browsers
+      // https://xgwang.me/posts/you-may-not-know-beacon/#it-may-throw-error%2C-be-sure-to-catch
+      navigator.sendBeacon.bind(navigator)(url, body);
+    } catch (err) {
+      sendFallback();
+    }
   } else {
-    fetch(url, { body, method: 'POST', keepalive: true });
+    sendFallback();
   }
 
   collectedMetrics = [];
