@@ -2,6 +2,7 @@ import { NextConfig, NextApiHandler, NextApiResponse } from 'next';
 import { NextMiddleware } from 'next/server';
 import { proxyPath, EndpointType, getIngestURL } from './shared';
 import { log } from './logger';
+import { Rewrite } from 'next/dist/lib/load-custom-routes';
 
 declare global {
   var EdgeRuntime: string;
@@ -36,14 +37,16 @@ function withAxiomNextConfig(nextConfig: NextConfig): NextConfig {
         return rewrites || []; // nothing to do
       }
 
-      const axiomRewrites = [
+      const axiomRewrites: Rewrite[] = [
         {
           source: `${proxyPath}/web-vitals`,
           destination: webVitalsEndpoint,
+          basePath: false,
         },
         {
           source: `${proxyPath}/logs`,
           destination: logsEndpoint,
+          basePath: false,
         },
       ];
 
