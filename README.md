@@ -31,26 +31,25 @@ export { reportWebVitals } from 'next-axiom'
 
 ## Sending Logs
 
-1. Import Axiom's logger
-```js
-import { log } from 'next-axiom';
-```
-2. If you want to log from a function, wrap it using `withAxiom` like this:
+
+
+1. Wrap your functions using `withAxiom`, then you can use `req.log` like this:
 ```js
 // serverless function
 async function handler(req, res) {
-  log.info("hello from function")
+  req.log.info("hello from function")
   res.status(200).text('hi')
 }
 
 export default withAxiom(handler)
 ```
+
 ```js
 // middleware function
 import { NextResponse } from 'next/server'
 
 async function handler(req, ev) {
-  log.info("hello from middleware")
+  req.log.info("hello from middleware")
   return NextResponse.next()
 }
 
@@ -83,6 +82,19 @@ logger.info('User logged in', { userId: 42 })
 //     "userId": 42,
 //   }
 // }
+```
+
+In the frontend pages you can import `log` directly from `next-axiom`
+
+```js
+import { log } from `next-axiom`;
+
+// pages/index.js
+function home() {
+    ...
+    log.debug('User logged in', { userId: 42 })
+    ...
+}
 ```
 
 4. Deploy your site and watch data coming into your Axiom dataset.
