@@ -37,13 +37,19 @@ interface VercelData {
   environment?: string;
   region?: string;
   route?: string;
+  source?: string;
 }
 
 export class Logger {
   public logEvents: LogEvent[] = [];
   throttledSendLogs = throttle(this.sendLogs, 1000);
 
-  constructor(private args: any = {}, private req: RequestReport | null = null, private autoFlush: Boolean = true) {}
+  constructor(
+    private args: any = {},
+    private req: RequestReport | null = null,
+    private autoFlush: Boolean = true,
+    public source: 'frontend' | 'lambda' | 'edge' = 'frontend'
+  ) {}
 
   debug(message: string, args: any = {}) {
     this._log('debug', message, { ...this.args, ...args });
@@ -59,11 +65,11 @@ export class Logger {
   }
 
   with(args: any) {
-    return new Logger({ ...this.args, ...args }, this.req, this.autoFlush);
+    return new Logger({ ...this.args, ...args }, this.req, this.autoFlush, this.source);
   }
 
   withRequest(req: RequestReport) {
-    return new Logger({ ...this.args }, req, this.autoFlush);
+    return new Logger({ ...this.args }, req, this.autoFlush, this.source);
   }
 
   _log(level: string, message: string, args: any = {}) {
@@ -75,6 +81,7 @@ export class Logger {
     logEvent.vercel = {
       environment: vercelEnv,
       region: vercelRegion,
+      source: this.source,
     };
 
     if (this.req != null) {

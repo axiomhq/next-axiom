@@ -113,7 +113,7 @@ function withAxiomNextApiHandler(handler: NextApiHandler): NextApiHandler {
       ip: getHeaderOrDefault(req, 'x-forwarded-for', ''),
       region: vercelRegion,
     };
-    const logger = new Logger({}, report, false);
+    const logger = new Logger({}, report, false, 'lambda');
     const axiomRequest = req as AxiomAPIRequest;
     axiomRequest.log = logger;
     const [wrappedRes, allPromises] = interceptNextApiResponse(axiomRequest, res);
@@ -151,7 +151,7 @@ function withAxiomNextEdgeFunction(handler: NextMiddleware): NextMiddleware {
       userAgent: req.headers.get('user-agent'),
     };
 
-    const logger = new Logger({}, report, false);
+    const logger = new Logger({}, report, false, 'edge');
     const axiomRequest = req as AxiomRequest;
     axiomRequest.log = logger;
 
