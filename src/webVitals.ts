@@ -1,5 +1,5 @@
 import { NextWebVitalsMetric } from 'next/app';
-import { isBrowser, proxyPath, isEnvVarsSet, throttle } from './shared';
+import { isBrowser, proxyPath, isEnvVarsSet, throttle, vercelEnv } from './shared';
 
 const url = `${proxyPath}/web-vitals`;
 
@@ -21,6 +21,7 @@ export function reportWebVitals(metric: NextWebVitalsMetric) {
 function sendMetrics() {
   const body = JSON.stringify({
     webVitals: collectedMetrics,
+    environment: vercelEnv,
   });
 
   function sendFallback() {
