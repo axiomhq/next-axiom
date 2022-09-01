@@ -3,8 +3,8 @@ export const proxyPath = '/_axiom';
 export const isBrowser = typeof window !== 'undefined';
 export const isEnvVarsSet = process.env.AXIOM_INGEST_ENDPOINT || process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT;
 export const isNoPrettyPrint = process.env.AXIOM_NO_PRETTY_PRINT == 'true' ? true : false;
-export const vercelRegion = process.env.VERCEL_REGION;
-export const vercelEnv = process.env.VERCEL_ENV;
+export const vercelRegion = process.env.VERCEL_REGION || process.env.NEXT_PUBLIC_VERCEL_REGION;
+export const vercelEnv = process.env.VERCEL_ENV || process.env.NEXT_PUBLIC_VERCEL_ENV;
 
 export enum EndpointType {
   webVitals = 'web-vitals',
