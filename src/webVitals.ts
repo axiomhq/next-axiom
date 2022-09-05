@@ -1,4 +1,5 @@
 import { NextWebVitalsMetric } from 'next/app';
+import { useRouter } from 'next/router';
 import { isBrowser, proxyPath, isEnvVarsSet, throttle, vercelEnv } from './shared';
 
 const url = `${proxyPath}/web-vitals`;
@@ -9,7 +10,8 @@ const throttledSendMetrics = throttle(sendMetrics, 1000);
 let collectedMetrics: WebVitalsMetric[] = [];
 
 export function reportWebVitals(metric: NextWebVitalsMetric) {
-  collectedMetrics.push({ route: window.__NEXT_DATA__?.page, ...metric });
+  const router = useRouter()
+  collectedMetrics.push({ route: router.pathname, ...metric });
   // if Axiom env vars are not set, do nothing,
   // otherwise devs will get errors on dev environments
   if (!isEnvVarsSet) {
