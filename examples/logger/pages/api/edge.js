@@ -7,6 +7,8 @@ export const config = {
 function handler(req) {
     req.log.debug("message from edge", { foo: 'bar' })
 
+    throw new Error('Hello from edge error');
+
     return new Response(
         JSON.stringify({
             message: 'Hello, world!',

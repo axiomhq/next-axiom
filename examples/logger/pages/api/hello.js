@@ -3,6 +3,7 @@ import { withAxiom } from 'next-axiom'
 
 async function handler(req, res) {
   req.log.info('Hello from function', { url: req.url });
+  throw new Error('Hello from error');
   res.status(200).json({ name: 'John Doe' })
 }
 
