@@ -1,5 +1,5 @@
 import { NextConfig, NextApiHandler, NextApiResponse, NextApiRequest } from 'next';
-import { NextFetchEvent, NextMiddleware, NextRequest } from 'next/server';
+import { NextFetchEvent, NextMiddleware, NextRequest, NextResponse } from 'next/server';
 import { NextMiddlewareResult } from 'next/dist/server/web/types';
 import { Logger, RequestReport } from './logger';
 import { Rewrite } from 'next/dist/lib/load-custom-routes';
@@ -123,11 +123,11 @@ function withAxiomNextApiHandler(handler: NextApiHandler): NextApiHandler {
       await logger.flush();
       await Promise.all(allPromises);
     } catch (error: any) {
-      logger.error('Error in API handler', { error });
+      logger.error('Error in API handler', { error, stack: error.stack });
       logger.attachResponseStatus(500);
       await logger.flush();
       await Promise.all(allPromises);
-      throw error;
+      return res.status(500).json({ error: 'Internal Server Error' });
     }
   };
 }
@@ -164,11 +164,11 @@ function withAxiomNextEdgeFunction(handler: NextMiddleware): NextMiddleware {
       logEdgeReport(report);
       return res;
     } catch (error: any) {
-      logger.error('Error in edge function', { error });
+      logger.error('Error in edge function', { error, stack: error.stack });
       logger.attachResponseStatus(500);
       ev.waitUntil(logger.flush());
       logEdgeReport(report);
-      throw error;
+      return NextResponse.error();
     }
   };
 }
