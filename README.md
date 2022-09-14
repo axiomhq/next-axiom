@@ -4,7 +4,7 @@
 
 Send Web-Vitals and logs from Next.js to [Axiom](https://axiom.co).
 
-## Get started
+## Get Started
 
 1. Make sure you have the [Axiom Vercel integration](https://www.axiom.co/vercel) installed or export `NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT`
 2. In your Next.js project, run `npm install --save next-axiom`
@@ -108,3 +108,10 @@ default, to disable it set the environment variable:
 ```
 AXIOM_PRETTY_PRINT_ENABLED=false
 ```
+
+## FAQ & Troubleshooting
+
+### Web-Vital and frontend log requests return 404
+
+Double-check that your Next.js config is wrapped in `withAxiom`, see 
+[Get started](#get-started).
