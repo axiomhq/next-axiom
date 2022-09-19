@@ -174,7 +174,7 @@ function withAxiomNextEdgeFunction(handler: NextMiddleware): NextMiddleware {
 }
 
 function logEdgeReport(report: any) {
-  if (config.isVercel) {
+  if (config.platform.shoudSendEdgeReport) {
     console.log(`AXIOM_EDGE_REPORT::${JSON.stringify(report)}`);
   }
 }

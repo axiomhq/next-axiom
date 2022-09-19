@@ -78,10 +78,10 @@ export class Logger {
 
     // logEvent.vercel = {
     logEvent.platform = {
-      environment: config.environment,
-      region: config.region,
+      environment: config.platform.getEnvironment(),
+      region: config.platform.getRegion(),
       source: this.source,
-      provider: config.provider,
+      provider: config.platform.provider,
     };
 
     if (this.req != null) {
@@ -109,7 +109,7 @@ export class Logger {
       return;
     }
 
-    if (!config.isEnvVarsSet) {
+    if (!config.platform.isEnvVarsSet) {
       // if AXIOM ingesting url is not set, fallback to printing to console
       // to avoid network errors in development environments
       this.logEvents.forEach((ev) => prettyPrint(ev));
@@ -121,7 +121,7 @@ export class Logger {
     const keepalive = true;
     const body = JSON.stringify(this.logEvents);
     const headers = {
-      Authorization: `Bearer ${config.token}`,
+      Authorization: `Bearer ${config.platform.getAuthToken()}`,
       'content-type': 'application/json',
     };
     // clear pending logs

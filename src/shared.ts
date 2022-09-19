@@ -1,38 +1,17 @@
 export const proxyPath = '/_axiom';
-const TOKEN = process.env.AXIOM_TOKEN;
+import { type PlatformManager, Generic, Vercel } from './platform';
 
-function detectEnvironmentConfiguration() {
-  const isVercel = process.env.NEXT_PUBLIC_VERCEL_ENV ? true : false;
-  const nodeEnv = process.env.NODE_ENV;
+class Config {
+  isVercel = process.env.NEXT_PUBLIC_VERCEL_ENV ? true : false;
+  isNoPrettyPrint = process.env.AXIOM_NO_PRETTY_PRINT == 'true' ? true : false;
+  isBrowser = typeof window !== 'undefined';
+  platform: PlatformManager;
 
-  const baseConfig = {
-    isBrowser: typeof window !== 'undefined',
-    // isEnvVarsSet: process.env.AXIOM_INGEST_ENDPOINT || process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT,
-    isEnvVarsSet: true,
-    isNoPrettyPrint: process.env.AXIOM_NO_PRETTY_PRINT == 'true' ? true : false,
-    isVercel,
-    token: TOKEN,
-  };
-
-  if (isVercel) {
-    return {
-      ...baseConfig,
-      region: process.env.VERCEL_REGION || process.env.NEXT_PUBLIC_VERCEL_REGION,
-      environment: process.env.VERCEL_ENV || process.env.NEXT_PUBLIC_VERCEL_ENV,
-      dataset: 'vercel',
-      provider: 'vercel',
-    };
+  constructor() {
+    this.platform = this.isVercel ? new Vercel() : new Generic();
   }
-
-  return {
-    ...baseConfig,
-    region: '',
-    environment: nodeEnv || 'dev',
-    provider: 'self-hosted',
-  };
 }
-
-export const config = detectEnvironmentConfiguration();
+export const config = new Config();
 
 export enum EndpointType {
   webVitals = 'web-vitals',
