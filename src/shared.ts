@@ -45,13 +45,20 @@ export enum EndpointType {
 }
 
 export const getIngestURL = function (t: EndpointType) {
+  if (process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT!! != '') {
+    const ingestEndpoint = `${BASE_URL}/api/v1/integrations/vercel/ingest`;
+    const url = new URL(ingestEndpoint);
+    // attach type query param based on passed EndpointType
+    url.searchParams.set('type', t.toString());
+    return url.toString();
+  }
+  
   const ingestEndpoint = `${BASE_URL}/api/v1/datasets/${config.dataset}/ingest`;
   if (!ingestEndpoint) {
     return '';
   }
 
   const url = new URL(ingestEndpoint);
-  // attach type query param based on passed EndpointType
   url.searchParams.set('type', t.toString());
   return url.toString();
 };

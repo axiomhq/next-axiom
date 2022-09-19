@@ -3,7 +3,7 @@ import { NextFetchEvent, NextMiddleware, NextRequest } from 'next/server';
 import { NextMiddlewareResult } from 'next/dist/server/web/types';
 import { Logger, RequestReport } from './logger';
 import { Rewrite } from 'next/dist/lib/load-custom-routes';
-import { proxyPath, EndpointType, getIngestURL } from './shared';
+import { proxyPath, EndpointType, getIngestURL, config } from './shared';
 
 declare global {
   var EdgeRuntime: string;
@@ -174,7 +174,9 @@ function withAxiomNextEdgeFunction(handler: NextMiddleware): NextMiddleware {
 }
 
 function logEdgeReport(report: any) {
-  console.log(`AXIOM_EDGE_REPORT::${JSON.stringify(report)}`);
+  if (config.isVercel) {
+    console.log(`AXIOM_EDGE_REPORT::${JSON.stringify(report)}`);
+  }
 }
 
 type WithAxiomParam = NextConfig | NextApiHandler | NextMiddleware;
