@@ -1,7 +1,7 @@
 export const proxyPath = '/_axiom';
 const TOKEN = process.env.AXIOM_TOKEN;
 const DATASET = process.env.AXIOM_DATASET;
-const BASE_URL = process.env.AXIOM_URL;
+const AXIOM_URL = process.env.AXIOM_URL;
 
 function detectEnvironmentConfiguration() {
   const isVercel = process.env.NEXT_PUBLIC_VERCEL_ENV ? true : false;
@@ -45,15 +45,16 @@ export enum EndpointType {
 }
 
 export const getIngestURL = function (t: EndpointType) {
-  if (process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT!! != '') {
-    const ingestEndpoint = `${BASE_URL}/api/v1/integrations/vercel/ingest`;
+  const vercelEndpoint = process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT || process.env.AXIOM_INGEST_ENDPOINT;
+  if (vercelEndpoint) {
+    const ingestEndpoint = `${vercelEndpoint}/api/v1/integrations/vercel/ingest`;
     const url = new URL(ingestEndpoint);
     // attach type query param based on passed EndpointType
     url.searchParams.set('type', t.toString());
     return url.toString();
   }
 
-  const ingestEndpoint = `${BASE_URL}/api/v1/datasets/${config.dataset}/ingest`;
+  const ingestEndpoint = `${AXIOM_URL}/api/v1/datasets/${config.dataset}/ingest`;
   if (!ingestEndpoint) {
     return '';
   }
