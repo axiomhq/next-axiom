@@ -3,7 +3,7 @@ const TOKEN = process.env.AXIOM_TOKEN;
 const DATASET = process.env.AXIOM_DATASET;
 const BASE_URL = process.env.AXIOM_URL;
 
-function detectEnvironmentConfiguration () {
+function detectEnvironmentConfiguration() {
   const isVercel = process.env.NEXT_PUBLIC_VERCEL_ENV ? true : false;
   const nodeEnv = process.env.NODE_ENV;
   const datasetName = process.env.AXIOM_DATASET || null;
@@ -16,7 +16,7 @@ function detectEnvironmentConfiguration () {
     isVercel,
     token: TOKEN,
     dataset: DATASET,
-  }
+  };
 
   if (isVercel) {
     return {
@@ -24,8 +24,8 @@ function detectEnvironmentConfiguration () {
       region: process.env.VERCEL_REGION || process.env.NEXT_PUBLIC_VERCEL_REGION,
       environment: process.env.VERCEL_ENV || process.env.NEXT_PUBLIC_VERCEL_ENV,
       dataset: 'vercel',
-      provider: 'vercel'
-    }
+      provider: 'vercel',
+    };
   }
 
   return {
@@ -34,10 +34,10 @@ function detectEnvironmentConfiguration () {
     environment: nodeEnv || 'dev',
     dataset: datasetName,
     provider: 'self-hosted',
-  }
+  };
 }
 
-export const config = detectEnvironmentConfiguration()
+export const config = detectEnvironmentConfiguration();
 
 export enum EndpointType {
   webVitals = 'web-vitals',
@@ -52,7 +52,7 @@ export const getIngestURL = function (t: EndpointType) {
     url.searchParams.set('type', t.toString());
     return url.toString();
   }
-  
+
   const ingestEndpoint = `${BASE_URL}/api/v1/datasets/${config.dataset}/ingest`;
   if (!ingestEndpoint) {
     return '';

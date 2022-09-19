@@ -19,23 +19,30 @@ export function reportWebVitals(metric: NextWebVitalsMetric) {
 }
 
 function sendMetrics() {
-  const body = JSON.stringify([{
-    msg: 'reportWebVitals',
-    webVitals: collectedMetrics,
-    _time: new Date().getTime(),
-    platform: {
-      provider: config.provider,
-      environment: config.environment,
-      source: 'reportWebVitals'
-    }
-  }]);
+  const body = JSON.stringify([
+    {
+      msg: 'reportWebVitals',
+      webVitals: collectedMetrics,
+      _time: new Date().getTime(),
+      platform: {
+        provider: config.provider,
+        environment: config.environment,
+        source: 'reportWebVitals',
+      },
+    },
+  ]);
 
   function sendFallback() {
     // Do not leak network errors; does not affect the running app
-    fetch(url, { body, method: 'POST', keepalive: true, headers: {
-      Authorization: `Bearer ${config.token}`,
-      'Content-Type': 'application/json'
-    } }).catch(console.error);
+    fetch(url, {
+      body,
+      method: 'POST',
+      keepalive: true,
+      headers: {
+        Authorization: `Bearer ${config.token}`,
+        'Content-Type': 'application/json',
+      },
+    }).catch(console.error);
   }
 
   // if (config.isBrowser && navigator.sendBeacon) {
@@ -51,7 +58,7 @@ function sendMetrics() {
   // } else {
   //   sendFallback();
   // }
-  sendFallback()
+  sendFallback();
 
   collectedMetrics = [];
 }

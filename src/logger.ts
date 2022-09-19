@@ -7,7 +7,6 @@ import {
 } from './shared';
 import { throttle } from './shared';
 
-
 const url = config.isBrowser ? `${proxyPath}/logs` : getIngestURL(EndpointType.logs);
 
 interface LogEvent {
@@ -124,7 +123,7 @@ export class Logger {
     const headers = {
       Authorization: `Bearer ${config.token}`,
       'content-type': 'application/json',
-    }
+    };
     // clear pending logs
     this.logEvents = [];
 
@@ -132,9 +131,9 @@ export class Logger {
       if (typeof fetch === 'undefined') {
         const fetch = await require('whatwg-fetch');
         await fetch(url, { body, method, keepalive, headers });
-      // } else if (config.isBrowser && navigator.sendBeacon) {
-      //   const blob = new Blob([body], headers)
-      //   navigator.sendBeacon(url, blob);
+        // } else if (config.isBrowser && navigator.sendBeacon) {
+        //   const blob = new Blob([body], headers)
+        //   navigator.sendBeacon(url, blob);
       } else {
         await fetch(url, { body, method, keepalive, headers });
       }
