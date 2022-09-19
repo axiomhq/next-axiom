@@ -5,3 +5,4 @@
 /src/*.js.map
 /dist/
 /.vscode
+.envrc
