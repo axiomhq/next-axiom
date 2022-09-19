@@ -29,7 +29,7 @@ function withAxiomNextConfig(nextConfig: NextConfig): NextConfig {
 
       const axiomRewrites: Rewrite[] = [
         {
-          source: `${proxyPath}/logs`,
+          source: `${proxyPath}/web-vitals`,
           destination: webVitalsEndpoint,
           basePath: false,
         },
