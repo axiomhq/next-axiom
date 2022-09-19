@@ -3,6 +3,7 @@
  */
 
 // clear Axiom env vars
+process.env.AXIOM_URL = '';
 process.env.AXIOM_INGEST_ENDPOINT = '';
 process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT = '';
 import { NextWebVitalsMetric } from 'next/app';
