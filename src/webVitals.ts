@@ -19,18 +19,26 @@ export function reportWebVitals(metric: NextWebVitalsMetric) {
 }
 
 function sendMetrics() {
-  const body = JSON.stringify([
-    {
-      msg: 'reportWebVitals',
+  let body = '';
+  if (config.isVercel) {
+    body = JSON.stringify({
       webVitals: collectedMetrics,
-      _time: new Date().getTime(),
-      platform: {
-        provider: config.platform.provider,
-        environment: config.platform.getEnvironment(),
-        source: 'reportWebVitals',
+      environment: config.platform.getEnvironment(),
+    });
+  } else {
+    body = JSON.stringify([
+      {
+        msg: 'reportWebVitals',
+        webVitals: collectedMetrics,
+        _time: new Date().getTime(),
+        platform: {
+          provider: config.platform.provider,
+          environment: config.platform.getEnvironment(),
+          source: 'reportWebVitals',
+        },
       },
-    },
-  ]);
+    ]);
+  }
 
   function sendFallback() {
     // Do not leak network errors; does not affect the running app
