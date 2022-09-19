@@ -1,18 +1,51 @@
 export const proxyPath = '/_axiom';
+const TOKEN = process.env.AXIOM_TOKEN;
+const DATASET = process.env.AXIOM_DATASET;
+const BASE_URL = process.env.AXIOM_URL;
 
-export const isBrowser = typeof window !== 'undefined';
-export const isEnvVarsSet = process.env.AXIOM_INGEST_ENDPOINT || process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT;
-export const isNoPrettyPrint = process.env.AXIOM_NO_PRETTY_PRINT == 'true' ? true : false;
-export const vercelRegion = process.env.VERCEL_REGION || process.env.NEXT_PUBLIC_VERCEL_REGION;
-export const vercelEnv = process.env.VERCEL_ENV || process.env.NEXT_PUBLIC_VERCEL_ENV;
+function detectEnvironmentConfiguration () {
+  const isVercel = process.env.NEXT_PUBLIC_VERCEL_ENV ? true : false;
+  const nodeEnv = process.env.NODE_ENV;
+  const datasetName = process.env.AXIOM_DATASET || null;
+
+  const baseConfig = {
+    isBrowser: typeof window !== 'undefined',
+    // isEnvVarsSet: process.env.AXIOM_INGEST_ENDPOINT || process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT,
+    isEnvVarsSet: true,
+    isNoPrettyPrint: process.env.AXIOM_NO_PRETTY_PRINT == 'true' ? true : false,
+    isVercel,
+    token: TOKEN,
+    dataset: DATASET,
+  }
+
+  if (isVercel) {
+    return {
+      ...baseConfig,
+      region: process.env.VERCEL_REGION || process.env.NEXT_PUBLIC_VERCEL_REGION,
+      environment: process.env.VERCEL_ENV || process.env.NEXT_PUBLIC_VERCEL_ENV,
+      dataset: 'vercel',
+      provider: 'vercel'
+    }
+  }
+
+  return {
+    ...baseConfig,
+    region: '',
+    environment: nodeEnv || 'dev',
+    dataset: datasetName,
+    provider: 'self-hosted',
+  }
+}
+
+export const config = detectEnvironmentConfiguration()
 
 export enum EndpointType {
   webVitals = 'web-vitals',
   logs = 'logs',
 }
 
-export const getIngestURL = (t: EndpointType) => {
-  const ingestEndpoint = process.env.AXIOM_INGEST_ENDPOINT || process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT;
+export const getIngestURL = function (t: EndpointType) {
+  const ingestEndpoint = `${BASE_URL}/api/v1/datasets/${config.dataset}/ingest`;
   if (!ingestEndpoint) {
     return '';
   }

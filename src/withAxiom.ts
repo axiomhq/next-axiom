@@ -3,7 +3,7 @@ import { NextFetchEvent, NextMiddleware, NextRequest } from 'next/server';
 import { NextMiddlewareResult } from 'next/dist/server/web/types';
 import { Logger, RequestReport } from './logger';
 import { Rewrite } from 'next/dist/lib/load-custom-routes';
-import { proxyPath, EndpointType, getIngestURL, vercelRegion } from './shared';
+import { proxyPath, EndpointType, getIngestURL } from './shared';
 
 declare global {
   var EdgeRuntime: string;
@@ -29,7 +29,7 @@ function withAxiomNextConfig(nextConfig: NextConfig): NextConfig {
 
       const axiomRewrites: Rewrite[] = [
         {
-          source: `${proxyPath}/web-vitals`,
+          source: `${proxyPath}/logs`,
           destination: webVitalsEndpoint,
           basePath: false,
         },
@@ -111,7 +111,7 @@ function withAxiomNextApiHandler(handler: NextApiHandler): NextApiHandler {
       userAgent: getHeaderOrDefault(req, 'user-agent', ''),
       scheme: 'https',
       ip: getHeaderOrDefault(req, 'x-forwarded-for', ''),
-      region: vercelRegion,
+      // region: vercelRegion,
     };
     const logger = new Logger({}, report, false, 'lambda');
     const axiomRequest = req as AxiomAPIRequest;

@@ -1,5 +1,5 @@
 import { NextWebVitalsMetric } from 'next/app';
-import { isBrowser, proxyPath, isEnvVarsSet, throttle, vercelEnv } from './shared';
+import { config, proxyPath, throttle } from './shared';
 
 const url = `${proxyPath}/web-vitals`;
 
@@ -12,35 +12,46 @@ export function reportWebVitals(metric: NextWebVitalsMetric) {
   collectedMetrics.push({ route: window.__NEXT_DATA__?.page, ...metric });
   // if Axiom env vars are not set, do nothing,
   // otherwise devs will get errors on dev environments
-  if (!isEnvVarsSet) {
+  if (!config.isEnvVarsSet) {
     return;
   }
   throttledSendMetrics();
 }
 
 function sendMetrics() {
-  const body = JSON.stringify({
+  const body = JSON.stringify([{
+    msg: 'reportWebVitals',
     webVitals: collectedMetrics,
-    environment: vercelEnv,
-  });
+    _time: new Date().getTime(),
+    platform: {
+      provider: config.provider,
+      environment: config.environment,
+      source: 'reportWebVitals'
+    }
+  }]);
 
   function sendFallback() {
     // Do not leak network errors; does not affect the running app
-    fetch(url, { body, method: 'POST', keepalive: true }).catch(console.error);
+    fetch(url, { body, method: 'POST', keepalive: true, headers: {
+      Authorization: `Bearer ${config.token}`,
+      'Content-Type': 'application/json'
+    } }).catch(console.error);
   }
 
-  if (isBrowser && navigator.sendBeacon) {
-    try {
-      // See https://github.com/vercel/next.js/pull/26601
-      // Navigator has to be bound to ensure it does not error in some browsers
-      // https://xgwang.me/posts/you-may-not-know-beacon/#it-may-throw-error%2C-be-sure-to-catch
-      navigator.sendBeacon.bind(navigator)(url, body);
-    } catch (err) {
-      sendFallback();
-    }
-  } else {
-    sendFallback();
-  }
+  // if (config.isBrowser && navigator.sendBeacon) {
+  //   try {
+  //     // See https://github.com/vercel/next.js/pull/26601
+  //     // Navigator has to be bound to ensure it does not error in some browsers
+  //     // https://xgwang.me/posts/you-may-not-know-beacon/#it-may-throw-error%2C-be-sure-to-catch
+  //     const b
+  //     navigator.sendBeacon.bind(navigator)(url, body);
+  //   } catch (err) {
+  //     sendFallback();
+  //   }
+  // } else {
+  //   sendFallback();
+  // }
+  sendFallback()
 
   collectedMetrics = [];
 }
