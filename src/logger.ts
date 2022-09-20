@@ -1,13 +1,8 @@
-import {
-  proxyPath,
-  EndpointType,
-  getIngestURL,
-  config,
-  // vercelRegion,
-} from './shared';
+import { config, isBrowser, isNoPrettyPrint } from './shared';
+
 import { throttle } from './shared';
 
-const url = config.isBrowser ? `${proxyPath}/logs` : getIngestURL(EndpointType.logs);
+const url = config.getLogsUrl();
 
 interface LogEvent {
   level: string;
@@ -78,10 +73,10 @@ export class Logger {
 
     // logEvent.vercel = {
     logEvent.platform = {
-      environment: config.platform.getEnvironment(),
-      region: config.platform.getRegion(),
+      environment: config.getEnvironment(),
+      region: config.getRegion(),
       source: this.source,
-      provider: config.platform.provider,
+      provider: config.provider,
     };
 
     if (this.req != null) {
@@ -109,7 +104,7 @@ export class Logger {
       return;
     }
 
-    if (!config.platform.isEnvVarsSet) {
+    if (!config.isEnvVarsSet) {
       // if AXIOM ingesting url is not set, fallback to printing to console
       // to avoid network errors in development environments
       this.logEvents.forEach((ev) => prettyPrint(ev));
@@ -121,7 +116,7 @@ export class Logger {
     const keepalive = true;
     const body = JSON.stringify(this.logEvents);
     const headers = {
-      Authorization: `Bearer ${config.platform.getAuthToken()}`,
+      Authorization: `Bearer ${config.getAuthToken()}`,
       'content-type': 'application/json',
     };
     // clear pending logs
@@ -132,8 +127,8 @@ export class Logger {
         const fetch = await require('whatwg-fetch');
         await fetch(url, { body, method, keepalive, headers });
         // } else if (config.isBrowser && navigator.sendBeacon) {
-        //   const blob = new Blob([body], headers)
-        //   navigator.sendBeacon(url, blob);
+        // const blob = new Blob([body], headers)
+        // navigator.sendBeacon(url, blob);
       } else {
         await fetch(url, { body, method, keepalive, headers });
       }
@@ -169,7 +164,7 @@ const levelColors = {
 export function prettyPrint(ev: LogEvent) {
   const hasFields = Object.keys(ev.fields).length > 0;
   // check whether pretty print is disabled
-  if (config.isNoPrettyPrint) {
+  if (isNoPrettyPrint) {
     let msg = `${ev.level} - ${ev.message}`;
     if (hasFields) {
       msg += ' ' + JSON.stringify(ev.fields);
@@ -184,7 +179,7 @@ export function prettyPrint(ev: LogEvent) {
   let msgString = '';
   let args: any[] = [ev.level, ev.message];
 
-  if (config.isBrowser) {
+  if (isBrowser) {
     msgString = '%c%s - %s';
     args = [`color: ${levelColors[ev.level].browser};`, ...args];
   } else {

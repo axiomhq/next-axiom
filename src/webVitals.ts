@@ -1,7 +1,7 @@
 import { NextWebVitalsMetric } from 'next/app';
-import { config, proxyPath, throttle } from './shared';
+import { config, isBrowser, throttle } from './shared';
 
-const url = `${proxyPath}/web-vitals`;
+const url = config.getWebVitalsUrl();
 
 export declare type WebVitalsMetric = NextWebVitalsMetric & { route: string };
 
@@ -12,33 +12,14 @@ export function reportWebVitals(metric: NextWebVitalsMetric) {
   collectedMetrics.push({ route: window.__NEXT_DATA__?.page, ...metric });
   // if Axiom env vars are not set, do nothing,
   // otherwise devs will get errors on dev environments
-  if (!config.platform.isEnvVarsSet) {
+  if (!config.isEnvVarsSet) {
     return;
   }
   throttledSendMetrics();
 }
 
 function sendMetrics() {
-  let body = '';
-  if (config.isVercel) {
-    body = JSON.stringify({
-      webVitals: collectedMetrics,
-      environment: config.platform.getEnvironment(),
-    });
-  } else {
-    body = JSON.stringify([
-      {
-        msg: 'reportWebVitals',
-        webVitals: collectedMetrics,
-        _time: new Date().getTime(),
-        platform: {
-          provider: config.platform.provider,
-          environment: config.platform.getEnvironment(),
-          source: 'reportWebVitals',
-        },
-      },
-    ]);
-  }
+  const body = JSON.stringify(config.wrapWebVitalsObject(collectedMetrics));
 
   function sendFallback() {
     // Do not leak network errors; does not affect the running app
@@ -47,13 +28,13 @@ function sendMetrics() {
       method: 'POST',
       keepalive: true,
       headers: {
-        Authorization: `Bearer ${config.platform.getAuthToken()}`,
+        Authorization: `Bearer ${config.getAuthToken()}`,
         'Content-Type': 'application/json',
       },
     }).catch(console.error);
   }
 
-  if (config.isBrowser && navigator.sendBeacon) {
+  if (isBrowser && navigator.sendBeacon) {
     try {
       // See https://github.com/vercel/next.js/pull/26601
       // Navigator has to be bound to ensure it does not error in some browsers

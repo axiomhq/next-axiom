@@ -3,7 +3,7 @@ import { NextFetchEvent, NextMiddleware, NextRequest } from 'next/server';
 import { NextMiddlewareResult } from 'next/dist/server/web/types';
 import { Logger, RequestReport } from './logger';
 import { Rewrite } from 'next/dist/lib/load-custom-routes';
-import { proxyPath, EndpointType, getIngestURL, config } from './shared';
+import { proxyPath, EndpointType, config } from './shared';
 
 declare global {
   var EdgeRuntime: string;
@@ -15,8 +15,8 @@ function withAxiomNextConfig(nextConfig: NextConfig): NextConfig {
     rewrites: async () => {
       const rewrites = await nextConfig.rewrites?.();
 
-      const webVitalsEndpoint = getIngestURL(EndpointType.webVitals);
-      const logsEndpoint = getIngestURL(EndpointType.logs);
+      const webVitalsEndpoint = config.getIngestURL(EndpointType.webVitals);
+      const logsEndpoint = config.getIngestURL(EndpointType.logs);
       if (!webVitalsEndpoint && !logsEndpoint) {
         const log = new Logger();
         log.warn(
@@ -174,7 +174,7 @@ function withAxiomNextEdgeFunction(handler: NextMiddleware): NextMiddleware {
 }
 
 function logEdgeReport(report: any) {
-  if (config.platform.shoudSendEdgeReport) {
+  if (config.shoudSendEdgeReport) {
     console.log(`AXIOM_EDGE_REPORT::${JSON.stringify(report)}`);
   }
 }
