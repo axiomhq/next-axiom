@@ -1,7 +1,7 @@
 import { NextWebVitalsMetric } from 'next/app';
 
 export const proxyPath = '/_axiom';
-const isVercel = typeof process.env.NEXT_PUBLIC_VERCEL_ENV != undefined ? true : false;
+const isVercel = typeof process.env.NEXT_PUBLIC_VERCEL_ENV != 'undefined' &&  process.env.NEXT_PUBLIC_VERCEL_ENV  != '' ? true : false;
 const isNetlify = typeof process.env.NETLIFY != undefined ? true : false;
 console.log('DEBUG IS_VERCEL', isVercel);
 console.log('DEBUG IS_NETLIFY', isNetlify);
