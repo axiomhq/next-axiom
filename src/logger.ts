@@ -11,6 +11,7 @@ interface LogEvent {
   _time: string;
   request?: RequestReport;
   platform?: PlatformInfo;
+  vercel?: PlatformInfo;
 }
 
 export interface RequestReport {
@@ -71,17 +72,29 @@ export class Logger {
       logEvent.fields = args;
     }
 
-    // logEvent.vercel = {
-    logEvent.platform = {
-      environment: config.getEnvironment(),
-      region: config.getRegion(),
-      source: this.source,
-      provider: config.provider,
-    };
+    if (config.provider != 'vercel') {
+      logEvent.vercel = {
+        environment: config.getEnvironment(),
+        region: config.getRegion(),
+        source: this.source,
+        provider: config.provider,
+      };
+    } else {
+      logEvent.platform = {
+        environment: config.getEnvironment(),
+        region: config.getRegion(),
+        source: this.source,
+        provider: config.provider,
+      };
+    }
 
     if (this.req != null) {
       logEvent.request = this.req;
-      logEvent.platform.route = this.req.path;
+      if (logEvent.platform) {
+        logEvent.platform.route = this.req.path;
+      } else if (logEvent.vercel) {
+        logEvent.vercel.route = this.req.path;
+      }
     }
 
     this.logEvents.push(logEvent);
