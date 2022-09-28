@@ -1,7 +1,8 @@
 import { NextWebVitalsMetric } from 'next/app';
 
 export const proxyPath = '/_axiom';
-const isVercel = process.env.NEXT_PUBLIC_VERCEL_ENV ? true : false;
+const isVercel = typeof process.env.NEXT_PUBLIC_VERCEL_ENV != undefined ? true : false;
+console.log('DEBUG IS_VERCEL', isVercel);
 export const isBrowser = typeof window !== 'undefined';
 export const isNoPrettyPrint = process.env.AXIOM_NO_PRETTY_PRINT == 'true' ? true : false;
 
