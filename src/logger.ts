@@ -72,21 +72,7 @@ export class Logger {
       logEvent.fields = args;
     }
 
-    if (config.provider != 'vercel') {
-      logEvent.vercel = {
-        environment: config.getEnvironment(),
-        region: config.getRegion(),
-        source: this.source,
-        provider: config.provider,
-      };
-    } else {
-      logEvent.platform = {
-        environment: config.getEnvironment(),
-        region: config.getRegion(),
-        source: this.source,
-        provider: config.provider,
-      };
-    }
+    config.injectLogMetadata(logEvent, this.source);
 
     if (this.req != null) {
       logEvent.request = this.req;

@@ -23,6 +23,7 @@ export interface PlatformConfigurator {
   getRegion(): string | undefined;
   getAuthToken(): string | undefined;
   wrapWebVitalsObject(metrics: NextWebVitalsMetric[]): any;
+  injectLogMetadata(logEvent: any, source: string): void;
 }
 
 export class GenericConfig implements PlatformConfigurator {
@@ -83,11 +84,25 @@ export class GenericConfig implements PlatformConfigurator {
       },
     ];
   }
+
+  injectLogMetadata(logEvent: any, source: string) {
+    logEvent.platform = {
+      environment: config.getEnvironment(),
+      region: config.getRegion(),
+      source: source,
+      provider: config.provider,
+    };
+  }
 }
 
 export class VercelConfig implements PlatformConfigurator {
+  constructor() {
+    console.log('DEBUG: vercel configurator is being used');
+  }
+
   provider = 'vercel';
   shoudSendEdgeReport = true;
+  private url = process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT || process.env.AXIOM_INGEST_ENDPOINT || '';
 
   isEnvVarsSet() {
     return process.env.AXIOM_INGEST_ENDPOINT != undefined || process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT != undefined;
@@ -101,7 +116,7 @@ export class VercelConfig implements PlatformConfigurator {
   }
 
   getAxiomURL() {
-    return process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT || process.env.AXIOM_INGEST_ENDPOINT || '';
+    return this.url;
   }
 
   getLogsUrl() {
@@ -128,6 +143,15 @@ export class VercelConfig implements PlatformConfigurator {
     return {
       webVitals: metrics,
       environment: this.getEnvironment(),
+    };
+  }
+
+  injectLogMetadata(logEvent: any, source: string) {
+    logEvent.vercel = {
+      environment: config.getEnvironment(),
+      region: config.getRegion(),
+      source: source,
+      provider: config.provider,
     };
   }
 }
