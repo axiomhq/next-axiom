@@ -2,7 +2,9 @@ import { NextWebVitalsMetric } from 'next/app';
 
 export const proxyPath = '/_axiom';
 const isVercel = typeof process.env.NEXT_PUBLIC_VERCEL_ENV != undefined ? true : false;
+const isNetlify = typeof process.env.NETLIFY != undefined ? true : false;
 console.log('DEBUG IS_VERCEL', isVercel);
+console.log('DEBUG IS_NETLIFY', isNetlify);
 export const isBrowser = typeof window !== 'undefined';
 export const isNoPrettyPrint = process.env.AXIOM_NO_PRETTY_PRINT == 'true' ? true : false;
 
@@ -30,10 +32,10 @@ export interface PlatformConfigurator {
 export class GenericConfig implements PlatformConfigurator {
   provider = 'self-hosted';
   shoudSendEdgeReport = false;
-  private token = process.env.AXIOM_TOKEN;
-  private url = process.env.AXOIOM_URL;
-  private env = process.env.NODE_ENV;
-  private dataset = process.env.AXIOM_DATASET;
+  token = process.env.AXIOM_TOKEN;
+  url = process.env.AXOIOM_URL;
+  env = process.env.NODE_ENV;
+  dataset = process.env.AXIOM_DATASET;
 
   isEnvVarsSet() {
     return this.url != undefined && this.dataset != undefined && this.token != undefined;
@@ -104,6 +106,8 @@ export class VercelConfig implements PlatformConfigurator {
   provider = 'vercel';
   shoudSendEdgeReport = true;
   private url = process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT || process.env.AXIOM_INGEST_ENDPOINT || '';
+  private env = process.env.VERCEL_ENV;
+  private region = process.env.VERCEL_REGION;
 
   isEnvVarsSet() {
     return process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT != undefined || process.env.AXIOM_INGEST_ENDPOINT != undefined;
@@ -129,11 +133,11 @@ export class VercelConfig implements PlatformConfigurator {
   }
 
   getEnvironment() {
-    return process.env.VERCEL_ENV;
+    return this.env;
   }
 
   getRegion() {
-    return process.env.VERCEL_REGION;
+    return this.region;
   }
 
   getAuthToken() {
@@ -153,6 +157,38 @@ export class VercelConfig implements PlatformConfigurator {
       region: config.getRegion(),
       source: source,
       provider: config.provider,
+    };
+  }
+}
+
+export class NetlifyConfig extends GenericConfig {
+  provider = 'netlify';
+
+  wrapWebVitalsObject(metrics: any[]) {
+    return [
+      {
+        msg: 'reportWebVitals',
+        webVitals: metrics,
+        _time: new Date().getTime(),
+        platform: {
+          provider: this.provider,
+          environment: this.getEnvironment(),
+          source: 'reportWebVitals',
+        },
+      },
+    ];
+  }
+
+  injectLogMetadata(logEvent: any, source: string) {
+    logEvent.platform = {
+      environment: config.getEnvironment(),
+      region: config.getRegion(),
+      source: source,
+      provider: config.provider,
+      build_id: process.env.BUILD_ID,
+      context: process.env.CONTEXT,
+      deployment_url: process.env.DEPLOYMENT_URL,
+      deployment_id: process.env.DEPLOYMENT_ID,
     };
   }
 }
@@ -178,4 +214,4 @@ export const throttle = (fn: Function, wait: number) => {
   };
 };
 
-export const config = isVercel ? new VercelConfig() : new GenericConfig();
+export const config = isVercel ? new VercelConfig() : isNetlify ? new NetlifyConfig() : new GenericConfig();
