@@ -106,7 +106,7 @@ export class VercelConfig implements PlatformConfigurator {
   private url = process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT || process.env.AXIOM_INGEST_ENDPOINT || '';
 
   isEnvVarsSet() {
-    return process.env.AXIOM_INGEST_ENDPOINT != undefined || process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT != undefined;
+    return process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT != undefined || process.env.AXIOM_INGEST_ENDPOINT != undefined;
   }
 
   getIngestURL(t: EndpointType) {
@@ -121,11 +121,11 @@ export class VercelConfig implements PlatformConfigurator {
   }
 
   getLogsUrl() {
-    return isBrowser ? `${proxyPath}/logs` : this.getAxiomURL();
+    return isBrowser ? `${proxyPath}/logs` : this.getIngestURL(EndpointType.logs);
   }
 
   getWebVitalsUrl(): string {
-    return isBrowser ? `${proxyPath}/web-vitals` : this.getAxiomURL();
+    return isBrowser ? `${proxyPath}/web-vitals` : this.getIngestURL(EndpointType.webVitals);
   }
 
   getEnvironment() {
