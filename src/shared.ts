@@ -1,12 +1,21 @@
 import { NextWebVitalsMetric } from 'next/app';
 
 export const proxyPath = '/_axiom';
-const isVercel = typeof process.env.NEXT_PUBLIC_VERCEL_ENV != 'undefined' &&  process.env.NEXT_PUBLIC_VERCEL_ENV  != '' ? true : false;
+// these values are defined here so that it works with frontend, since they are resolved at run time
+const isVercel =
+  typeof process.env.NEXT_PUBLIC_VERCEL_ENV != 'undefined' && process.env.NEXT_PUBLIC_VERCEL_ENV != '' ? true : false;
 const isNetlify = typeof process.env.NETLIFY != undefined ? true : false;
 console.log('DEBUG IS_VERCEL', isVercel);
 console.log('DEBUG IS_NETLIFY', isNetlify);
 export const isBrowser = typeof window !== 'undefined';
 export const isNoPrettyPrint = process.env.AXIOM_NO_PRETTY_PRINT == 'true' ? true : false;
+const token = process.env.AXIOM_TOKEN;
+const axiomUrl = process.env.AXOIOM_URL;
+const vercelIngestEndpoint = process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT || process.env.AXIOM_INGEST_ENDPOINT;
+const env = process.env.NODE_ENV;
+const vercelEnv = process.env.VERCEL_ENV;
+const vercelRegion = process.env.VERCEL_REGION;
+const dataset = process.env.AXIOM_DATASET;
 
 export enum EndpointType {
   webVitals = 'web-vitals',
@@ -32,13 +41,9 @@ export interface PlatformConfigurator {
 export class GenericConfig implements PlatformConfigurator {
   provider = 'self-hosted';
   shoudSendEdgeReport = false;
-  token = process.env.AXIOM_TOKEN;
-  url = process.env.AXOIOM_URL;
-  env = process.env.NODE_ENV;
-  dataset = process.env.AXIOM_DATASET;
 
   isEnvVarsSet() {
-    return this.url != undefined && this.dataset != undefined && this.token != undefined;
+    return axiomUrl != undefined && dataset != undefined && token != undefined;
   }
 
   getWebVitalsPath(): string {
@@ -58,11 +63,11 @@ export class GenericConfig implements PlatformConfigurator {
   }
 
   getAxiomURL() {
-    return this.url || '';
+    return axiomUrl || '';
   }
 
   getEnvironment() {
-    return this.env;
+    return env;
   }
 
   getRegion() {
@@ -70,7 +75,7 @@ export class GenericConfig implements PlatformConfigurator {
   }
 
   getAuthToken() {
-    return this.token;
+    return token;
   }
 
   wrapWebVitalsObject(metrics: any[]) {
@@ -105,9 +110,6 @@ export class VercelConfig implements PlatformConfigurator {
 
   provider = 'vercel';
   shoudSendEdgeReport = true;
-  private url = process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT || process.env.AXIOM_INGEST_ENDPOINT || '';
-  private env = process.env.VERCEL_ENV;
-  private region = process.env.VERCEL_REGION;
 
   isEnvVarsSet() {
     return process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT != undefined || process.env.AXIOM_INGEST_ENDPOINT != undefined;
@@ -121,7 +123,7 @@ export class VercelConfig implements PlatformConfigurator {
   }
 
   getAxiomURL() {
-    return this.url;
+    return vercelIngestEndpoint || '';
   }
 
   getLogsUrl() {
@@ -133,11 +135,11 @@ export class VercelConfig implements PlatformConfigurator {
   }
 
   getEnvironment() {
-    return this.env;
+    return vercelEnv;
   }
 
   getRegion() {
-    return this.region;
+    return vercelRegion;
   }
 
   getAuthToken() {
