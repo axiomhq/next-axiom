@@ -10,7 +10,7 @@ console.log('DEBUG IS_NETLIFY', isNetlify);
 export const isBrowser = typeof window !== 'undefined';
 export const isNoPrettyPrint = process.env.AXIOM_NO_PRETTY_PRINT == 'true' ? true : false;
 const token = process.env.AXIOM_TOKEN;
-const axiomUrl = process.env.AXOIOM_URL;
+const axiomUrl = process.env.AXIOM_URL;
 const vercelIngestEndpoint = process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT || process.env.AXIOM_INGEST_ENDPOINT;
 const env = process.env.NODE_ENV;
 const vercelEnv = process.env.VERCEL_ENV;
@@ -176,6 +176,10 @@ export class NetlifyConfig extends GenericConfig {
           provider: this.provider,
           environment: this.getEnvironment(),
           source: 'reportWebVitals',
+          build_id: process.env.BUILD_ID,
+          context: process.env.CONTEXT,
+          deployment_url: process.env.DEPLOYMENT_URL,
+          deployment_id: process.env.DEPLOYMENT_ID,
         },
       },
     ];
