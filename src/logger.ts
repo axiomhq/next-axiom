@@ -136,6 +136,9 @@ export class Logger {
     this.logEvents = [];
 
     try {
+      console.log('DEBUG URL:', url);
+      console.log('DEBUG env:', config.getEnvironment());
+      console.log('DEBUG region:', config.getRegion());
       if (typeof fetch === 'undefined') {
         const fetch = await require('whatwg-fetch');
         await fetch(url, { body, method, keepalive, headers });
