@@ -20,6 +20,10 @@ export function reportWebVitals(metric: NextWebVitalsMetric) {
 
 function sendMetrics() {
   const body = JSON.stringify(config.wrapWebVitalsObject(collectedMetrics));
+  const headers = {
+    Authorization: `Bearer ${config.getAuthToken()}`,
+    type: 'application/json',
+  };
 
   function sendFallback() {
     // Do not leak network errors; does not affect the running app
@@ -27,10 +31,7 @@ function sendMetrics() {
       body,
       method: 'POST',
       keepalive: true,
-      headers: {
-        Authorization: `Bearer ${config.getAuthToken()}`,
-        'Content-Type': 'application/json',
-      },
+      headers,
     }).catch(console.error);
   }
 
@@ -39,7 +40,8 @@ function sendMetrics() {
       // See https://github.com/vercel/next.js/pull/26601
       // Navigator has to be bound to ensure it does not error in some browsers
       // https://xgwang.me/posts/you-may-not-know-beacon/#it-may-throw-error%2C-be-sure-to-catch
-      navigator.sendBeacon.bind(navigator)(url, body);
+      const blob = new Blob([body], headers);
+      navigator.sendBeacon.bind(navigator)(url, blob);
     } catch (err) {
       sendFallback();
     }

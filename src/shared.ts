@@ -4,7 +4,7 @@ export const proxyPath = '/_axiom';
 // these values are defined here so that it works with frontend, since they are resolved at run time
 const isVercel =
   typeof process.env.NEXT_PUBLIC_VERCEL_ENV != 'undefined' && process.env.NEXT_PUBLIC_VERCEL_ENV != '' ? true : false;
-const isNetlify = typeof process.env.NETLIFY != undefined ? true : false;
+const isNetlify = typeof process.env.NETLIFY != `undefined` ? true : false;
 console.log('DEBUG IS_VERCEL', isVercel);
 console.log('DEBUG IS_NETLIFY', isNetlify);
 export const isBrowser = typeof window !== 'undefined';
@@ -12,11 +12,17 @@ export const isNoPrettyPrint = process.env.AXIOM_NO_PRETTY_PRINT == 'true' ? tru
 const token = process.env.AXIOM_TOKEN;
 const axiomUrl = process.env.AXIOM_URL;
 console.log('DEBUG AXIOM URL', axiomUrl);
+console.log('DEBUG NEXT PUBLIC TOKEN', process.env.NEXT_PUBLIC_AXIOM_TOKEN);
 const vercelIngestEndpoint = process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT || process.env.AXIOM_INGEST_ENDPOINT;
 const env = process.env.NODE_ENV;
 const vercelEnv = process.env.VERCEL_ENV;
 const vercelRegion = process.env.VERCEL_REGION;
 const dataset = process.env.AXIOM_DATASET;
+// netlify env variables
+const netlifyBuildId = process.env.BUILD_ID;
+const netlifyContext = process.env.CONTEXT;
+const netlifyDeploymentUrl = process.env.DEPLOYMENT_URL;
+const netlifyDeploymentId = process.env.DEPLOYMENT_ID;
 
 export enum EndpointType {
   webVitals = 'web-vitals',
@@ -177,10 +183,10 @@ export class NetlifyConfig extends GenericConfig {
           provider: this.provider,
           environment: this.getEnvironment(),
           source: 'reportWebVitals',
-          build_id: process.env.BUILD_ID,
-          context: process.env.CONTEXT,
-          deployment_url: process.env.DEPLOYMENT_URL,
-          deployment_id: process.env.DEPLOYMENT_ID,
+          build_id: netlifyBuildId,
+          context: netlifyContext,
+          deployment_url: netlifyDeploymentUrl,
+          deployment_id: netlifyDeploymentId,
         },
       },
     ];
@@ -192,10 +198,10 @@ export class NetlifyConfig extends GenericConfig {
       region: config.getRegion(),
       source: source,
       provider: config.provider,
-      build_id: process.env.BUILD_ID,
-      context: process.env.CONTEXT,
-      deployment_url: process.env.DEPLOYMENT_URL,
-      deployment_id: process.env.DEPLOYMENT_ID,
+      build_id: netlifyBuildId,
+      context: netlifyContext,
+      deployment_url: netlifyDeploymentUrl,
+      deployment_id: netlifyDeploymentId,
     };
   }
 }
