@@ -51,16 +51,16 @@ export class GenericConfig implements PlatformConfigurator {
     return '/logs';
   }
 
-  getIngestURL(t: EndpointType) {
+  getIngestURL(_: EndpointType) {
     return `${process.env.AXIOM_URL}/api/v1/datasets/${process.env.AXIOM_DATASET}/ingest`;
   }
 
   getLogsUrl() {
-    return isBrowser ? `${proxyPath}/logs` : this.getAxiomURL();
+    return isBrowser ? `${proxyPath}/logs` : this.getIngestURL(EndpointType.logs);
   }
 
   getWebVitalsUrl(): string {
-    return isBrowser ? `${proxyPath}/logs` : this.getAxiomURL();
+    return isBrowser ? `${proxyPath}/logs` : this.getIngestURL(EndpointType.webVitals);
   }
 
   getAxiomURL() {

@@ -123,6 +123,7 @@ export class Logger {
 
     try {
       console.log('DEBUG URL:', url);
+      console.log('DEBUG token:', config.getAuthToken());
       console.log('DEBUG env:', config.getEnvironment());
       console.log('DEBUG region:', config.getRegion());
       if (typeof fetch === 'undefined') {
