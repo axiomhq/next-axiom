@@ -2,17 +2,13 @@ import { NextWebVitalsMetric } from 'next/app';
 
 export const proxyPath = '/_axiom';
 // these values are defined here so that it works with frontend, since they are resolved at run time
-const isVercel =
-  typeof process.env.NEXT_PUBLIC_VERCEL_ENV != 'undefined' && process.env.NEXT_PUBLIC_VERCEL_ENV != '' ? true : false;
+const isVercel = typeof process.env.NEXT_PUBLIC_VERCEL_ENV != 'undefined' && process.env.VERCEL_ENV != '';
 const isNetlify = typeof process.env.NETLIFY != `undefined` ? true : false;
-console.log('DEBUG IS_VERCEL', isVercel);
-console.log('DEBUG IS_NETLIFY', isNetlify);
+
 export const isBrowser = typeof window !== 'undefined';
 export const isNoPrettyPrint = process.env.AXIOM_NO_PRETTY_PRINT == 'true' ? true : false;
 const token = process.env.AXIOM_TOKEN;
 const axiomUrl = process.env.AXIOM_URL;
-console.log('DEBUG AXIOM URL', axiomUrl);
-console.log('DEBUG NEXT PUBLIC TOKEN', process.env.NEXT_PUBLIC_AXIOM_TOKEN);
 const vercelIngestEndpoint = process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT || process.env.AXIOM_INGEST_ENDPOINT;
 const env = process.env.NODE_ENV;
 const vercelEnv = process.env.VERCEL_ENV;
@@ -23,6 +19,13 @@ const netlifyBuildId = process.env.BUILD_ID;
 const netlifyContext = process.env.CONTEXT;
 const netlifyDeploymentUrl = process.env.DEPLOYMENT_URL;
 const netlifyDeploymentId = process.env.DEPLOYMENT_ID;
+
+console.log('DEBUG IS_VERCEL', isVercel);
+console.log('DEBUG IS_NETLIFY', isNetlify);
+console.log('DEBUG AXIOM URL', axiomUrl);
+console.log('DEBUG NEXT PUBLIC TOKEN', process.env.NEXT_PUBLIC_AXIOM_TOKEN);
+console.log('DEBUG vercel ingest url', process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT);
+console.log('DEBUG vercel env', process.env.VERCEL_ENV);
 
 export enum EndpointType {
   webVitals = 'web-vitals',
