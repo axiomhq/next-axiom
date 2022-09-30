@@ -2,7 +2,9 @@ import { NextWebVitalsMetric } from 'next/app';
 
 export const proxyPath = '/_axiom';
 // these values are defined here so that it works with frontend, since they are resolved at run time
-const isVercel = typeof process.env.NEXT_PUBLIC_VERCEL_ENV != 'undefined' && process.env.VERCEL_ENV != '';
+const isVercel =
+  typeof process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT != 'undefined' &&
+  process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT != '';
 const isNetlify = typeof process.env.NETLIFY != `undefined` ? true : false;
 
 export const isBrowser = typeof window !== 'undefined';
