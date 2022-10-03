@@ -170,7 +170,7 @@ function withAxiomNextEdgeFunction(handler: NextMiddleware): NextMiddleware {
       console.log("Handler threw error", error)
       logger.error('Error in edge function', { error, stack: error.stack });
       logger.attachResponseStatus(500);
-      ev.waitUntil(logger.flush());
+      await logger.flush();
       logEdgeReport(report);
       throw error;
     }
