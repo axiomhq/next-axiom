@@ -23,11 +23,11 @@ const netlifyContext = process.env.CONTEXT;
 const netlifyDeploymentUrl = process.env.DEPLOYMENT_URL;
 const netlifyDeploymentId = process.env.DEPLOYMENT_ID;
 
+console.log(process.env)
 console.log('DEBUG IS_VERCEL', isVercel);
-console.log('DEBUG IS_NETLIFY', process.env.NETLIFY);
-console.log('DEBUG IS_NETLIFY', isNetlify);
+console.log('DEBUG IS_NETLIFY', process.env.NETLIFY, isNetlify);
 console.log('DEBUG AXIOM URL', axiomUrl);
-console.log('DEBUG NEXT PUBLIC TOKEN', process.env.NEXT_PUBLIC_AXIOM_TOKEN);
+console.log('DEBUG AXIOM TOKEN', process.env.AXIOM_TOKEN, process.env.NEXT_PUBLIC_AXIOM_TOKEN);
 console.log('DEBUG vercel ingest url', process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT);
 console.log('DEBUG vercel env', process.env.VERCEL_ENV, process.env.NEXT_PUBLIC_VERCEL_ENV);
 console.log('DEBUG vercel region', process.env.VERCEL_REGION, process.env.NEXT_PUBLIC_VERCEL_REGION);
