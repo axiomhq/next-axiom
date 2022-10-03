@@ -1,5 +1,5 @@
 import { NextConfig, NextApiHandler, NextApiResponse, NextApiRequest } from 'next';
-import { NextFetchEvent, NextMiddleware, NextRequest, NextResponse } from 'next/server';
+import { NextFetchEvent, NextMiddleware, NextRequest } from 'next/server';
 import { NextMiddlewareResult } from 'next/dist/server/web/types';
 import { Logger, RequestReport } from './logger';
 import { Rewrite } from 'next/dist/lib/load-custom-routes';
@@ -172,7 +172,7 @@ function withAxiomNextEdgeFunction(handler: NextMiddleware): NextMiddleware {
       logger.attachResponseStatus(500);
       ev.waitUntil(logger.flush());
       logEdgeReport(report);
-      return NextResponse.error();
+      throw error;
     }
   };
 }
