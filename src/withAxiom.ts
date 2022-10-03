@@ -103,16 +103,7 @@ export type AxiomApiHandler = (
 
 function withAxiomNextApiHandler(handler: NextApiHandler): NextApiHandler {
   return async (req, res) => {
-    const report: RequestReport = {
-      startTime: new Date().getTime(),
-      path: req.url!,
-      method: req.method!,
-      host: getHeaderOrDefault(req, 'host', ''),
-      userAgent: getHeaderOrDefault(req, 'user-agent', ''),
-      scheme: 'https',
-      ip: getHeaderOrDefault(req, 'x-forwarded-for', ''),
-      // region: vercelRegion,
-    };
+    const report: RequestReport = config.generateRequestMeta(req);
     const logger = new Logger({}, report, false, 'lambda');
     const axiomRequest = req as AxiomAPIRequest;
     axiomRequest.log = logger;
@@ -203,6 +194,3 @@ export function withAxiom<T extends WithAxiomParam>(param: T): T {
     return withAxiomNextEdgeFunction(param) as T;
   }
 }
-
-const getHeaderOrDefault = (req: NextApiRequest, headerName: string, defaultValue: any) =>
-  req.headers[headerName] ? req.headers[headerName] : defaultValue;

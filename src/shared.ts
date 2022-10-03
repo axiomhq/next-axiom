@@ -1,4 +1,6 @@
+import { NextApiRequest } from 'next';
 import { NextWebVitalsMetric } from 'next/app';
+import { RequestReport } from './logger';
 
 export const proxyPath = '/_axiom';
 // these values are defined here so that it works with frontend, since they are resolved at run time
@@ -11,6 +13,7 @@ const token = process.env.AXIOM_TOKEN;
 const axiomUrl = process.env.AXIOM_URL;
 const vercelIngestEndpoint = process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT || process.env.AXIOM_INGEST_ENDPOINT;
 const env = process.env.NODE_ENV;
+// vercel env variables
 const vercelEnv = process.env.VERCEL_ENV;
 const vercelRegion = process.env.VERCEL_REGION;
 const dataset = process.env.AXIOM_DATASET;
@@ -25,7 +28,8 @@ console.log('DEBUG IS_NETLIFY', isNetlify);
 console.log('DEBUG AXIOM URL', axiomUrl);
 console.log('DEBUG NEXT PUBLIC TOKEN', process.env.NEXT_PUBLIC_AXIOM_TOKEN);
 console.log('DEBUG vercel ingest url', process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT);
-console.log('DEBUG vercel env', process.env.VERCEL_ENV);
+console.log('DEBUG vercel env', process.env.VERCEL_ENV, process.env.NEXT_PUBLIC_VERCEL_ENV);
+console.log('DEBUG vercel region', process.env.VERCEL_REGION, process.env.NEXT_PUBLIC_VERCEL_REGION);
 
 export enum EndpointType {
   webVitals = 'web-vitals',
@@ -46,7 +50,11 @@ export interface PlatformConfigurator {
   getAuthToken(): string | undefined;
   wrapWebVitalsObject(metrics: NextWebVitalsMetric[]): any;
   injectLogMetadata(logEvent: any, source: string): void;
+  generateRequestMeta(req: any): RequestReport;
 }
+
+const getHeaderOrDefault = (req: NextApiRequest, headerName: string, defaultValue: any) =>
+  req.headers[headerName] ? req.headers[headerName] : defaultValue;
 
 export class GenericConfig implements PlatformConfigurator {
   provider = 'self-hosted';
@@ -111,6 +119,19 @@ export class GenericConfig implements PlatformConfigurator {
       provider: config.provider,
     };
   }
+
+  generateRequestMeta(req: any): RequestReport {
+    return {
+      startTime: new Date().getTime(),
+      path: req.url!,
+      method: req.method!,
+      host: getHeaderOrDefault(req, 'host', ''),
+      userAgent: getHeaderOrDefault(req, 'user-agent', ''),
+      scheme: 'https',
+      ip: getHeaderOrDefault(req, 'x-forwarded-for', ''),
+      region: this.getRegion(),
+    };
+  }
 }
 
 export class VercelConfig implements PlatformConfigurator {
@@ -169,6 +190,19 @@ export class VercelConfig implements PlatformConfigurator {
       region: config.getRegion(),
       source: source,
       provider: config.provider,
+    };
+  }
+
+  generateRequestMeta(req: any): RequestReport {
+    return {
+      startTime: new Date().getTime(),
+      path: req.url!,
+      method: req.method!,
+      host: getHeaderOrDefault(req, 'host', ''),
+      userAgent: getHeaderOrDefault(req, 'user-agent', ''),
+      scheme: 'https',
+      ip: getHeaderOrDefault(req, 'x-forwarded-for', ''),
+      region: vercelRegion,
     };
   }
 }
