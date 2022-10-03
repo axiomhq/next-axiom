@@ -155,8 +155,11 @@ function withAxiomNextEdgeFunction(handler: NextMiddleware): NextMiddleware {
     const axiomRequest = req as AxiomRequest;
     axiomRequest.log = logger;
 
+    console.log("Start of try block")
     try {
+      console.log("Calling handler")
       const res = await handler(axiomRequest, ev);
+      console.log("Handler returned")
       if (res) {
         logger.attachResponseStatus(res.status);
       }
@@ -164,6 +167,7 @@ function withAxiomNextEdgeFunction(handler: NextMiddleware): NextMiddleware {
       logEdgeReport(report);
       return res;
     } catch (error: any) {
+      console.log("Handler threw error", error)
       logger.error('Error in edge function', { error, stack: error.stack });
       logger.attachResponseStatus(500);
       ev.waitUntil(logger.flush());
