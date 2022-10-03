@@ -241,6 +241,7 @@ export class NetlifyConfig extends GenericConfig {
       deployment_url: netlifyDeploymentUrl,
       deployment_id: netlifyDeploymentId,
     };
+    console.log(logEvent);
   }
 }
 
