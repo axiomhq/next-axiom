@@ -23,7 +23,7 @@ const netlifyContext = process.env.CONTEXT;
 const netlifyDeploymentUrl = process.env.DEPLOYMENT_URL;
 const netlifyDeploymentId = process.env.DEPLOYMENT_ID;
 
-console.log(process.env)
+console.log(process.env);
 console.log('DEBUG IS_VERCEL', isVercel);
 console.log('DEBUG IS_NETLIFY', process.env.NETLIFY, isNetlify);
 console.log('DEBUG AXIOM URL', axiomUrl);

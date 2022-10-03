@@ -179,7 +179,8 @@ function isNextConfig(param: WithAxiomParam): param is NextConfig {
 function isApiHandler(param: WithAxiomParam): param is NextApiHandler {
   const isFunction = typeof param == 'function';
 
-  return isFunction && typeof globalThis.EdgeRuntime === 'undefined';
+  // Vercel defines EdgeRuntime for edge functions, but Netlify defines NEXT_RUNTIME = 'edge'
+  return isFunction && typeof globalThis.EdgeRuntime === 'undefined' && process.env.NEXT_RUNTIME != 'edge';
 }
 
 // withAxiom can be called either with NextConfig, which will add proxy rewrites
