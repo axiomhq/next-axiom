@@ -159,7 +159,7 @@ function withAxiomNextEdgeFunction(handler: NextMiddleware): NextMiddleware {
     try {
       console.log("Calling handler")
       const res = await handler(axiomRequest, ev);
-      console.log("Handler returned")
+      console.log("Handler returned", res)
       if (res) {
         logger.attachResponseStatus(res.status);
       }
