@@ -20,17 +20,8 @@ const dataset = process.env.AXIOM_DATASET;
 // netlify env variables
 const netlifyBuildId = process.env.BUILD_ID;
 const netlifyContext = process.env.CONTEXT;
-const netlifyDeploymentUrl = process.env.DEPLOYMENT_URL;
-const netlifyDeploymentId = process.env.DEPLOYMENT_ID;
-
-console.log(process.env);
-console.log('DEBUG IS_VERCEL', isVercel);
-console.log('DEBUG IS_NETLIFY', process.env.NETLIFY, isNetlify);
-console.log('DEBUG AXIOM URL', axiomUrl);
-console.log('DEBUG AXIOM TOKEN', process.env.AXIOM_TOKEN, process.env.NEXT_PUBLIC_AXIOM_TOKEN);
-console.log('DEBUG vercel ingest url', process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT);
-console.log('DEBUG vercel env', process.env.VERCEL_ENV, process.env.NEXT_PUBLIC_VERCEL_ENV);
-console.log('DEBUG vercel region', process.env.VERCEL_REGION, process.env.NEXT_PUBLIC_VERCEL_REGION);
+const netlifyDeploymentUrl = process.env.DEPLOY_URL;
+const netlifyDeploymentId = process.env.DEPLOY_ID;
 
 export enum EndpointType {
   webVitals = 'web-vitals',
@@ -221,10 +212,10 @@ export class NetlifyConfig extends GenericConfig {
           provider: this.provider,
           environment: this.getEnvironment(),
           source: 'reportWebVitals',
-          build_id: netlifyBuildId,
+          buildId: netlifyBuildId,
           context: netlifyContext,
-          deployment_url: netlifyDeploymentUrl,
-          deployment_id: netlifyDeploymentId,
+          deploymentUrl: netlifyDeploymentUrl,
+          deploymentId: netlifyDeploymentId,
         },
       },
     ];
@@ -236,12 +227,11 @@ export class NetlifyConfig extends GenericConfig {
       region: config.getRegion(),
       source: source,
       provider: config.provider,
-      build_id: netlifyBuildId,
+      buildId: netlifyBuildId,
       context: netlifyContext,
-      deployment_url: netlifyDeploymentUrl,
-      deployment_id: netlifyDeploymentId,
+      deploymentUrl: netlifyDeploymentUrl,
+      deploymentId: netlifyDeploymentId,
     };
-    console.log(logEvent);
   }
 }
 
