@@ -5,7 +5,7 @@ import { RequestReport } from './logger';
 export const proxyPath = '/_axiom';
 // these values are defined here so that it works with frontend, since they are resolved at run time
 const isVercel = process.env.AXIOM_INGEST_ENDPOINT || process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT;
-const isNetlify = process.env.NETLIFY;
+const isNetlify = process.env.NETLIFY == 'true';
 
 export const isBrowser = typeof window !== 'undefined';
 export const isNoPrettyPrint = process.env.AXIOM_NO_PRETTY_PRINT == 'true' ? true : false;
@@ -24,6 +24,7 @@ const netlifyDeploymentUrl = process.env.DEPLOYMENT_URL;
 const netlifyDeploymentId = process.env.DEPLOYMENT_ID;
 
 console.log('DEBUG IS_VERCEL', isVercel);
+console.log('DEBUG IS_NETLIFY', process.env.NETLIFY);
 console.log('DEBUG IS_NETLIFY', isNetlify);
 console.log('DEBUG AXIOM URL', axiomUrl);
 console.log('DEBUG NEXT PUBLIC TOKEN', process.env.NEXT_PUBLIC_AXIOM_TOKEN);
