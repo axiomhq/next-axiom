@@ -41,7 +41,7 @@ export interface PlatformConfigurator {
   getRegion(): string | undefined;
   getAuthToken(): string | undefined;
   wrapWebVitalsObject(metrics: NextWebVitalsMetric[]): any;
-  injectLogMetadata(logEvent: any, source: string): void;
+  injectPlatformMetadata(logEvent: any, source: string): void;
   generateRequestMeta(req: any): RequestReport;
 }
 
@@ -103,7 +103,7 @@ export class GenericConfig implements PlatformConfigurator {
     ];
   }
 
-  injectLogMetadata(logEvent: any, source: string) {
+  injectPlatformMetadata(logEvent: any, source: string) {
     logEvent.platform = {
       environment: config.getEnvironment(),
       region: config.getRegion(),
@@ -127,10 +127,6 @@ export class GenericConfig implements PlatformConfigurator {
 }
 
 export class VercelConfig implements PlatformConfigurator {
-  constructor() {
-    console.log('DEBUG: vercel configurator is being used');
-  }
-
   provider = 'vercel';
   shoudSendEdgeReport = true;
 
@@ -158,7 +154,7 @@ export class VercelConfig implements PlatformConfigurator {
   }
 
   getEnvironment() {
-    return vercelEnv;
+    return vercelEnv || env;
   }
 
   getRegion() {
@@ -176,7 +172,7 @@ export class VercelConfig implements PlatformConfigurator {
     };
   }
 
-  injectLogMetadata(logEvent: any, source: string) {
+  injectPlatformMetadata(logEvent: any, source: string) {
     logEvent.vercel = {
       environment: config.getEnvironment(),
       region: config.getRegion(),
@@ -221,7 +217,7 @@ export class NetlifyConfig extends GenericConfig {
     ];
   }
 
-  injectLogMetadata(logEvent: any, source: string) {
+  injectPlatformMetadata(logEvent: any, source: string) {
     logEvent.platform = {
       environment: config.getEnvironment(),
       region: config.getRegion(),
