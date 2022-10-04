@@ -3,7 +3,7 @@ import { NextFetchEvent, NextMiddleware, NextRequest } from 'next/server';
 import { NextMiddlewareResult } from 'next/dist/server/web/types';
 import { Logger, RequestReport } from './logger';
 import { Rewrite } from 'next/dist/lib/load-custom-routes';
-import { proxyPath, EndpointType, config } from './shared';
+import { EndpointType, config } from './shared';
 
 declare global {
   var EdgeRuntime: string;
@@ -29,12 +29,12 @@ function withAxiomNextConfig(nextConfig: NextConfig): NextConfig {
 
       const axiomRewrites: Rewrite[] = [
         {
-          source: `${proxyPath}/web-vitals`,
+          source: `${config.proxyPath}/web-vitals`,
           destination: webVitalsEndpoint,
           basePath: false,
         },
         {
-          source: `${proxyPath}/logs`,
+          source: `${config.proxyPath}/logs`,
           destination: logsEndpoint,
           basePath: false,
         },

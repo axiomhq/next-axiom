@@ -1,7 +1,7 @@
 import { NextWebVitalsMetric } from 'next/app';
-import { config, isBrowser, throttle } from './shared';
+import { config, throttle } from './shared';
 
-const url = config.getWebVitalsUrl();
+const url = config.webVitalsUrl;
 
 export declare type WebVitalsMetric = NextWebVitalsMetric & { route: string };
 
@@ -21,7 +21,7 @@ export function reportWebVitals(metric: NextWebVitalsMetric) {
 function sendMetrics() {
   const body = JSON.stringify(config.wrapWebVitalsObject(collectedMetrics));
   const headers = {
-    Authorization: `Bearer ${config.getAuthToken()}`,
+    Authorization: `Bearer ${config.token}`,
     type: 'application/json',
   };
 
@@ -35,7 +35,7 @@ function sendMetrics() {
     }).catch(console.error);
   }
 
-  if (isBrowser && navigator.sendBeacon) {
+  if (config.isBrowser && navigator.sendBeacon) {
     try {
       // See https://github.com/vercel/next.js/pull/26601
       // Navigator has to be bound to ensure it does not error in some browsers

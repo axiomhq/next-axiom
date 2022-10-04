@@ -1,8 +1,8 @@
-import { config, isBrowser, isNoPrettyPrint } from './shared';
+import { config, isNoPrettyPrint } from './shared';
 
 import { throttle } from './shared';
 
-const url = config.getLogsUrl();
+const url = config.logsUrl;
 
 interface LogEvent {
   level: string;
@@ -72,7 +72,7 @@ export class Logger {
       logEvent.fields = args;
     }
 
-    config.injectLogMetadata(logEvent, this.source);
+    config.injectPlatformMetadata(logEvent, this.source);
 
     if (this.req != null) {
       logEvent.request = this.req;
@@ -115,7 +115,7 @@ export class Logger {
     const keepalive = true;
     const body = JSON.stringify(this.logEvents);
     const headers = {
-      Authorization: `Bearer ${config.getAuthToken()}`,
+      Authorization: `Bearer ${config.token}`,
       'content-type': 'application/json',
     };
     // clear pending logs
@@ -178,7 +178,7 @@ export function prettyPrint(ev: LogEvent) {
   let msgString = '';
   let args: any[] = [ev.level, ev.message];
 
-  if (isBrowser) {
+  if (config.isBrowser) {
     msgString = '%c%s - %s';
     args = [`color: ${levelColors[ev.level].browser};`, ...args];
   } else {
