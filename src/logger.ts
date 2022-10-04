@@ -51,28 +51,28 @@ export class Logger {
     public source: 'frontend' | 'lambda' | 'edge' = 'frontend'
   ) {}
 
-  debug(message: string, args: any = {}) {
+  debug = (message: string, args: any = {}) => {
     this._log('debug', message, { ...this.args, ...args });
-  }
-  info(message: string, args: any = {}) {
+  };
+  info = (message: string, args: any = {}) => {
     this._log('info', message, { ...this.args, ...args });
-  }
-  warn(message: string, args: any = {}) {
+  };
+  warn = (message: string, args: any = {}) => {
     this._log('warn', message, { ...this.args, ...args });
-  }
-  error(message: string, args: any = {}) {
+  };
+  error = (message: string, args: any = {}) => {
     this._log('error', message, { ...this.args, ...args });
-  }
+  };
 
-  with(args: any) {
+  with = (args: any) => {
     return new Logger({ ...this.args, ...args }, this.req, this.autoFlush, this.source);
-  }
+  };
 
-  withRequest(req: RequestReport) {
+  withRequest = (req: RequestReport) => {
     return new Logger({ ...this.args }, req, this.autoFlush, this.source);
-  }
+  };
 
-  _log(level: string, message: string, args: any = {}) {
+  _log = (level: string, message: string, args: any = {}) => {
     const logEvent: LogEvent = { level, message, _time: new Date(Date.now()).toISOString(), fields: {} };
     if (Object.keys(args).length > 0) {
       logEvent.fields = args;
@@ -93,16 +93,16 @@ export class Logger {
     if (this.autoFlush) {
       this.throttledSendLogs();
     }
-  }
+  };
 
-  attachResponseStatus(statusCode: number) {
+  attachResponseStatus = (statusCode: number) => {
     this.logEvents = this.logEvents.map((log) => {
       if (log.request) {
         log.request.statusCode = statusCode;
       }
       return log;
     });
-  }
+  };
 
   async sendLogs() {
     if (!this.logEvents.length) {
