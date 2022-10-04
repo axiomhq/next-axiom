@@ -20,7 +20,7 @@ export default class VercelConfig extends GenericConfig implements PlatformConfi
 }
 
   getIngestURL(t: EndpointType) {
-    console.log('axiom url =>', process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT, this.axiomUrl)
+    console.log('axiom url =>', ingestEndpoint, this.axiomUrl)
     const url = new URL(this.axiomUrl);
     // attach type query param based on passed EndpointType
     url.searchParams.set('type', t.toString());
