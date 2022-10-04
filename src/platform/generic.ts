@@ -15,10 +15,17 @@ export default class GenericConfig implements PlatformConfigurator {
   logsUrl = this.isBrowser ? `${this.proxyPath}/logs` : this.getIngestURL(EndpointType.logs);
   webVitalsUrl = this.isBrowser ? `${this.proxyPath}/logs` : this.getIngestURL(EndpointType.webVitals);
   region = process.env.REGION || undefined;
-  isEnvVarsSet = this.axiomUrl != undefined && this.dataset != undefined && this.token != undefined;;
+  isEnvVarsSet = this.axiomUrl != undefined && this.dataset != undefined && this.token != undefined;
+
+  constructor () {
+    // debug
+    console.log('ingest url', this.getIngestURL(EndpointType.logs));
+    console.log('axiom host', this.axiomUrl)
+    console.log('token', this.token)
+  }
 
   getIngestURL(_: EndpointType) {
-    return `${process.env.AXIOM_URL}/api/v1/datasets/${process.env.AXIOM_DATASET}/ingest`;
+    return `${this.axiomUrl}/api/v1/datasets/${this.dataset}/ingest`;
   }
 
   wrapWebVitalsObject(metrics: any[]): any {
