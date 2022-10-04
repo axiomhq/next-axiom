@@ -14,6 +14,10 @@ export default class VercelConfig extends GenericConfig implements PlatformConfi
   environment = process.env.VERCEL_ENV || process.env.NODE_ENV;
   token = undefined;
 
+  constructor () {
+    super();
+  }
+
   getIngestURL(t: EndpointType) {
     const url = new URL(this.axiomUrl);
     // attach type query param based on passed EndpointType
