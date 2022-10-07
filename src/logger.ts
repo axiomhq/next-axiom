@@ -1,8 +1,7 @@
-import { config, isNoPrettyPrint } from './shared';
+import config from './config';
+import { isNoPrettyPrint, throttle } from './shared';
 
-import { throttle } from './shared';
-
-const url = config.logsUrl;
+const url = config.getLogsEndpoint();
 
 interface LogEvent {
   level: string;

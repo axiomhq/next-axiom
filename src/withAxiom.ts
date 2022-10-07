@@ -3,7 +3,8 @@ import { NextFetchEvent, NextMiddleware, NextRequest } from 'next/server';
 import { NextMiddlewareResult } from 'next/dist/server/web/types';
 import { Logger, RequestReport } from './logger';
 import { Rewrite } from 'next/dist/lib/load-custom-routes';
-import { EndpointType, config } from './shared';
+import { EndpointType } from './shared';
+import config from './config';
 
 declare global {
   var EdgeRuntime: string;

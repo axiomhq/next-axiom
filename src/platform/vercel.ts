@@ -2,7 +2,7 @@ import { EndpointType } from '../shared';
 import type PlatformConfigurator from './base';
 import GenericConfig from './generic';
 
-const ingestEndpoint = process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT || process.env.AXIOM_INGEST_ENDPOINT;
+const ingestEndpoint = process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT || process.env.AXIOM_INGEST_ENDPOINT || '';
 
 export default class VercelConfig extends GenericConfig implements PlatformConfigurator {
   provider = 'vercel';
@@ -12,17 +12,10 @@ export default class VercelConfig extends GenericConfig implements PlatformConfi
   region = process.env.VERCEL_REGION || undefined;
   environment = process.env.VERCEL_ENV || process.env.NODE_ENV;
   token = undefined;
-  axiomUrl = '';
-
-  constructor () {
-    super();
-    this.axiomUrl = ingestEndpoint || '';  
-}
+  axiomUrl = ingestEndpoint;
 
   getIngestURL(t: EndpointType) {
-    console.log('axiom url =>', ingestEndpoint, this.axiomUrl)
     const url = new URL(this.axiomUrl);
-    // attach type query param based on passed EndpointType
     url.searchParams.set('type', t.toString());
     return url.toString();
   }

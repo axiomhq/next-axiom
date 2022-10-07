@@ -1,10 +1,3 @@
-import GenericConfig from './platform/generic';
-import VercelConfig from './platform/vercel';
-import NetlifyConfig from './platform/netlify';
-
-const isVercel = process.env.AXIOM_INGEST_ENDPOINT || process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT;
-const isNetlify = process.env.NETLIFY == 'true';
-
 export const isNoPrettyPrint = process.env.AXIOM_NO_PRETTY_PRINT == 'true' ? true : false;
 
 export enum EndpointType {
@@ -33,4 +26,10 @@ export const throttle = (fn: Function, wait: number) => {
   };
 };
 
-export const config = isVercel ? new VercelConfig() : isNetlify ? new NetlifyConfig() : new GenericConfig();
+export function envVarExists(name: string) {
+  if (name in process.env && process.env[name] != undefined && process.env[name] != '') {
+    return true;
+  }
+
+  return false;
+}

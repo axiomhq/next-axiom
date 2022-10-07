@@ -2,7 +2,8 @@ process.env.AXIOM_INGEST_ENDPOINT = '';
 process.env.AXIOM_URL = 'https://test.axiom.co';
 process.env.AXIOM_DATASET = 'test';
 
-import { config, EndpointType } from '../src/shared';
+import config from '../src/config';
+import { EndpointType } from '../src/shared';
 
 test('reading axiom ingest endpoint', () => {
   let url = config.getIngestURL(EndpointType.webVitals);

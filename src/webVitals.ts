@@ -1,7 +1,8 @@
 import { NextWebVitalsMetric } from 'next/app';
-import { config, throttle } from './shared';
+import { throttle } from './shared';
+import config from './config';
 
-const url = config.webVitalsUrl;
+const url = config.getWebVitalsEndpoint();
 
 export declare type WebVitalsMetric = NextWebVitalsMetric & { route: string };
 

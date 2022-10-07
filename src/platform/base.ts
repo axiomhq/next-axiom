@@ -9,12 +9,12 @@ export default interface PlatformConfigurator {
   token: string | undefined;
   environment: string;
   region: string | undefined;
-  logsUrl: string;
-  webVitalsUrl: string;
   axiomUrl: string | undefined;
 
   getIngestURL(t: EndpointType): string;
   wrapWebVitalsObject(metrics: NextWebVitalsMetric[]): any;
   injectPlatformMetadata(logEvent: any, source: string): void;
   generateRequestMeta(req: any): RequestReport;
+  getLogsEndpoint(): string
+  getWebVitalsEndpoint(): string
 }

@@ -4,6 +4,7 @@
 import { jest } from '@jest/globals';
 import { NextWebVitalsMetric } from 'next/app';
 // set axiom env vars before importing webvitals
+process.env.AXIOM_URL = '';
 process.env.AXIOM_INGEST_ENDPOINT = 'https://example.co/api/test';
 import { reportWebVitals } from '../src/webVitals';
 import 'whatwg-fetch';

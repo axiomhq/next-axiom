@@ -1,6 +1,6 @@
 import { NextApiRequest } from "next";
 import { RequestReport } from "../logger";
-import { EndpointType } from "../shared";
+import { EndpointType, envVarExists } from "../shared";
 import type PlatformConfigurator from "./base";
 
 export default class GenericConfig implements PlatformConfigurator {
@@ -12,20 +12,19 @@ export default class GenericConfig implements PlatformConfigurator {
   dataset = process.env.AXIOM_DATASET;
   environment: string = process.env.NODE_ENV;
   axiomUrl = process.env.AXIOM_URL;
-  logsUrl = this.isBrowser ? `${this.proxyPath}/logs` : this.getIngestURL(EndpointType.logs);
-  webVitalsUrl = this.isBrowser ? `${this.proxyPath}/logs` : this.getIngestURL(EndpointType.webVitals);
   region = process.env.REGION || undefined;
-  isEnvVarsSet = this.axiomUrl != undefined && this.dataset != undefined && this.token != undefined;
-
-  constructor () {
-    // debug
-    console.log('ingest url', this.getIngestURL(EndpointType.logs));
-    console.log('axiom host', this.axiomUrl)
-    console.log('token', this.token)
-  }
+  isEnvVarsSet = envVarExists('AXIOM_URL') && envVarExists('AXIOM_DATASET') && envVarExists('AXIOM_TOKEN');
 
   getIngestURL(_: EndpointType) {
     return `${this.axiomUrl}/api/v1/datasets/${this.dataset}/ingest`;
+  }
+
+  getLogsEndpoint(): string {
+    return this.isBrowser ? `${this.proxyPath}/logs` : this.getIngestURL(EndpointType.logs);
+  }
+
+  getWebVitalsEndpoint(): string {
+    return this.isBrowser ? `${this.proxyPath}/logs` : this.getIngestURL(EndpointType.webVitals);
   }
 
   wrapWebVitalsObject(metrics: any[]): any {
