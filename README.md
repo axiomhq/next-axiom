@@ -21,8 +21,13 @@ For more information check out the [official documentation](https://axiom.co/doc
 
 First of all make sure you have the [Axiom Vercel integration](https://www.axiom.co/vercel) 
 installed.
-Then in your Next.js project, run `npm install --save next-axiom` and wrap your 
-Next.js config in `withAxiom` like this in `next.config.js`:
+Then in your Next.js project, run install `next-axiom` like this:
+
+```sh
+npm install --save next-axiom
+```
+
+Wrap your Next.js config in `withAxiom` like this in `next.config.js`:
 
 ```js
 const { withAxiom } = require('next-axiom')
