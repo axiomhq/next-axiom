@@ -19,9 +19,10 @@ For more information check out the [official documentation](https://axiom.co/doc
 
 ## Usage
 
-1. Make sure you have the [Axiom Vercel integration](https://www.axiom.co/vercel) installed
-2. In your Next.js project, run `npm install --save next-axiom`
-3. Wrap your Next.js config in `withAxiom` like this in `next.config.js`:
+First of all make sure you have the [Axiom Vercel integration](https://www.axiom.co/vercel) 
+installed.
+Then in your Next.js project, run `npm install --save next-axiom` and wrap your 
+Next.js config in `withAxiom` like this in `next.config.js`:
 
 ```js
 const { withAxiom } = require('next-axiom')
@@ -31,7 +32,7 @@ module.exports = withAxiom({
 })
 ```
 
-4. Go to `pages/_app.js` or `pages/_app.ts` and add the following line to report web vitals:
+Go to `pages/_app.js` or `pages/_app.ts` and add the following line to report web vitals:
 
 ```js
 export { reportWebVitals } from 'next-axiom'
@@ -39,7 +40,8 @@ export { reportWebVitals } from 'next-axiom'
 
 > **Note**: WebVitals are only sent from production deployments.
 
-5. Wrapping your handlers in `withAxiom` will make `req.log` available:
+Wrapping your handlers in `withAxiom` will make `req.log` available and log
+exceptions:
 
 ```js
 async function handler(req, res) {
@@ -55,9 +57,7 @@ async function handler(req, res) {
 export default withAxiom(handler)
 ```
 
-This will log exceptions as well as making sure logs are flushed.
-
-6. Import and use `log` in the frontend like this:
+Import and use `log` in the frontend like this:
 
 ```js
 import { log } from `next-axiom`;
@@ -70,9 +70,6 @@ function home() {
 }
 ```
 
-## FAQ & Troubleshooting
+## License
 
-### Web-Vital and frontend log requests return 404
-
-Double-check that your Next.js config is wrapped in `withAxiom`, see 
-[Get started](#get-started).
+Distributed under the [MIT License](LICENSE).
