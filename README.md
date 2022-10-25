@@ -1,12 +1,25 @@
-# next-axiom [![CI](https://github.com/axiomhq/next-axiom/actions/workflows/ci.yml/badge.svg)](https://github.com/axiomhq/next-axiom/actions/workflows/ci.yml) [![Latest release](https://img.shields.io/github/release/axiomhq/next-axiom.svg)](https://github.com/axiomhq/next-axiom/releases/latest) [![License](https://img.shields.io/github/license/axiomhq/next-axiom.svg?color=blue)](https://opensource.org/licenses/MIT) [![Weekly Downloads](https://img.shields.io/npm/dw/next-axiom)](https://npmjs.com/package/next-axiom) 
+![next-axiom: The official Next.js library for Axiom](.github/images/banner-dark.svg#gh-dark-mode-only)
+![next-axiom: The official Next.js library for Axiom](.github/images/banner-light.svg#gh-light-mode-only)
 
-![](./web-vitals-dashboard.png)
+<div align="center">
 
-Send Web-Vitals and logs from Next.js to [Axiom](https://axiom.co).
+[![build](https://img.shields.io/github/workflow/status/axiomhq/next-axiom/CI?ghcache=unused)](https://github.com/axiomhq/next-axiom/actions?query=workflow%3ACI)
+[![Latest release](https://img.shields.io/github/release/axiomhq/next-axiom.svg)](https://github.com/axiomhq/next-axiom/releases/latest) 
+[![License](https://img.shields.io/github/license/axiomhq/next-axiom.svg?color=blue)](https://opensource.org/licenses/MIT) 
 
-## Get Started
+</div>
 
-1. Make sure you have the [Axiom Vercel integration](https://www.axiom.co/vercel) installed or export `NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT`
+[Axiom](https://axiom.co) unlocks observability at any scale.
+
+- **Ingest with ease, store without limits:** Axiom’s next-generation datastore enables ingesting petabytes of data with ultimate efficiency. Ship logs from Kubernetes, AWS, Azure, Google Cloud, DigitalOcean, Nomad, and others.
+- **Query everything, all the time:** Whether DevOps, SecOps, or EverythingOps, query all your data no matter its age. No provisioning, no moving data from cold/archive to “hot”, and no worrying about slow queries. All your data, all. the. time.
+- **Powerful dashboards, for continuous observability:** Build dashboards to collect related queries and present information that’s quick and easy to digest for you and your team. Dashboards can be kept private or shared with others, and are the perfect way to bring together data from different sources
+
+For more information check out the [official documentation](https://axiom.co/docs).
+
+## Usage
+
+1. Make sure you have the [Axiom Vercel integration](https://www.axiom.co/vercel) installed
 2. In your Next.js project, run `npm install --save next-axiom`
 3. Wrap your Next.js config in `withAxiom` like this in `next.config.js`:
 
@@ -18,39 +31,25 @@ module.exports = withAxiom({
 })
 ```
 
-This will proxy the Axiom ingest call from the frontend to improve deliverability.
+4. Go to `pages/_app.js` or `pages/_app.ts` and add the following line to report web vitals:
 
-## Reporting WebVitals
-
-Go to `pages/_app.js` or `pages/_app.ts` and add the following line:
 ```js
 export { reportWebVitals } from 'next-axiom'
 ```
 
 > **Note**: WebVitals are only sent from production deployments.
 
-## Sending Logs
+5. Wrapping your handlers in `withAxiom` will make `req.log` available:
 
-
-
-1. Wrap your functions using `withAxiom`, then you can use `req.log` like this:
 ```js
-// serverless function
 async function handler(req, res) {
-  req.log.info("hello from function")
+  req.log.info("Login function called")
+
+  // You can create intermediate loggers
+  const log = req.log.with({ scope: 'user' })
+  log.info("User logged in", { userId: 42 })
+
   res.status(200).text('hi')
-}
-
-export default withAxiom(handler)
-```
-
-```js
-// middleware function
-import { NextResponse } from 'next/server'
-
-async function handler(req, ev) {
-  req.log.info("hello from middleware")
-  return NextResponse.next()
 }
 
 export default withAxiom(handler)
@@ -58,33 +57,7 @@ export default withAxiom(handler)
 
 This will log exceptions as well as making sure logs are flushed.
 
-3. Use the logger to send logs to Axiom, you can attach other metadata to your 
-logs by passing them as parameters:
-
-```js
-log.info('hello, world!')
-log.debug('debugging information', { foo: 'bar', x: 'y' })
-log.warn('be careful!')
-log.error('oops!')
-```
-
-If you have fields you want to log with all messages, you can create an 
-intermediate logger like this:
-```js
-const logger = log.with({ scope: 'user' })
-logger.info('User logged in', { userId: 42 })
-// { 
-//   "level": "info", 
-//   "_time": "2022-07-04T09:49:42Z", 
-//   "message": "User logged in", 
-//   "fields": {
-//     "scope": "user",
-//     "userId": 42,
-//   }
-// }
-```
-
-In the frontend pages you can import `log` directly from `next-axiom`
+6. Import and use `log` in the frontend like this:
 
 ```js
 import { log } from `next-axiom`;
@@ -95,18 +68,6 @@ function home() {
     log.debug('User logged in', { userId: 42 })
     ...
 }
-```
-
-4. Deploy your site and watch data coming into your Axiom dataset.
-
-> **Note**: Logs are only sent to Axiom from production deployments.
-
-### Configuration
-
-When env vars are not detected, Pretty printing to console is enabled by 
-default, to disable it set the environment variable:
-```
-AXIOM_PRETTY_PRINT_ENABLED=false
 ```
 
 ## FAQ & Troubleshooting
