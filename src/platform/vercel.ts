@@ -13,6 +13,13 @@ export default class VercelConfig extends GenericConfig implements PlatformConfi
   token = undefined;
   axiomUrl = ingestEndpoint;
 
+  constructor () {
+    super();
+    console.log(ingestEndpoint);
+    console.log(process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT, process.env.AXIOM_INGEST_ENDPOINT);
+    console.log(ingestEndpoint != undefined && ingestEndpoint != '');
+  } 
+
   getIngestURL(t: EndpointType) {
     const url = new URL(this.axiomUrl);
     url.searchParams.set('type', t.toString());
