@@ -7,8 +7,7 @@ const ingestEndpoint = process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT || process.
 export default class VercelConfig extends GenericConfig implements PlatformConfigurator {
   provider = 'vercel';
   shoudSendEdgeReport = true;
-  isEnvVarsSet =
-    process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT != undefined || process.env.AXIOM_INGEST_ENDPOINT != undefined;
+  isEnvVarsSet = ingestEndpoint != undefined && ingestEndpoint != '';
   region = process.env.VERCEL_REGION || undefined;
   environment = process.env.VERCEL_ENV || process.env.NODE_ENV;
   token = undefined;
