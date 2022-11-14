@@ -13,7 +13,10 @@ export default class GenericConfig implements PlatformConfigurator {
   environment: string = process.env.NODE_ENV;
   axiomUrl = process.env.AXIOM_URL;
   region = process.env.REGION || undefined;
-  isEnvVarsSet = envVarExists('AXIOM_URL') && envVarExists('AXIOM_DATASET') && envVarExists('AXIOM_TOKEN');
+
+  isEnvVarsSet() {
+    return envVarExists('AXIOM_URL') && envVarExists('AXIOM_DATASET') && envVarExists('AXIOM_TOKEN');
+  }
 
   getIngestURL(_: EndpointType) {
     return `${this.axiomUrl}/api/v1/datasets/${this.dataset}/ingest`;

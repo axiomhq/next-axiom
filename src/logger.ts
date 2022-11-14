@@ -102,8 +102,8 @@ export class Logger {
       return;
     }
 
-    console.log('isEnvVarsSet', config.isEnvVarsSet);
-    if (!config.isEnvVarsSet) {
+    console.log('isEnvVarsSet', config.isEnvVarsSet());
+    if (!config.isEnvVarsSet()) {
       // if AXIOM ingesting url is not set, fallback to printing to console
       // to avoid network errors in development environments
       this.logEvents.forEach((ev) => prettyPrint(ev));

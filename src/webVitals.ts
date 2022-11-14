@@ -13,7 +13,7 @@ export function reportWebVitals(metric: NextWebVitalsMetric) {
   collectedMetrics.push({ route: window.__NEXT_DATA__?.page, ...metric });
   // if Axiom env vars are not set, do nothing,
   // otherwise devs will get errors on dev environments
-  if (!config.isEnvVarsSet) {
+  if (!config.isEnvVarsSet()) {
     return;
   }
   throttledSendMetrics();
