@@ -27,7 +27,7 @@ export const throttle = (fn: Function, wait: number) => {
 };
 
 export function envVarExists(name: string) {
-  if (name in process.env && process.env[name] != undefined && process.env[name] != '') {
+  if (process.env[name] != undefined && process.env[name] != '') {
     return true;
   }
 
