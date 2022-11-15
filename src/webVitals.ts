@@ -1,6 +1,6 @@
 import { NextWebVitalsMetric } from 'next/app';
 import { throttle } from './shared';
-import config from './config';
+import config, { isVercel } from './config';
 
 const url = config.getWebVitalsEndpoint();
 
@@ -36,13 +36,12 @@ function sendMetrics() {
     }).catch(console.error);
   }
 
-  if (config.isBrowser && navigator.sendBeacon) {
+  if (config.isBrowser && isVercel && navigator.sendBeacon) {
     try {
       // See https://github.com/vercel/next.js/pull/26601
       // Navigator has to be bound to ensure it does not error in some browsers
       // https://xgwang.me/posts/you-may-not-know-beacon/#it-may-throw-error%2C-be-sure-to-catch
-      const blob = new Blob([body], headers);
-      navigator.sendBeacon.bind(navigator)(url, blob);
+      navigator.sendBeacon.bind(navigator)(url, body);
     } catch (err) {
       sendFallback();
     }

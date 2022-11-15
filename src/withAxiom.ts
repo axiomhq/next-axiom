@@ -18,7 +18,6 @@ function withAxiomNextConfig(nextConfig: NextConfig): NextConfig {
 
       const webVitalsEndpoint = config.getIngestURL(EndpointType.webVitals);
       const logsEndpoint = config.getIngestURL(EndpointType.logs);
-      console.log('debug endpoints', webVitalsEndpoint, logsEndpoint);
       if (!webVitalsEndpoint && !logsEndpoint) {
         const log = new Logger();
         log.warn(

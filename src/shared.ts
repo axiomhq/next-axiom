@@ -25,11 +25,3 @@ export const throttle = (fn: Function, wait: number) => {
     }, Math.max(wait - (Date.now() - lastTime), 0));
   };
 };
-
-export function envVarExists(name: string) {
-  if (process.env[name] != undefined && process.env[name] != '') {
-    return true;
-  }
-
-  return false;
-}

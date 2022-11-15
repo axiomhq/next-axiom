@@ -1,4 +1,4 @@
-import config from './config';
+import config, { isVercel } from './config';
 import { isNoPrettyPrint, throttle } from './shared';
 
 const url = config.getLogsEndpoint();
@@ -102,7 +102,6 @@ export class Logger {
       return;
     }
 
-    console.log('isEnvVarsSet', config.isEnvVarsSet());
     if (!config.isEnvVarsSet()) {
       // if AXIOM ingesting url is not set, fallback to printing to console
       // to avoid network errors in development environments
@@ -125,9 +124,8 @@ export class Logger {
       if (typeof fetch === 'undefined') {
         const fetch = await require('whatwg-fetch');
         await fetch(url, { body, method, keepalive, headers });
-        // } else if (config.isBrowser && navigator.sendBeacon) {
-        // const blob = new Blob([body], headers)
-        // navigator.sendBeacon(url, blob);
+      } else if (config.isBrowser && isVercel && navigator.sendBeacon) {
+        navigator.sendBeacon(url, body);
       } else {
         await fetch(url, { body, method, keepalive, headers });
       }
