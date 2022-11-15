@@ -6,14 +6,18 @@ import { envVarExists } from './shared';
 const isVercel = envVarExists('AXIOM_INGEST_ENDPOINT') || envVarExists('NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT');
 const isNetlify = envVarExists('NETLIFY') && process.env.NETLIFY == 'true';
 
-console.log(process.env)
+console.log(process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT, {
+  isVercel: envVarExists('AXIOM_INGEST_ENDPOINT'),
+  isVercelPubluc: envVarExists('NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT'),
+  isNetlify: process.env.NETLIFY,
+});
 
 if (isVercel) {
-    console.log('vercel is used')
+  console.log('vercel is used');
 } else if (isNetlify) {
-    console.log('netlify is used')
+  console.log('netlify is used');
 } else {
-    console.log('fallback to generic')
+  console.log('fallback to generic');
 }
 
 const config = isVercel ? new VercelConfig() : isNetlify ? new NetlifyConfig() : new GenericConfig();
