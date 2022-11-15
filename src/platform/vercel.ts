@@ -15,11 +15,6 @@ export default class VercelConfig extends GenericConfig implements PlatformConfi
   token = undefined;
   axiomUrl = ingestEndpoint;
 
-  constructor () {
-    super();
-    
-  }
-
   isEnvVarsSet () {
     return ingestEndpoint != undefined && ingestEndpoint != '';
   }

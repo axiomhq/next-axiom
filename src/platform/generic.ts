@@ -15,6 +15,7 @@ export default class GenericConfig implements PlatformConfigurator {
   region = process.env.REGION || undefined;
 
   isEnvVarsSet() {
+    console.log('am I called instead?')
     return envVarExists('AXIOM_URL') && envVarExists('AXIOM_DATASET') && envVarExists('AXIOM_TOKEN');
   }
 
