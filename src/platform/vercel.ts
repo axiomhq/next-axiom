@@ -22,6 +22,10 @@ export default class VercelConfig extends GenericConfig implements PlatformConfi
     return url.toString();
   }
 
+  getWebVitalsEndpoint(): string {
+    return this.getIngestURL(EndpointType.webVitals);
+  }
+
   wrapWebVitalsObject(metrics: any[]) {
     return {
       webVitals: metrics,
