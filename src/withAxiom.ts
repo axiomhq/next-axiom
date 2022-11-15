@@ -41,6 +41,9 @@ function withAxiomNextConfig(nextConfig: NextConfig): NextConfig {
         },
       ];
 
+      console.log(rewrites)
+      console.log(axiomRewrites)
+
       if (!rewrites) {
         return axiomRewrites;
       } else if (Array.isArray(rewrites)) {
