@@ -1,7 +1,9 @@
 import { NextApiRequest } from "next";
 import { RequestReport } from "../logger";
-import { EndpointType, envVarExists } from "../shared";
+import { EndpointType } from "../shared";
 import type PlatformConfigurator from "./base";
+
+console.log(process.env.AXIOM_URL, process.env.AXIOM_DATASET, process.env.AXIOM_TOKEN)
 
 export default class GenericConfig implements PlatformConfigurator {
   provider = '-';
@@ -15,8 +17,7 @@ export default class GenericConfig implements PlatformConfigurator {
   region = process.env.REGION || undefined;
 
   isEnvVarsSet() {
-    console.log('am I called instead?')
-    return envVarExists('AXIOM_URL') && envVarExists('AXIOM_DATASET') && envVarExists('AXIOM_TOKEN');
+    return !!(process.env.AXIOM_URL && process.env.AXIOM_DATASET && process.env.AXIOM_TOKEN);
   }
 
   getIngestURL(_: EndpointType) {

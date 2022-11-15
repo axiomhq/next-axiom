@@ -3,9 +3,6 @@ import type PlatformConfigurator from './base';
 import GenericConfig from './generic';
 
 const ingestEndpoint = process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT || process.env.AXIOM_INGEST_ENDPOINT || '';
-console.log('ingestEndpoint', ingestEndpoint);
-console.log('vercel env vars', process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT, process.env.AXIOM_INGEST_ENDPOINT);
-console.log("ingestEndpoint != undefined && ingestEndpoint != ''", ingestEndpoint != undefined && ingestEndpoint != '');
 
 export default class VercelConfig extends GenericConfig implements PlatformConfigurator {
   provider = 'vercel';
