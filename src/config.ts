@@ -1,14 +1,13 @@
 import GenericConfig from './platform/generic';
 import VercelConfig from './platform/vercel';
 import NetlifyConfig from './platform/netlify';
-import { envVarExists } from './shared';
 
-const isVercel = envVarExists('AXIOM_INGEST_ENDPOINT') || envVarExists('NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT');
-const isNetlify = envVarExists('NETLIFY') && process.env.NETLIFY == 'true';
+const isVercel = process.env.AXIOM_INGEST_ENDPOINT || process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT;
+const isNetlify = process.env.NETLIFY == 'true';
 
-console.log(process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT, {
-  isVercel: envVarExists('AXIOM_INGEST_ENDPOINT'),
-  isVercelPubluc: envVarExists('NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT'),
+console.log({
+  isVercel: process.env.AXIOM_INGEST_ENDPOINT,
+  isVercelPubluc: process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT,
   isNetlify: process.env.NETLIFY,
 });
 
