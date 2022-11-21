@@ -23,8 +23,6 @@ test('throttled sendMetrics', async () => {
     [{ id: '4', startTime: 4012, value: 4, name: 'FCP', label: 'web-vital' }],
   ];
 
-  console.log('isBrowser', config.isBrowser);
-
   // report first set of web-vitals
   metricsMatrix[0].forEach(reportWebVitals);
   // skip 100ms and report another webVital
