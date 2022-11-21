@@ -23,7 +23,7 @@ export default class VercelConfig extends GenericConfig implements PlatformConfi
   }
 
   getWebVitalsEndpoint(): string {
-    return this.getIngestURL(EndpointType.webVitals);
+    return `${this.proxyPath}/web-vitals`;
   }
 
   wrapWebVitalsObject(metrics: any[]) {

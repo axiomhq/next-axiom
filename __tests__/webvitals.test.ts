@@ -23,7 +23,7 @@ test('throttled sendMetrics', async () => {
     [{ id: '4', startTime: 4012, value: 4, name: 'FCP', label: 'web-vital' }],
   ];
 
-  console.log(config.isBrowser)
+  console.log('isBrowser', config.isBrowser);
 
   // report first set of web-vitals
   metricsMatrix[0].forEach(reportWebVitals);
@@ -47,7 +47,7 @@ test('throttled sendMetrics', async () => {
   expect(fetch).nthCalledWith(1, url, {
     body: JSON.stringify({
       webVitals: [...metricsMatrix[0], ...metricsMatrix[1]],
-      environment: 'test'
+      environment: 'test',
     }),
     ...payload,
   });
