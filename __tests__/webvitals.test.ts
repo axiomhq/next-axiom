@@ -7,6 +7,7 @@ import { NextWebVitalsMetric } from 'next/app';
 process.env.AXIOM_URL = '';
 process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT = 'https://example.co/api/test';
 import { reportWebVitals } from '../src/webVitals';
+import config from '../src/config';
 import 'whatwg-fetch';
 
 global.fetch = jest.fn(() => Promise.resolve(new Response('', { status: 204, statusText: 'OK' }))) as jest.Mock;
@@ -21,6 +22,8 @@ test('throttled sendMetrics', async () => {
     [{ id: '3', startTime: 9012, value: 3, name: 'FCP', label: 'web-vital' }],
     [{ id: '4', startTime: 4012, value: 4, name: 'FCP', label: 'web-vital' }],
   ];
+
+  console.log(config.isBrowser)
 
   // report first set of web-vitals
   metricsMatrix[0].forEach(reportWebVitals);
@@ -44,6 +47,7 @@ test('throttled sendMetrics', async () => {
   expect(fetch).nthCalledWith(1, url, {
     body: JSON.stringify({
       webVitals: [...metricsMatrix[0], ...metricsMatrix[1]],
+      environment: 'test'
     }),
     ...payload,
   });
