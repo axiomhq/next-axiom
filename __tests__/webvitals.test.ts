@@ -41,7 +41,14 @@ test('throttled sendMetrics', async () => {
   jest.advanceTimersByTime(1000);
 
   const url = '/_axiom/web-vitals';
-  const payload = { method: 'POST', keepalive: true };
+  const payload = {
+    method: 'POST',
+    keepalive: true,
+    headers: {
+      Authorization: `Bearer ${config.token}`,
+      type: 'application/json',
+    },
+  };
 
   expect(fetch).toHaveBeenCalledTimes(2);
   expect(fetch).nthCalledWith(1, url, {
@@ -54,6 +61,7 @@ test('throttled sendMetrics', async () => {
   expect(fetch).nthCalledWith(2, url, {
     body: JSON.stringify({
       webVitals: metricsMatrix[2],
+      environment: 'test',
     }),
     ...payload,
   });
