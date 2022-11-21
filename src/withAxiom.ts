@@ -41,7 +41,7 @@ function withAxiomNextConfig(nextConfig: NextConfig): NextConfig {
         },
       ];
 
-      console.log(rewrites);
+      console.log('rewrites', rewrites);
       console.log(axiomRewrites);
 
       if (!rewrites) {
