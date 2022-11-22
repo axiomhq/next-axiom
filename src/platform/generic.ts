@@ -14,7 +14,7 @@ export default class GenericConfig implements PlatformConfigurator {
   axiomUrl = process.env.AXIOM_URL;
   region = process.env.REGION || undefined;
 
-  isEnvVarsSet() {
+  isEnvVarsSet(): boolean {
     return !!(process.env.AXIOM_URL && process.env.AXIOM_DATASET && process.env.AXIOM_TOKEN);
   }
 
