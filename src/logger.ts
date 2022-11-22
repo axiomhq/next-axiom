@@ -52,16 +52,16 @@ export class Logger {
   ) {}
 
   debug = (message: string, args: any = {}) => {
-    this._log('debug', message, { ...this.args, ...args });
+    this._log('debug', message, args);
   };
   info = (message: string, args: any = {}) => {
-    this._log('info', message, { ...this.args, ...args });
+    this._log('info', message, args);
   };
   warn = (message: string, args: any = {}) => {
-    this._log('warn', message, { ...this.args, ...args });
+    this._log('warn', message, args);
   };
   error = (message: string, args: any = {}) => {
-    this._log('error', message, { ...this.args, ...args });
+    this._log('error', message, args);
   };
 
   with = (args: any) => {
@@ -74,8 +74,11 @@ export class Logger {
 
   _log = (level: string, message: string, args: any = {}) => {
     const logEvent: LogEvent = { level, message, _time: new Date(Date.now()).toISOString(), fields: {} };
-    if (Object.keys(args).length > 0) {
-      logEvent.fields = args;
+    // check if passed args is an object, if its not an object, add it to fields.args
+    if (typeof args === 'object' && args !== null && Object.keys(args).length > 0) {
+      logEvent.fields = { ...this.args, ...args };
+    } else if (args != null) {
+      logEvent.fields = { ...this.args, args: args };
     }
 
     logEvent.vercel = {
