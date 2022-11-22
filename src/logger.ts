@@ -113,21 +113,24 @@ export class Logger {
     const method = 'POST';
     const keepalive = true;
     const body = JSON.stringify(this.logEvents);
-    const headers = {
-      Authorization: `Bearer ${config.token}`,
-      'content-type': 'application/json',
-    };
     // clear pending logs
     this.logEvents = [];
+    const headers = {
+      'content-type': 'application/json',
+    };
+    if (config.token) {
+      headers['Authorization'] = `Bearer ${config.token}`;
+    }
+    const reqOptions: RequestInit = { body, method, keepalive, headers };
 
     try {
       if (typeof fetch === 'undefined') {
         const fetch = await require('whatwg-fetch');
-        await fetch(url, { body, method, keepalive, headers });
+        await fetch(url, reqOptions);
       } else if (config.isBrowser && isVercel && navigator.sendBeacon) {
         navigator.sendBeacon(url, body);
       } else {
-        await fetch(url, { body, method, keepalive, headers });
+        await fetch(url, reqOptions);
       }
     } catch (e) {
       console.error(`Failed to send logs to Axiom: ${e}`);

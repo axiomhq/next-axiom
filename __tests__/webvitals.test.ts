@@ -7,7 +7,6 @@ import { NextWebVitalsMetric } from 'next/app';
 process.env.AXIOM_URL = '';
 process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT = 'https://example.co/api/test';
 import { reportWebVitals } from '../src/webVitals';
-import config from '../src/config';
 import 'whatwg-fetch';
 
 global.fetch = jest.fn(() => Promise.resolve(new Response('', { status: 204, statusText: 'OK' }))) as jest.Mock;
@@ -40,12 +39,11 @@ test('throttled sendMetrics', async () => {
 
   const url = '/_axiom/web-vitals';
   const payload = {
+    headers: {
+      'Content-Type': 'application/json',
+    },
     method: 'POST',
     keepalive: true,
-    headers: {
-      Authorization: `Bearer ${config.token}`,
-      type: 'application/json',
-    },
   };
 
   expect(fetch).toHaveBeenCalledTimes(2);

@@ -22,18 +22,16 @@ export function reportWebVitals(metric: NextWebVitalsMetric) {
 function sendMetrics() {
   const body = JSON.stringify(config.wrapWebVitalsObject(collectedMetrics));
   const headers = {
-    Authorization: `Bearer ${config.token}`,
-    type: 'application/json',
+    'Content-Type': 'application/json',
   };
+  if (config.token) {
+    headers['Authorization'] = `Bearer ${config.token}`;
+  }
+  const reqOptions: RequestInit = { body, method: 'POST', keepalive: true, headers };
 
   function sendFallback() {
     // Do not leak network errors; does not affect the running app
-    fetch(url, {
-      body,
-      method: 'POST',
-      keepalive: true,
-      headers,
-    }).catch(console.error);
+    fetch(url, reqOptions).catch(console.error);
   }
 
   if (config.isBrowser && isVercel && navigator.sendBeacon) {
