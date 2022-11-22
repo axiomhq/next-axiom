@@ -20,7 +20,7 @@ export default class GenericConfig implements Provider {
     return !!(process.env.AXIOM_URL && process.env.AXIOM_DATASET && process.env.AXIOM_TOKEN);
   }
 
-  getIngestURL(_: EndpointType) {
+  getIngestURL(_: EndpointType): string {
     return `${this.axiomUrl}/api/v1/datasets/${this.dataset}/ingest`;
   }
 
