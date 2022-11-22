@@ -1,9 +1,11 @@
 import { NextApiRequest } from "next";
 import { RequestReport } from "../logger";
 import { EndpointType } from "../shared";
-import type PlatformConfigurator from "./base";
+import type Provider from "./base";
 
-export default class GenericConfig implements PlatformConfigurator {
+// This is the generic config class for all platforms that doesn't have a special
+// implementation (e.g: vercel, netlify). All config classes extends this one.
+export default class GenericConfig implements Provider {
   provider = '-';
   proxyPath = '/_axiom';
   isBrowser = typeof window !== 'undefined';

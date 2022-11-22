@@ -1,10 +1,10 @@
 import { EndpointType } from '../shared';
-import type PlatformConfigurator from './base';
+import type Provider from './base';
 import GenericConfig from './generic';
 
 const ingestEndpoint = process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT || process.env.AXIOM_INGEST_ENDPOINT || '';
 
-export default class VercelConfig extends GenericConfig implements PlatformConfigurator {
+export default class VercelConfig extends GenericConfig implements Provider {
   provider = 'vercel';
   shoudSendEdgeReport = true;
   region = process.env.VERCEL_REGION || undefined;

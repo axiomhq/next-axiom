@@ -1,7 +1,7 @@
-import type PlatformConfigurator from './base';
+import type Provider from './base';
 import GenericConfig from './generic';
 
-export default class NetlifyConfig extends GenericConfig implements PlatformConfigurator {
+export default class NetlifyConfig extends GenericConfig implements Provider {
   provider = 'netlify';
   netlifyBuildId = process.env.BUILD_ID;
   netlifyContext = process.env.CONTEXT;
