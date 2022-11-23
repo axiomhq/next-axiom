@@ -38,7 +38,6 @@ export default class VercelConfig extends GenericConfig implements Provider {
       environment: this.environment,
       region: this.region,
       source: source,
-      provider: this.provider,
     };
   }
 }

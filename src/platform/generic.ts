@@ -6,7 +6,6 @@ import type Provider from "./base";
 // This is the generic config class for all platforms that doesn't have a special
 // implementation (e.g: vercel, netlify). All config classes extends this one.
 export default class GenericConfig implements Provider {
-  provider = '-';
   proxyPath = '/_axiom';
   isBrowser = typeof window !== 'undefined';
   shoudSendEdgeReport = false;
@@ -39,7 +38,6 @@ export default class GenericConfig implements Provider {
         webVitals: metrics,
         _time: new Date().getTime(),
         platform: {
-          provider: this.provider,
           environment: this.environment,
           source: 'reportWebVitals',
         },
@@ -52,7 +50,6 @@ export default class GenericConfig implements Provider {
       environment: this.environment,
       region: this.environment,
       source: source,
-      provider: this.provider,
     };
   }
 
