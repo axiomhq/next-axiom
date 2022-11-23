@@ -10,12 +10,11 @@ export default class NetlifyConfig extends GenericConfig implements Provider {
   wrapWebVitalsObject(metrics: any[]) {
     return [
       {
-        msg: 'reportWebVitals',
         webVitals: metrics,
         _time: new Date().getTime(),
         netlify: {
           environment: this.environment,
-          source: 'reportWebVitals',
+          source: 'web-vital',
           buildId: this.netlifyBuildId,
           context: this.netlifyContext,
           deploymentUrl: this.netlifyDeploymentUrl,

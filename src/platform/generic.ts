@@ -34,12 +34,11 @@ export default class GenericConfig implements Provider {
   wrapWebVitalsObject(metrics: any[]): any {
     return [
       {
-        msg: 'reportWebVitals',
         webVitals: metrics,
         _time: new Date().getTime(),
         platform: {
           environment: this.environment,
-          source: 'reportWebVitals',
+          source: 'web-vital',
         },
       },
     ];
