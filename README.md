@@ -17,17 +17,23 @@
 
 For more information check out the [official documentation](https://axiom.co/docs).
 
-## Usage
+## Quickstart
 
-First of all make sure you have the [Axiom Vercel integration](https://www.axiom.co/vercel) 
-installed.
-Then in your Next.js project, run install `next-axiom` like this:
+- If you are using vercel, make sure you have the [Axiom Vercel integration](https://www.axiom.co/vercel) 
+installed. On other platforms you must create an API token and set those environment variables:
+
+```
+AXIOM_DATASET: the dataset the logs will be ingested into
+AXIOM_TOKEN: the API token you created for ingestion to the dataset
+```
+
+- Then in your Next.js project, run install `next-axiom` like this:
 
 ```sh
 npm install --save next-axiom
 ```
 
-Wrap your Next.js config in `withAxiom` like this in `next.config.js`:
+- Wrap your Next.js config in `withAxiom` like this in `next.config.js`:
 
 ```js
 const { withAxiom } = require('next-axiom')
@@ -37,7 +43,7 @@ module.exports = withAxiom({
 })
 ```
 
-Go to `pages/_app.js` or `pages/_app.ts` and add the following line to report web vitals:
+- Go to `pages/_app.js` or `pages/_app.ts` and add the following line to report web vitals:
 
 ```js
 export { reportWebVitals } from 'next-axiom'
