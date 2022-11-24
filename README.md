@@ -19,7 +19,7 @@ For more information check out the [official documentation](https://axiom.co/doc
 
 ## Quickstart
 
-- If you are using vercel, make sure you have the [Axiom Vercel integration](https://www.axiom.co/vercel) 
+- If you are using Vercel, make sure you have the [Axiom Vercel integration](https://www.axiom.co/vercel) 
 installed. On other platforms you must create an API token and set those environment variables:
 
 ```
