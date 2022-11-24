@@ -45,26 +45,26 @@ export class Logger {
   throttledSendLogs = throttle(this.sendLogs, 1000);
 
   constructor(
-    private args: any = {},
+    private args: { [key: string]: any } = {},
     private req: RequestReport | null = null,
     private autoFlush: Boolean = true,
     public source: 'frontend' | 'lambda' | 'edge' = 'frontend'
   ) {}
 
-  debug = (message: string, args: any = {}) => {
+  debug = (message: string, args: { [key: string]: any } = {}) => {
     this._log('debug', message, args);
   };
-  info = (message: string, args: any = {}) => {
+  info = (message: string, args: { [key: string]: any } = {}) => {
     this._log('info', message, args);
   };
-  warn = (message: string, args: any = {}) => {
+  warn = (message: string, args: { [key: string]: any } = {}) => {
     this._log('warn', message, args);
   };
-  error = (message: string, args: any = {}) => {
+  error = (message: string, args: { [key: string]: any } = {}) => {
     this._log('error', message, args);
   };
 
-  with = (args: any) => {
+  with = (args: { [key: string]: any }) => {
     return new Logger({ ...this.args, ...args }, this.req, this.autoFlush, this.source);
   };
 
@@ -72,7 +72,7 @@ export class Logger {
     return new Logger({ ...this.args }, req, this.autoFlush, this.source);
   };
 
-  _log = (level: string, message: string, args: any = {}) => {
+  _log = (level: string, message: string, args: { [key: string]: any } = {}) => {
     const logEvent: LogEvent = { level, message, _time: new Date(Date.now()).toISOString(), fields: {} };
     // check if passed args is an object, if its not an object, add it to fields.args
     if (typeof args === 'object' && args !== null && Object.keys(args).length > 0) {
