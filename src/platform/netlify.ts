@@ -7,10 +7,9 @@ export default class NetlifyConfig extends GenericConfig implements Provider {
   netlifyDeploymentUrl = process.env.DEPLOY_URL;
   netlifyDeploymentId = process.env.DEPLOY_ID;
 
-  wrapWebVitalsObject(metrics: any[]) {
-    return [
-      {
-        webVitals: metrics,
+  wrapWebVitalsObject(metrics: any[]): any {
+    return metrics.map(m => ({
+      webVital: m,
         _time: new Date().getTime(),
         netlify: {
           environment: this.environment,
@@ -20,8 +19,7 @@ export default class NetlifyConfig extends GenericConfig implements Provider {
           deploymentUrl: this.netlifyDeploymentUrl,
           deploymentId: this.netlifyDeploymentId,
         },
-      },
-    ];
+    }))
   }
 
   injectPlatformMetadata(logEvent: any, source: string) {

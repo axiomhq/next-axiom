@@ -32,16 +32,14 @@ export default class GenericConfig implements Provider {
   }
 
   wrapWebVitalsObject(metrics: any[]): any {
-    return [
-      {
-        webVitals: metrics,
+    return metrics.map(m => ({
+        webVital: m,
         _time: new Date().getTime(),
         platform: {
           environment: this.environment,
           source: 'web-vital',
         },
-      },
-    ];
+    }))
   }
 
   injectPlatformMetadata(logEvent: any, source: string) {
