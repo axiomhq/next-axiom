@@ -40,3 +40,23 @@ test('with', async () => {
   expect(fst.fields.foo).toBe('bar');
   expect(fst.fields.bar).toBe('baz');
 });
+
+test('passing non-object', async () => {
+  global.fetch = jest.fn() as jest.Mock;
+
+  const logger = log.with({ foo: 'bar' });
+  const args = 'baz';
+  logger.info('hello, world!', args as unknown as object);
+  expect(fetch).toHaveBeenCalledTimes(0);
+
+  jest.advanceTimersByTime(1000);
+  expect(fetch).toHaveBeenCalledTimes(1);
+  const payload = JSON.parse((fetch as jest.Mock).mock.calls[0][1].body);
+  expect(payload.length).toBe(1);
+  const fst = payload[0];
+  expect(fst.level).toBe('info');
+  expect(fst.message).toBe('hello, world!');
+  expect(fst.fields.foo).toBe('bar');
+  console.log(fst.fields);
+  expect(fst.fields.args).toBe('baz');
+});
