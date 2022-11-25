@@ -16,6 +16,7 @@ export default class GenericConfig implements Provider {
   region = process.env.REGION || undefined;
 
   isEnvVarsSet(): boolean {
+    console.log('debug isEnvVarsSet', process.env.AXIOM_URL, process.env.AXIOM_DATASET, process.env.AXIOM_TOKEN);
     return !!(process.env.AXIOM_URL && process.env.AXIOM_DATASET && process.env.AXIOM_TOKEN);
   }
 
