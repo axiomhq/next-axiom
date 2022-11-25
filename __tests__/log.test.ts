@@ -45,7 +45,8 @@ test('passing non-object', async () => {
   global.fetch = jest.fn() as jest.Mock;
 
   const logger = log.with({ foo: 'bar' });
-  logger.info('hello, world!', 'baz');
+  const args = 'baz';
+  logger.info('hello, world!', args as unknown as object);
   expect(fetch).toHaveBeenCalledTimes(0);
 
   jest.advanceTimersByTime(1000);
