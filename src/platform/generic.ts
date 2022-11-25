@@ -17,7 +17,7 @@ export default class GenericConfig implements Provider {
 
   isEnvVarsSet(): boolean {
     console.log('debug isEnvVarsSet', process.env.AXIOM_URL, process.env.AXIOM_DATASET, process.env.AXIOM_TOKEN);
-    return !!(process.env.AXIOM_URL && process.env.AXIOM_DATASET && process.env.AXIOM_TOKEN);
+    return !!(this.axiomUrl && process.env.AXIOM_DATASET && process.env.AXIOM_TOKEN);
   }
 
   getIngestURL(_: EndpointType): string {
