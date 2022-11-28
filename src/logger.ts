@@ -43,6 +43,7 @@ interface VercelData {
 export class Logger {
   public logEvents: LogEvent[] = [];
   throttledSendLogs = throttle(this.sendLogs, 1000);
+  _children: Logger[] = [];
 
   constructor(
     private args: { [key: string]: any } = {},
@@ -65,7 +66,9 @@ export class Logger {
   };
 
   with = (args: { [key: string]: any }) => {
-    return new Logger({ ...this.args, ...args }, this.req, this.autoFlush, this.source);
+    const child = new Logger({ ...this.args, ...args }, this.req, this.autoFlush, this.source);
+    this._children.push(child);
+    return child;
   };
 
   withRequest = (req: RequestReport) => {
@@ -140,7 +143,9 @@ export class Logger {
     }
   }
 
-  flush = this.sendLogs;
+  flush = async () => {
+    return Promise.all([this.sendLogs, ...this._children.map((c) => c.sendLogs)]);
+  };
 }
 
 export const log = new Logger();
