@@ -48,8 +48,8 @@ export { reportWebVitals } from 'next-axiom'
 Wrapping your handlers in `withAxiom` will make `req.log` available and log
 exceptions:
 
-```js
-async function handler(req, res) {
+```ts
+async function handler(req: AxiomAPIRequest, res: NextApiResponse) {
   req.log.info("Login function called")
 
   // You can create intermediate loggers
