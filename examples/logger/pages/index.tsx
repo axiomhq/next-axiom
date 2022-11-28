@@ -1,16 +1,18 @@
 import { log } from 'next-axiom'
-import useSWR from 'swr'
+import { GetStaticProps } from 'next'
+import useSWR, { BareFetcher } from 'swr'
 
-export async function getStaticProps(context) {
+export const getStaticProps: GetStaticProps =  async (context) => {
   log.info('Hello from SSR', { context })
   return {
     props: {},
   }
 }
 
-const fetcher = async (...args) => {
+const fetcher = async (args: any[]) => {
   console.log('Fetching', args)
   log.info('Hello from SWR', { args });
+  // @ts-ignore
   const res = await fetch(...args);
   return await res.json();
 }

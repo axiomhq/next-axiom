@@ -1,10 +1,10 @@
-import { withAxiom } from 'next-axiom'
+import { withAxiom, AxiomRequest } from 'next-axiom'
 
 export const config = {
     runtime: 'experimental-edge',
 };
 
-function handler(req) {
+function handler(req: AxiomRequest) {
     req.log.debug("message from edge", { foo: 'bar' })
 
     return new Response(
