@@ -1,3 +1,4 @@
+import { LogEvent } from '../logger';
 import { EndpointType } from '../shared';
 import type Provider from './base';
 import GenericConfig from './generic';
@@ -33,7 +34,7 @@ export default class VercelConfig extends GenericConfig implements Provider {
     };
   }
 
-  injectPlatformMetadata(logEvent: any, source: string) {
+  injectPlatformMetadata(logEvent: LogEvent, source: string) {
     logEvent.vercel = {
       environment: this.environment,
       region: this.region,

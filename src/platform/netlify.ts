@@ -1,5 +1,13 @@
+import { LogEvent, PlatformInfo } from '../logger';
 import type Provider from './base';
 import GenericConfig from './generic';
+
+export interface NetlifyInfo extends PlatformInfo {
+  buildId?: string;
+  context?: string;
+  deploymentUrl?: string;
+  deploymentId?: string;
+}
 
 export default class NetlifyConfig extends GenericConfig implements Provider {
   netlifyBuildId = process.env.BUILD_ID;
@@ -22,7 +30,7 @@ export default class NetlifyConfig extends GenericConfig implements Provider {
     }))
   }
 
-  injectPlatformMetadata(logEvent: any, source: string) {
+  injectPlatformMetadata(logEvent: LogEvent, source: string) {
     logEvent.netlify = {
       environment: this.environment,
       region: this.region,

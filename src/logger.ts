@@ -1,9 +1,10 @@
 import config, { isVercel } from './config';
+import { NetlifyInfo } from './platform/netlify';
 import { isNoPrettyPrint, throttle } from './shared';
 
 const url = config.getLogsEndpoint();
 
-interface LogEvent {
+export interface LogEvent {
   level: string;
   message: string;
   fields: {};
@@ -11,6 +12,7 @@ interface LogEvent {
   request?: RequestReport;
   platform?: PlatformInfo;
   vercel?: PlatformInfo;
+  netlify?: NetlifyInfo;
 }
 
 export interface RequestReport {
@@ -25,12 +27,11 @@ export interface RequestReport {
   userAgent?: string | null;
 }
 
-interface PlatformInfo {
+export interface PlatformInfo {
   environment?: string;
   region?: string;
   route?: string;
   source?: string;
-  provider: string;
 }
 
 export class Logger {

@@ -1,5 +1,5 @@
 import { NextApiRequest } from "next";
-import { RequestReport } from "../logger";
+import { LogEvent, RequestReport } from "../logger";
 import { EndpointType } from "../shared";
 import type Provider from "./base";
 
@@ -42,7 +42,7 @@ export default class GenericConfig implements Provider {
     }))
   }
 
-  injectPlatformMetadata(logEvent: any, source: string) {
+  injectPlatformMetadata(logEvent: LogEvent, source: string) {
     logEvent.platform = {
       environment: this.environment,
       region: this.environment,
