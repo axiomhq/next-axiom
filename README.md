@@ -49,6 +49,8 @@ Wrapping your handlers in `withAxiom` will make `req.log` available and log
 exceptions:
 
 ```ts
+import { withAxiom, AxiomAPIRequest } from 'next-axiom'
+
 async function handler(req: AxiomAPIRequest, res: NextApiResponse) {
   req.log.info("Login function called")
 
