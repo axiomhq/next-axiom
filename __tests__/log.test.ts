@@ -37,6 +37,7 @@ test('with', async () => {
   const fst = payload[0];
   expect(fst.level).toBe('info');
   expect(fst.message).toBe('hello, world!');
+  expect(Object.keys(fst.fields).length).toBe(2);
   expect(fst.fields.foo).toBe('bar');
   expect(fst.fields.bar).toBe('baz');
 });
@@ -72,5 +73,13 @@ test('flushing child loggers', async () => {
   expect(fetch).toHaveBeenCalledTimes(0);
   await log.flush();
 
+  expect(fetch).toHaveBeenCalledTimes(3);
+
+  const payload = JSON.parse((fetch as jest.Mock).mock.calls[2][1].body);
+  expect(Object.keys(payload[0].fields).length).toEqual(2);
+  expect(payload[0].fields.foo).toEqual('bar');
+  expect(payload[0].fields.bar).toEqual('foo');
+  // ensure there is nothing was left unflushed
+  await log.flush();
   expect(fetch).toHaveBeenCalledTimes(3);
 });

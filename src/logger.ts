@@ -77,11 +77,15 @@ export class Logger {
 
   _log = (level: string, message: string, args: { [key: string]: any } = {}) => {
     const logEvent: LogEvent = { level, message, _time: new Date(Date.now()).toISOString(), fields: {} };
+    // check if there is args attached to the logger
+    if (Object.keys(this.args).length) {
+      logEvent.fields = { ...this.args };
+    }
     // check if passed args is an object, if its not an object, add it to fields.args
     if (typeof args === 'object' && args !== null && Object.keys(args).length > 0) {
-      logEvent.fields = { ...this.args, ...args };
-    } else if (args != null) {
-      logEvent.fields = { ...this.args, args: args };
+      logEvent.fields = { ...logEvent.fields, ...args };
+    } else if (args && args.length) {
+      logEvent.fields = { ...logEvent.fields, args: args };
     }
 
     logEvent.vercel = {
