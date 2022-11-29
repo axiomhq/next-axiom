@@ -43,7 +43,7 @@ interface VercelData {
 export class Logger {
   public logEvents: LogEvent[] = [];
   throttledSendLogs = throttle(this.sendLogs, 1000);
-  _children: Logger[] = [];
+  children: Logger[] = [];
 
   constructor(
     private args: { [key: string]: any } = {},
@@ -67,7 +67,7 @@ export class Logger {
 
   with = (args: { [key: string]: any }) => {
     const child = new Logger({ ...this.args, ...args }, this.req, this.autoFlush, this.source);
-    this._children.push(child);
+    this.children.push(child);
     return child;
   };
 
@@ -76,11 +76,7 @@ export class Logger {
   };
 
   _log = (level: string, message: string, args: { [key: string]: any } = {}) => {
-    const logEvent: LogEvent = { level, message, _time: new Date(Date.now()).toISOString(), fields: {} };
-    // check if there is args attached to the logger
-    if (Object.keys(this.args).length) {
-      logEvent.fields = { ...this.args };
-    }
+    const logEvent: LogEvent = { level, message, _time: new Date(Date.now()).toISOString(), fields: this.args || {} };
     // check if passed args is an object, if its not an object, add it to fields.args
     if (typeof args === 'object' && args !== null && Object.keys(args).length > 0) {
       logEvent.fields = { ...logEvent.fields, ...args };
@@ -148,10 +144,8 @@ export class Logger {
   }
 
   flush = async () => {
-    await Promise.all([this.sendLogs(), ...this._children.map((c) => c.flush())]);
+    await Promise.all([this.sendLogs(), ...this.children.map((c) => c.flush())]);
   };
-
-  // flush = this.sendLogs
 }
 
 export const log = new Logger();
