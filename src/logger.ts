@@ -43,6 +43,7 @@ interface VercelData {
 export class Logger {
   public logEvents: LogEvent[] = [];
   throttledSendLogs = throttle(this.sendLogs, 1000);
+  children: Logger[] = [];
 
   constructor(
     private args: { [key: string]: any } = {},
@@ -65,7 +66,9 @@ export class Logger {
   };
 
   with = (args: { [key: string]: any }) => {
-    return new Logger({ ...this.args, ...args }, this.req, this.autoFlush, this.source);
+    const child = new Logger({ ...this.args, ...args }, this.req, this.autoFlush, this.source);
+    this.children.push(child);
+    return child;
   };
 
   withRequest = (req: RequestReport) => {
@@ -73,12 +76,12 @@ export class Logger {
   };
 
   _log = (level: string, message: string, args: { [key: string]: any } = {}) => {
-    const logEvent: LogEvent = { level, message, _time: new Date(Date.now()).toISOString(), fields: {} };
+    const logEvent: LogEvent = { level, message, _time: new Date(Date.now()).toISOString(), fields: this.args || {} };
     // check if passed args is an object, if its not an object, add it to fields.args
     if (typeof args === 'object' && args !== null && Object.keys(args).length > 0) {
-      logEvent.fields = { ...this.args, ...args };
-    } else if (args != null) {
-      logEvent.fields = { ...this.args, args: args };
+      logEvent.fields = { ...logEvent.fields, ...args };
+    } else if (args && args.length) {
+      logEvent.fields = { ...logEvent.fields, args: args };
     }
 
     logEvent.vercel = {
@@ -140,7 +143,9 @@ export class Logger {
     }
   }
 
-  flush = this.sendLogs;
+  flush = async () => {
+    await Promise.all([this.sendLogs(), ...this.children.map((c) => c.flush())]);
+  };
 }
 
 export const log = new Logger();

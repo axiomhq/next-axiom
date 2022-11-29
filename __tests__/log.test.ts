@@ -37,6 +37,7 @@ test('with', async () => {
   const fst = payload[0];
   expect(fst.level).toBe('info');
   expect(fst.message).toBe('hello, world!');
+  expect(Object.keys(fst.fields).length).toBe(2);
   expect(fst.fields.foo).toBe('bar');
   expect(fst.fields.bar).toBe('baz');
 });
@@ -58,4 +59,26 @@ test('passing non-object', async () => {
   expect(fst.message).toBe('hello, world!');
   expect(fst.fields.foo).toBe('bar');
   expect(fst.fields.args).toBe('baz');
+});
+
+test('flushing child loggers', async () => {
+  global.fetch = jest.fn() as jest.Mock;
+
+  log.info('hello, world!');
+  const logger1 = log.with({ foo: 'bar' });
+  logger1.debug('logger1');
+  const logger2 = logger1.with({ bar: 'foo' });
+  logger2.debug('logger2');
+  expect(fetch).toHaveBeenCalledTimes(0);
+  await log.flush();
+
+  expect(fetch).toHaveBeenCalledTimes(3);
+
+  const payload = JSON.parse((fetch as jest.Mock).mock.calls[2][1].body);
+  expect(Object.keys(payload[0].fields).length).toEqual(2);
+  expect(payload[0].fields.foo).toEqual('bar');
+  expect(payload[0].fields.bar).toEqual('foo');
+  // ensure there is nothing was left unflushed
+  await log.flush();
+  expect(fetch).toHaveBeenCalledTimes(3);
 });
