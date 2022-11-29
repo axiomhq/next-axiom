@@ -60,3 +60,17 @@ test('passing non-object', async () => {
   console.log(fst.fields);
   expect(fst.fields.args).toBe('baz');
 });
+
+test('flushing child loggers', async () => {
+  global.fetch = jest.fn() as jest.Mock;
+
+  log.info('hello, world!');
+  const logger1 = log.with({ foo: 'bar' });
+  logger1.debug('logger1');
+  const logger2 = logger1.with({ bar: 'foo' });
+  logger2.debug('logger2');
+  expect(fetch).toHaveBeenCalledTimes(0);
+  await log.flush();
+
+  expect(fetch).toHaveBeenCalledTimes(3);
+});

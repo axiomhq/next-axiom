@@ -144,8 +144,10 @@ export class Logger {
   }
 
   flush = async () => {
-    return Promise.all([this.sendLogs, ...this._children.map((c) => c.sendLogs)]);
+    await Promise.all([this.sendLogs(), ...this._children.map((c) => c.flush())]);
   };
+
+  // flush = this.sendLogs
 }
 
 export const log = new Logger();
