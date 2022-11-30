@@ -45,7 +45,7 @@ export default class GenericConfig implements Provider {
   injectPlatformMetadata(logEvent: LogEvent, source: string) {
     logEvent.platform = {
       environment: this.environment,
-      region: this.environment,
+      region: this.region,
       source: source + '-log',
     };
   }
