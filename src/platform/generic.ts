@@ -46,7 +46,7 @@ export default class GenericConfig implements Provider {
     logEvent.platform = {
       environment: this.environment,
       region: this.environment,
-      source: source,
+      source: source + '-log',
     };
   }
 

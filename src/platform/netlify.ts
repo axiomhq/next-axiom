@@ -39,7 +39,7 @@ export default class NetlifyConfig extends GenericConfig implements Provider {
     logEvent.netlify = {
       environment: this.environment,
       region: this.region,
-      source: source,
+      source: source + '-log',
       siteId: netlifySiteId,
       buildId: netlifyBuildId,
       context: netlifyContext,
