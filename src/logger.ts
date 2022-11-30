@@ -3,6 +3,7 @@ import { NetlifyInfo } from './platform/netlify';
 import { isNoPrettyPrint, throttle } from './shared';
 
 const url = config.getLogsEndpoint();
+const LOG_LEVEL = process.env.AXIOM_LOG_LEVEL || 'debug';
 
 export interface LogEvent {
   level: string;
@@ -13,6 +14,13 @@ export interface LogEvent {
   platform?: PlatformInfo;
   vercel?: PlatformInfo;
   netlify?: NetlifyInfo;
+}
+
+export enum LogLevel {
+  debug = 0,
+  info = 1,
+  warn = 2,
+  error = 3,
 }
 
 export interface RequestReport {
@@ -38,13 +46,17 @@ export class Logger {
   public logEvents: LogEvent[] = [];
   throttledSendLogs = throttle(this.sendLogs, 1000);
   children: Logger[] = [];
+  public logLevel: string;
 
   constructor(
     private args: { [key: string]: any } = {},
     private req: RequestReport | null = null,
     private autoFlush: Boolean = true,
-    public source: 'frontend' | 'lambda' | 'edge' = 'frontend'
-  ) {}
+    public source: 'frontend' | 'lambda' | 'edge' = 'frontend',
+    logLevel?: string
+  ) {
+    this.logLevel = logLevel || LOG_LEVEL || 'debug';
+  }
 
   debug = (message: string, args: { [key: string]: any } = {}) => {
     this._log('debug', message, args);
@@ -70,7 +82,11 @@ export class Logger {
   };
 
   _log = (level: string, message: string, args: { [key: string]: any } = {}) => {
+    if (LogLevel[level] < LogLevel[this.logLevel]) {
+      return;
+    }
     const logEvent: LogEvent = { level, message, _time: new Date(Date.now()).toISOString(), fields: this.args || {} };
+
     // check if passed args is an object, if its not an object, add it to fields.args
     if (typeof args === 'object' && args !== null && Object.keys(args).length > 0) {
       logEvent.fields = { ...logEvent.fields, ...args };
