@@ -43,7 +43,7 @@ export default class NetlifyConfig extends GenericConfig implements Provider {
   injectPlatformMetadata(logEvent: LogEvent, source: string) {
     logEvent.netlify = {
       environment: this.environment,
-      region: process.env.DENO_REGION,
+      region: source === 'edge' ? process.env.DENO_REGION : process.env.AWS_REGION,
       source: source + '-log',
       siteId: netlifySiteId,
       buildId: netlifyBuildId,

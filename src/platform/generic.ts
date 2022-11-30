@@ -50,7 +50,7 @@ export default class GenericConfig implements Provider {
     };
   }
 
-  generateRequestMeta(req: any): RequestReport {
+  generateRequestMeta(req: NextApiRequest): RequestReport {
     return {
       startTime: new Date().getTime(),
       path: req.url!,
