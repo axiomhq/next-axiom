@@ -83,6 +83,28 @@ function home() {
 }
 ```
 
+## Log Levels
+
+You can control which log levels are sent to Axiom by setting the `AXIOM_LOG_LEVEL` environment variable. The default is `debug`.
+
+```sh
+export AXIOM_LOG_LEVEL=error
+```
+
+to disable logging completely, set the log level to `off`.
+
+```sh
+export AXIOM_LOG_LEVEL=off
+```
+
+available levels:
+
+- debug
+- info
+- warn
+- error
+- off
+
 ## License
 
 Distributed under the [MIT License](LICENSE).

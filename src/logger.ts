@@ -21,6 +21,7 @@ export enum LogLevel {
   info = 1,
   warn = 2,
   error = 3,
+  off = 100,
 }
 
 export interface RequestReport {
