@@ -58,7 +58,6 @@ test('passing non-object', async () => {
   expect(fst.level).toBe('info');
   expect(fst.message).toBe('hello, world!');
   expect(fst.fields.foo).toBe('bar');
-  console.log(fst.fields);
   expect(fst.fields.args).toBe('baz');
 });
 
