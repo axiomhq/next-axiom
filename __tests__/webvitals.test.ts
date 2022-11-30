@@ -4,7 +4,8 @@
 import { jest } from '@jest/globals';
 import { NextWebVitalsMetric } from 'next/app';
 // set axiom env vars before importing webvitals
-process.env.AXIOM_INGEST_ENDPOINT = 'https://example.co/api/test';
+process.env.AXIOM_URL = '';
+process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT = 'https://example.co/api/test';
 import { reportWebVitals } from '../src/webVitals';
 import 'whatwg-fetch';
 
@@ -37,18 +38,26 @@ test('throttled sendMetrics', async () => {
   jest.advanceTimersByTime(1000);
 
   const url = '/_axiom/web-vitals';
-  const payload = { method: 'POST', keepalive: true };
+  const payload = {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    method: 'POST',
+    keepalive: true,
+  };
 
   expect(fetch).toHaveBeenCalledTimes(2);
   expect(fetch).nthCalledWith(1, url, {
     body: JSON.stringify({
       webVitals: [...metricsMatrix[0], ...metricsMatrix[1]],
+      environment: 'test',
     }),
     ...payload,
   });
   expect(fetch).nthCalledWith(2, url, {
     body: JSON.stringify({
       webVitals: metricsMatrix[2],
+      environment: 'test',
     }),
     ...payload,
   });

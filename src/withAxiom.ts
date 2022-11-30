@@ -3,7 +3,8 @@ import { NextFetchEvent, NextMiddleware, NextRequest } from 'next/server';
 import { NextMiddlewareResult } from 'next/dist/server/web/types';
 import { Logger, RequestReport } from './logger';
 import { Rewrite } from 'next/dist/lib/load-custom-routes';
-import { proxyPath, EndpointType, getIngestURL, vercelRegion } from './shared';
+import { EndpointType } from './shared';
+import config from './config';
 
 declare global {
   var EdgeRuntime: string;
@@ -15,8 +16,8 @@ function withAxiomNextConfig(nextConfig: NextConfig): NextConfig {
     rewrites: async () => {
       const rewrites = await nextConfig.rewrites?.();
 
-      const webVitalsEndpoint = getIngestURL(EndpointType.webVitals);
-      const logsEndpoint = getIngestURL(EndpointType.logs);
+      const webVitalsEndpoint = config.getIngestURL(EndpointType.webVitals);
+      const logsEndpoint = config.getIngestURL(EndpointType.logs);
       if (!webVitalsEndpoint && !logsEndpoint) {
         const log = new Logger();
         log.warn(
@@ -29,12 +30,12 @@ function withAxiomNextConfig(nextConfig: NextConfig): NextConfig {
 
       const axiomRewrites: Rewrite[] = [
         {
-          source: `${proxyPath}/web-vitals`,
+          source: `${config.proxyPath}/web-vitals`,
           destination: webVitalsEndpoint,
           basePath: false,
         },
         {
-          source: `${proxyPath}/logs`,
+          source: `${config.proxyPath}/logs`,
           destination: logsEndpoint,
           basePath: false,
         },
@@ -103,16 +104,7 @@ export type AxiomApiHandler = (
 
 function withAxiomNextApiHandler(handler: NextApiHandler): NextApiHandler {
   return async (req, res) => {
-    const report: RequestReport = {
-      startTime: new Date().getTime(),
-      path: req.url!,
-      method: req.method!,
-      host: getHeaderOrDefault(req, 'host', ''),
-      userAgent: getHeaderOrDefault(req, 'user-agent', ''),
-      scheme: 'https',
-      ip: getHeaderOrDefault(req, 'x-forwarded-for', ''),
-      region: vercelRegion,
-    };
+    const report: RequestReport = config.generateRequestMeta(req);
     const logger = new Logger({}, report, false, 'lambda');
     const axiomRequest = req as AxiomAPIRequest;
     axiomRequest.log = logger;
@@ -174,7 +166,9 @@ function withAxiomNextEdgeFunction(handler: NextMiddleware): NextMiddleware {
 }
 
 function logEdgeReport(report: any) {
-  console.log(`AXIOM_EDGE_REPORT::${JSON.stringify(report)}`);
+  if (config.shoudSendEdgeReport) {
+    console.log(`AXIOM_EDGE_REPORT::${JSON.stringify(report)}`);
+  }
 }
 
 type WithAxiomParam = NextConfig | NextApiHandler | NextMiddleware;
@@ -186,7 +180,8 @@ function isNextConfig(param: WithAxiomParam): param is NextConfig {
 function isApiHandler(param: WithAxiomParam): param is NextApiHandler {
   const isFunction = typeof param == 'function';
 
-  return isFunction && typeof globalThis.EdgeRuntime === 'undefined';
+  // Vercel defines EdgeRuntime for edge functions, but Netlify defines NEXT_RUNTIME = 'edge'
+  return isFunction && typeof globalThis.EdgeRuntime === 'undefined' && process.env.NEXT_RUNTIME != 'edge';
 }
 
 // withAxiom can be called either with NextConfig, which will add proxy rewrites
@@ -201,6 +196,3 @@ export function withAxiom<T extends WithAxiomParam>(param: T): T {
     return withAxiomNextEdgeFunction(param) as T;
   }
 }
-
-const getHeaderOrDefault = (req: NextApiRequest, headerName: string, defaultValue: any) =>
-  req.headers[headerName] ? req.headers[headerName] : defaultValue;

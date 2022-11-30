@@ -1,24 +1,18 @@
-import {
-  proxyPath,
-  isBrowser,
-  EndpointType,
-  getIngestURL,
-  isEnvVarsSet,
-  isNoPrettyPrint,
-  vercelEnv,
-  vercelRegion,
-} from './shared';
-import { throttle } from './shared';
+import config, { isVercel } from './config';
+import { NetlifyInfo } from './platform/netlify';
+import { isNoPrettyPrint, throttle } from './shared';
 
-const url = isBrowser ? `${proxyPath}/logs` : getIngestURL(EndpointType.logs);
+const url = config.getLogsEndpoint();
 
-interface LogEvent {
+export interface LogEvent {
   level: string;
   message: string;
   fields: {};
   _time: string;
   request?: RequestReport;
-  vercel?: VercelData;
+  platform?: PlatformInfo;
+  vercel?: PlatformInfo;
+  netlify?: NetlifyInfo;
 }
 
 export interface RequestReport {
@@ -33,7 +27,7 @@ export interface RequestReport {
   userAgent?: string | null;
 }
 
-interface VercelData {
+export interface PlatformInfo {
   environment?: string;
   region?: string;
   route?: string;
@@ -84,15 +78,15 @@ export class Logger {
       logEvent.fields = { ...logEvent.fields, args: args };
     }
 
-    logEvent.vercel = {
-      environment: vercelEnv,
-      region: vercelRegion,
-      source: this.source,
-    };
+    config.injectPlatformMetadata(logEvent, this.source);
 
     if (this.req != null) {
       logEvent.request = this.req;
-      logEvent.vercel.route = this.req.path;
+      if (logEvent.platform) {
+        logEvent.platform.route = this.req.path;
+      } else if (logEvent.vercel) {
+        logEvent.vercel.route = this.req.path;
+      }
     }
 
     this.logEvents.push(logEvent);
@@ -115,7 +109,7 @@ export class Logger {
       return;
     }
 
-    if (!isEnvVarsSet) {
+    if (!config.isEnvVarsSet()) {
       // if AXIOM ingesting url is not set, fallback to printing to console
       // to avoid network errors in development environments
       this.logEvents.forEach((ev) => prettyPrint(ev));
@@ -128,15 +122,22 @@ export class Logger {
     const body = JSON.stringify(this.logEvents);
     // clear pending logs
     this.logEvents = [];
+    const headers = {
+      'content-type': 'application/json',
+    };
+    if (config.token) {
+      headers['Authorization'] = `Bearer ${config.token}`;
+    }
+    const reqOptions: RequestInit = { body, method, keepalive, headers };
 
     try {
       if (typeof fetch === 'undefined') {
         const fetch = await require('whatwg-fetch');
-        await fetch(url, { body, method, keepalive });
-      } else if (isBrowser && navigator.sendBeacon) {
+        await fetch(url, reqOptions);
+      } else if (config.isBrowser && isVercel && navigator.sendBeacon) {
         navigator.sendBeacon(url, body);
       } else {
-        await fetch(url, { body, method, keepalive });
+        await fetch(url, reqOptions);
       }
     } catch (e) {
       console.error(`Failed to send logs to Axiom: ${e}`);
@@ -187,7 +188,7 @@ export function prettyPrint(ev: LogEvent) {
   let msgString = '';
   let args: any[] = [ev.level, ev.message];
 
-  if (isBrowser) {
+  if (config.isBrowser) {
     msgString = '%c%s - %s';
     args = [`color: ${levelColors[ev.level].browser};`, ...args];
   } else {
