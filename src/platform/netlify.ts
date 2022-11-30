@@ -5,8 +5,8 @@ import GenericConfig from './generic';
 const netlifySiteId = process.env.SITE_ID;
 const netlifyBuildId = process.env.BUILD_ID;
 const netlifyContext = process.env.CONTEXT;
-const netlifyDeploymentUrl = process.env.DEPLOY_URL;
-const netlifyDeploymentId = process.env.DEPLOY_ID;
+const netlifyDeploymentUrl = process.env.DEPLOYMENT_URL;
+const netlifyDeploymentId = process.env.DEPLOYMENT_ID;
 
 console.log(process.env)
 console.log('site_id', process.env.SITE_ID)
