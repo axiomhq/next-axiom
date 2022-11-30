@@ -34,6 +34,12 @@ test('log levels', async () => {
   await logger.flush();
   expect(fetch).toHaveBeenCalledTimes(0);
 
+  // disabled logging
+  logger = new Logger({}, null, false, 'frontend', 'off');
+  logger.error('no logs');
+  await logger.flush();
+  expect(fetch).toHaveBeenCalledTimes(0);
+
   logger = new Logger({}, null, false, 'frontend', 'error');
   logger.warn('warn');
   logger.error('error');
