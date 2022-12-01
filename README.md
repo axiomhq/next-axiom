@@ -22,6 +22,8 @@ For more information check out the [official documentation](https://axiom.co/doc
 - If you are using Vercel, make sure you have the [Axiom Vercel integration](https://www.axiom.co/vercel) 
 installed. On other platforms you must create an API token and set those environment variables:
 
+:warning: next-axiom is still experimental for non-vercel platforms and is subject to change.
+
 ```
 AXIOM_DATASET: the dataset the logs will be ingested into
 AXIOM_TOKEN: the API token you created for ingestion to the dataset

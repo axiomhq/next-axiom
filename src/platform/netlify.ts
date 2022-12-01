@@ -17,7 +17,6 @@ export interface NetlifyInfo extends PlatformInfo {
 }
 
 export default class NetlifyConfig extends GenericConfig implements Provider {
-  
 
   wrapWebVitalsObject(metrics: any[]): any {
     return metrics.map(m => ({
