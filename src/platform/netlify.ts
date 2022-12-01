@@ -8,11 +8,6 @@ const netlifyContext = process.env.CONTEXT;
 const netlifyDeploymentUrl = process.env.DEPLOYMENT_URL;
 const netlifyDeploymentId = process.env.DEPLOYMENT_ID;
 
-console.log(process.env)
-console.log('site_id', process.env.SITE_ID)
-console.log('deploy_url', process.env.DEPLOY_URL)
-console.log('deploy_id', process.env.DEPLOY_ID)
-
 export interface NetlifyInfo extends PlatformInfo {
   buildId?: string;
   context?: string;
