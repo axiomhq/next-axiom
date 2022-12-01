@@ -45,12 +45,12 @@ export default class GenericConfig implements Provider {
   injectPlatformMetadata(logEvent: LogEvent, source: string) {
     logEvent.platform = {
       environment: this.environment,
-      region: this.environment,
-      source: source,
+      region: this.region,
+      source: source + '-log',
     };
   }
 
-  generateRequestMeta(req: any): RequestReport {
+  generateRequestMeta(req: NextApiRequest): RequestReport {
     return {
       startTime: new Date().getTime(),
       path: req.url!,
