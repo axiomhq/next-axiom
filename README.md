@@ -4,8 +4,8 @@
 <div align="center">
 
 [![build](https://img.shields.io/github/workflow/status/axiomhq/next-axiom/CI?ghcache=unused)](https://github.com/axiomhq/next-axiom/actions?query=workflow%3ACI)
-[![Latest release](https://img.shields.io/github/release/axiomhq/next-axiom.svg)](https://github.com/axiomhq/next-axiom/releases/latest) 
-[![License](https://img.shields.io/github/license/axiomhq/next-axiom.svg?color=blue)](https://opensource.org/licenses/MIT) 
+[![Latest release](https://img.shields.io/github/release/axiomhq/next-axiom.svg)](https://github.com/axiomhq/next-axiom/releases/latest)
+[![License](https://img.shields.io/github/license/axiomhq/next-axiom.svg?color=blue)](https://opensource.org/licenses/MIT)
 
 </div>
 
@@ -19,8 +19,8 @@ For more information check out the [official documentation](https://axiom.co/doc
 
 ## Quickstart
 
-- If you are using Vercel, make sure you have the [Axiom Vercel integration](https://www.axiom.co/vercel) 
-installed. On other platforms you must create an API token and set those environment variables:
+- If you are using Vercel, make sure you have the [Axiom Vercel integration](https://www.axiom.co/vercel)
+  installed. On other platforms you must create an API token and set those environment variables:
 
 :warning: next-axiom is still experimental for non-Vercel platforms and is subject to change.
 
@@ -38,17 +38,17 @@ npm install --save next-axiom
 - Wrap your Next.js config in `withAxiom` like this in `next.config.js`:
 
 ```js
-const { withAxiom } = require('next-axiom')
+const { withAxiom } = require('next-axiom');
 
 module.exports = withAxiom({
   // ... your existing config
-})
+});
 ```
 
 - Go to `pages/_app.js` or `pages/_app.ts` and add the following line to report web vitals:
 
 ```js
-export { reportWebVitals } from 'next-axiom'
+export { reportWebVitals } from 'next-axiom';
 ```
 
 > **Note**: WebVitals are only sent from production deployments.
@@ -57,19 +57,19 @@ Wrapping your handlers in `withAxiom` will make `req.log` available and log
 exceptions:
 
 ```ts
-import { withAxiom, AxiomAPIRequest } from 'next-axiom'
+import { withAxiom, AxiomAPIRequest } from 'next-axiom';
 
 async function handler(req: AxiomAPIRequest, res: NextApiResponse) {
-  req.log.info("Login function called")
+  req.log.info('Login function called');
 
   // You can create intermediate loggers
-  const log = req.log.with({ scope: 'user' })
-  log.info("User logged in", { userId: 42 })
+  const log = req.log.with({ scope: 'user' });
+  log.info('User logged in', { userId: 42 });
 
-  res.status(200).text('hi')
+  res.status(200).text('hi');
 }
 
-export default withAxiom(handler)
+export default withAxiom(handler);
 ```
 
 Import and use `log` in the frontend like this:
@@ -87,25 +87,21 @@ function home() {
 
 ## Log Levels
 
-You can control which log levels are sent to Axiom by setting the `AXIOM_LOG_LEVEL` environment variable. The default is `debug`.
+The log level defines the lowest level of logs sent to Axiom.
+The default is debug, resulting in all logs being sent.
+Available levels are (from lowest to highest): `debug`, `info`, `warn`, `error`
+
+For example, if you don't want debug logs to be sent to Axiom:
 
 ```sh
-export AXIOM_LOG_LEVEL=error
+export AXIOM_LOG_LEVEL=info
 ```
 
-to disable logging completely, set the log level to `off`.
+You can also disable logging completely by setting the log level to `off`:
 
 ```sh
 export AXIOM_LOG_LEVEL=off
 ```
-
-available levels:
-
-- debug
-- info
-- warn
-- error
-- off
 
 ## License
 
