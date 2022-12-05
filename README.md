@@ -19,15 +19,21 @@ For more information check out the [official documentation](https://axiom.co/doc
 
 ## Quickstart
 
+
+#### Configure your deployment
+
+###### With Vercel integration
+
 - If you are using Vercel, make sure you have the [Axiom Vercel integration](https://www.axiom.co/vercel)
-  installed. On other platforms you must create an API token and set those environment variables:
+  installed.
+
+###### With non-Vercel deployments
 
 :warning: next-axiom is still experimental for non-Vercel platforms and is subject to change.
 
-```
-AXIOM_DATASET: the dataset the logs will be ingested into
-AXIOM_TOKEN: the API token you created for ingestion to the dataset
-```
+Create an API token in [Axiom settings](https://cloud.axiom.co/settings/profile) and export it as `AXIOM_TOKEN`, as well as the Axiom dataset name as `AXIOM_DATASET`.
+
+#### Install & configure next-axiom
 
 - Then in your Next.js project, run install `next-axiom` like this:
 
