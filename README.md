@@ -22,18 +22,25 @@ For more information check out the [official documentation](https://axiom.co/doc
 
 #### Configure your deployment
 
-###### With Vercel integration
+<details>
+<summary>With Vercel integration</summary>
 
-- If you are using Vercel, make sure you have the [Axiom Vercel integration](https://www.axiom.co/vercel)
+If you are using Vercel, make sure you have the [Axiom Vercel integration](https://www.axiom.co/vercel)
   installed.
+</details>
 
-###### With non-Vercel deployments
+<details>
+
+<summary> With non-Vercel deployments</summary>
 
 :warning: next-axiom is still experimental for non-Vercel platforms and is subject to change.
 
 Create an API token in [Axiom settings](https://cloud.axiom.co/settings/profile) and export it as `AXIOM_TOKEN`, as well as the Axiom dataset name as `AXIOM_DATASET`.
+</details>
 
-#### Install & configure next-axiom
+#### Install & Configure next-axiom
+
+```bash
 
 - Then in your Next.js project, run install `next-axiom` like this:
 
