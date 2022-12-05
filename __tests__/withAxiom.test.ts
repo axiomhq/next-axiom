@@ -1,4 +1,4 @@
-import { withAxiom } from '../src/index';
+import { withAxiom, withAxiomGetServerSideProps } from '../src/index';
 import { GetServerSideProps, GetServerSidePropsContext, NextApiRequest, NextApiResponse } from 'next';
 import 'whatwg-fetch';
 import { NextFetchEvent, NextRequest, NextResponse } from 'next/server';
@@ -52,7 +52,7 @@ test('withAxiom(GetServerSideProps)', async () => {
       props: {},
     };
   };
-  const handler = withAxiom(getServerSideProps);
+  const handler = withAxiomGetServerSideProps(getServerSideProps);
   expect(handler).toBeInstanceOf(Function);
   // TODO: Make sure we have a AxiomGetServerSideProps
 });

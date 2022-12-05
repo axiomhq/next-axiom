@@ -3,7 +3,6 @@ import {
   NextApiHandler,
   NextApiResponse,
   NextApiRequest,
-  GetServerSideProps,
   GetServerSidePropsContext,
   GetServerSidePropsResult,
   PreviewData,
@@ -210,7 +209,7 @@ function logEdgeReport(report: any) {
   }
 }
 
-type WithAxiomParam = NextConfig | NextApiHandler | NextMiddleware | GetServerSideProps;
+type WithAxiomParam = NextConfig | NextApiHandler | NextMiddleware;
 
 function isNextConfig(param: WithAxiomParam): param is NextConfig {
   return typeof param == 'object';
@@ -223,19 +222,14 @@ function isApiHandler(param: WithAxiomParam): param is NextApiHandler {
   return isFunction && typeof globalThis.EdgeRuntime === 'undefined' && process.env.NEXT_RUNTIME != 'edge';
 }
 
-function isGetServerSideProps(param: WithAxiomParam): param is GetServerSideProps {
-  // TODO: This fails to detect getServerSideProps, find a way to detect it
-  return typeof param == 'function' && param.name == 'getServerSideProps';
-}
-
 // withAxiom can be called either with NextConfig, which will add proxy rewrites
 // to improve deliverability of Web-Vitals and logs, or with NextApiRequest or
 // NextMiddleware which will automatically log exceptions and flush logs.
 export function withAxiom<T extends WithAxiomParam>(param: T): T {
+  // TODO: This fails to detect GetServerSideProps, find a way to detect it.
+
   if (isNextConfig(param)) {
     return withAxiomNextConfig(param) as T;
-  } else if (isGetServerSideProps(param)) {
-    return withAxiomGetServerSideProps(param) as T;
   } else if (isApiHandler(param)) {
     return withAxiomNextApiHandler(param) as T;
   } else {
