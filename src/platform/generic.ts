@@ -1,4 +1,5 @@
-import { NextApiRequest } from "next";
+import { IncomingMessage } from "http";
+import { GetServerSidePropsContext, NextApiRequest } from "next";
 import { LogEvent, RequestReport } from "../logger";
 import { EndpointType } from "../shared";
 import type Provider from "./base";
@@ -63,7 +64,20 @@ export default class GenericConfig implements Provider {
     };
   }
 
-  getHeaderOrDefault(req: NextApiRequest, headerName: string, defaultValue: any) {
+  generateServerSidePropsReport(ctx: GetServerSidePropsContext): RequestReport {
+    return {
+      startTime: new Date().getTime(),
+      path: ctx.req.url!,
+      method: ctx.req.method!,
+      host: this.getHeaderOrDefault(ctx.req, 'host', ''),
+      userAgent: this.getHeaderOrDefault(ctx.req, 'user-agent', ''),
+      scheme: 'https',
+      ip: this.getHeaderOrDefault(ctx.req, 'x-forwarded-for', ''),
+      region: this.region,
+    };
+  }
+
+  getHeaderOrDefault(req: NextApiRequest | IncomingMessage, headerName: string, defaultValue: any) {
     return req.headers[headerName] ? req.headers[headerName] : defaultValue;
   }
 }
