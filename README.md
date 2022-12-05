@@ -85,6 +85,25 @@ function home() {
 }
 ```
 
+
+## getServerSideProps
+
+To be able to use next-axiom with `getServerSideProps` you need to wrap your function with `withAxiomGetServerSideProps`, becasue there is no
+way at the moment to automatically detected if getServerSideProps is used.
+
+```ts
+import { withAxiomGetServerSideProps } from 'next-axiom'
+
+export const getServerSideProps = withAxiomGetServerSideProps(async ({ req, log })  => {
+  log.info('Hello, world!');
+  return {
+    props: {
+    },
+  }
+});
+```
+
+
 ## Log Levels
 
 The log level defines the lowest level of logs sent to Axiom.

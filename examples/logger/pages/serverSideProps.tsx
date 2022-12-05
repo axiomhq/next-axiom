@@ -1,13 +1,13 @@
-import { withAxiom, AxiomGetServerSideProps, AxiomGetServerSidePropsContext } from 'next-axiom'
+import { withAxiomGetServerSideProps } from 'next-axiom'
 
-export const getServerSideProps: AxiomGetServerSideProps =  withAxiom(async ({ req, log }: AxiomGetServerSidePropsContext)  => {
-  log.info('Hello from server side', { 'method': req.method })
+export const getServerSideProps = withAxiomGetServerSideProps(async ({ req, log })  => {
+  log.info('Hello from server side');
   return {
     props: {
         method: req.method
     },
   }
-})
+});
 
 export default function Home({ method }: { method: string }) {
   return (

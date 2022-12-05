@@ -1,5 +1,5 @@
 import { IncomingMessage } from "http";
-import { GetServerSidePropsContext, NextApiRequest } from "next";
+import { NextApiRequest } from "next";
 import { LogEvent, RequestReport } from "../logger";
 import { EndpointType } from "../shared";
 import type Provider from "./base";
@@ -51,7 +51,7 @@ export default class GenericConfig implements Provider {
     };
   }
 
-  generateRequestMeta(req: NextApiRequest): RequestReport {
+  generateRequestMeta(req: NextApiRequest | IncomingMessage): RequestReport {
     return {
       startTime: new Date().getTime(),
       path: req.url!,
@@ -60,19 +60,6 @@ export default class GenericConfig implements Provider {
       userAgent: this.getHeaderOrDefault(req, 'user-agent', ''),
       scheme: 'https',
       ip: this.getHeaderOrDefault(req, 'x-forwarded-for', ''),
-      region: this.region,
-    };
-  }
-
-  generateServerSidePropsReport(ctx: GetServerSidePropsContext): RequestReport {
-    return {
-      startTime: new Date().getTime(),
-      path: ctx.req.url!,
-      method: ctx.req.method!,
-      host: this.getHeaderOrDefault(ctx.req, 'host', ''),
-      userAgent: this.getHeaderOrDefault(ctx.req, 'user-agent', ''),
-      scheme: 'https',
-      ip: this.getHeaderOrDefault(ctx.req, 'x-forwarded-for', ''),
       region: this.region,
     };
   }

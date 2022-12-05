@@ -1,6 +1,6 @@
 import { log } from 'next-axiom'
 import { GetStaticProps } from 'next'
-import useSWR, { BareFetcher } from 'swr'
+import useSWR from 'swr'
 
 export const getStaticProps: GetStaticProps =  async (context) => {
   log.info('Hello from SSR', { context })

@@ -116,15 +116,15 @@ export type AxiomGetServerSideProps<
   D extends PreviewData = PreviewData
 > = (context: AxiomGetServerSidePropsContext<Q, D>) => Promise<GetServerSidePropsResult<P>>;
 
-function withAxiomGetServerSideProps(handler: GetServerSideProps): AxiomGetServerSideProps {
+export function withAxiomGetServerSideProps(handler: AxiomGetServerSideProps): AxiomGetServerSideProps {
   return async (ctx) => {
-    const report: RequestReport = config.generateServerSidePropsReport(ctx);
-    const logger = new Logger({}, report, false, 'lambda');
+    const report: RequestReport = config.generateRequestMeta(ctx.req);
+    const logger = new Logger({}, report, true, 'lambda');
     const axiomCtx = ctx as AxiomGetServerSidePropsContext;
     axiomCtx.log = logger;
 
     try {
-      const res = await handler(ctx);
+      const res = await handler(axiomCtx);
       await logger.flush();
       return res;
     } catch (error: any) {
@@ -224,6 +224,7 @@ function isApiHandler(param: WithAxiomParam): param is NextApiHandler {
 }
 
 function isGetServerSideProps(param: WithAxiomParam): param is GetServerSideProps {
+  // TODO: This fails to detect getServerSideProps, find a way to detect it
   return typeof param == 'function' && param.name == 'getServerSideProps';
 }
 

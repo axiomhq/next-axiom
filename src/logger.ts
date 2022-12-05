@@ -34,6 +34,7 @@ export interface RequestReport {
   method: string;
   scheme: string;
   userAgent?: string | null;
+  referer?: string | null;
 }
 
 export interface PlatformInfo {
