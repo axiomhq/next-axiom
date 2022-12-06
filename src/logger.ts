@@ -89,7 +89,9 @@ export class Logger {
     }
     const logEvent: LogEvent = { level, message, _time: new Date(Date.now()).toISOString(), fields: this.args || {} };
     // check if passed args is an object, if its not an object, add it to fields.args
-    if (typeof args === 'object' && args !== null && Object.keys(args).length > 0) {
+    if (args instanceof Error) {
+      logEvent.fields = { ...logEvent.fields, message: args.message, stack: args.stack, name: args.name };
+    } else if (typeof args === 'object' && args !== null && Object.keys(args).length > 0) {
       const parsedArgs = JSON.parse(JSON.stringify(args, jsonFriendlyErrorReplacer));
       logEvent.fields = { ...logEvent.fields, ...parsedArgs };
     } else if (args && args.length) {
