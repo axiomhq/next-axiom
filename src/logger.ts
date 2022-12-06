@@ -88,7 +88,6 @@ export class Logger {
       return;
     }
     const logEvent: LogEvent = { level, message, _time: new Date(Date.now()).toISOString(), fields: this.args || {} };
-
     // check if passed args is an object, if its not an object, add it to fields.args
     if (typeof args === 'object' && args !== null && Object.keys(args).length > 0) {
       logEvent.fields = { ...logEvent.fields, ...args };
@@ -137,7 +136,7 @@ export class Logger {
 
     const method = 'POST';
     const keepalive = true;
-    const body = JSON.stringify(this.logEvents);
+    const body = JSON.stringify(this.logEvents, jsonFriendlyErrorReplacer);
     // clear pending logs
     this.logEvents = [];
     const headers = {
@@ -225,4 +224,19 @@ export function prettyPrint(ev: LogEvent) {
   }
 
   console.log.apply(console, [msgString, ...args]);
+}
+
+function jsonFriendlyErrorReplacer(key: string, value: any) {
+  if (value instanceof Error) {
+    return {
+      // Pull all enumerable properties, supporting properties on custom Errors
+      ...value,
+      // Explicitly pull Error's non-enumerable properties
+      name: value.name,
+      message: value.message,
+      stack: value.stack,
+    }
+  }
+
+  return value
 }
