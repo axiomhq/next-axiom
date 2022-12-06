@@ -90,7 +90,8 @@ export class Logger {
     const logEvent: LogEvent = { level, message, _time: new Date(Date.now()).toISOString(), fields: this.args || {} };
     // check if passed args is an object, if its not an object, add it to fields.args
     if (typeof args === 'object' && args !== null && Object.keys(args).length > 0) {
-      logEvent.fields = { ...logEvent.fields, ...args };
+      const parsedArgs = JSON.parse(JSON.stringify(args, jsonFriendlyErrorReplacer));
+      logEvent.fields = { ...logEvent.fields, ...parsedArgs };
     } else if (args && args.length) {
       logEvent.fields = { ...logEvent.fields, args: args };
     }
@@ -136,7 +137,7 @@ export class Logger {
 
     const method = 'POST';
     const keepalive = true;
-    const body = JSON.stringify(this.logEvents, jsonFriendlyErrorReplacer);
+    const body = JSON.stringify(this.logEvents);
     // clear pending logs
     this.logEvents = [];
     const headers = {
@@ -235,8 +236,8 @@ function jsonFriendlyErrorReplacer(key: string, value: any) {
       name: value.name,
       message: value.message,
       stack: value.stack,
-    }
+    };
   }
 
-  return value
+  return value;
 }
