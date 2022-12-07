@@ -22,7 +22,6 @@ export function reportWebVitals(metric: NextWebVitalsMetric) {
 function sendMetrics() {
   const body = JSON.stringify(config.wrapWebVitalsObject(collectedMetrics));
   const headers = {
-    'Content-Type': 'application/json',
   };
   if (config.token) {
     headers['Authorization'] = `Bearer ${config.token}`;

@@ -140,7 +140,6 @@ export class Logger {
     // clear pending logs
     this.logEvents = [];
     const headers = {
-      'content-type': 'application/json',
     };
     if (config.token) {
       headers['Authorization'] = `Bearer ${config.token}`;
