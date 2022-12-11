@@ -13,32 +13,22 @@
 
 - **Ingest with ease, store without limits:** Axiom’s next-generation datastore enables ingesting petabytes of data with ultimate efficiency. Ship logs from Kubernetes, AWS, Azure, Google Cloud, DigitalOcean, Nomad, and others.
 - **Query everything, all the time:** Whether DevOps, SecOps, or EverythingOps, query all your data no matter its age. No provisioning, no moving data from cold/archive to “hot”, and no worrying about slow queries. All your data, all. the. time.
-- **Powerful dashboards, for continuous observability:** Build dashboards to collect related queries and present information that’s quick and easy to digest for you and your team. Dashboards can be kept private or shared with others, and are the perfect way to bring together data from different sources
+- **Powerful dashboards, for continuous observability:** Build dashboards to collect related queries and present information that’s quick and easy to digest for you and your team. Dashboards can be kept private or shared with others, and are the perfect way to bring together data from different sources.
 
-For more information check out the [official documentation](https://axiom.co/docs).
+For more information, check out the [official documentation](https://axiom.co/docs).
 
 ## Quickstart
 
+#### Install & Configure next-axiom
 
-#### Configure your deployment
+First, select one of two deployment types:
 
-<details>
-<summary>With Vercel integration</summary>
-
-If you are using Vercel, make sure you have the [Axiom Vercel integration](https://www.axiom.co/vercel)
-  installed.
-</details>
-
-<details>
-
-<summary> With non-Vercel deployments</summary>
+- **Using Vercel integration**: Make sure you have the [Axiom Vercel integration](https://vercel.com/integrations/axiom) installed.
+- **Using any other platform**: Create an API token in [Axiom settings](https://cloud.axiom.co/settings/profile) and export it as `AXIOM_TOKEN`, as well as the Axiom dataset name as `AXIOM_DATASET`.
 
 :warning: next-axiom is still experimental for non-Vercel platforms and is subject to change.
 
-Create an API token in [Axiom settings](https://cloud.axiom.co/settings/profile) and export it as `AXIOM_TOKEN`, as well as the Axiom dataset name as `AXIOM_DATASET`.
-</details>
-
-#### Install & Configure next-axiom
+After that, perform the steps below:
 
 ```bash
 
