@@ -1,4 +1,13 @@
-import { NextConfig, NextApiHandler, NextApiResponse, NextApiRequest } from 'next';
+import {
+  NextConfig,
+  NextApiHandler,
+  NextApiResponse,
+  NextApiRequest,
+  GetServerSideProps,
+  GetServerSidePropsContext,
+  PreviewData,
+  GetServerSidePropsResult,
+} from 'next';
 import { NextFetchEvent, NextMiddleware, NextRequest } from 'next/server';
 import { NextMiddlewareResult } from 'next/dist/server/web/types';
 import { Logger, RequestReport } from './logger';
@@ -10,7 +19,7 @@ declare global {
   var EdgeRuntime: string;
 }
 
-function withAxiomNextConfig(nextConfig: NextConfig): NextConfig {
+export function withAxiomNextConfig(nextConfig: NextConfig): NextConfig {
   return {
     ...nextConfig,
     rewrites: async () => {
@@ -102,7 +111,7 @@ export type AxiomApiHandler = (
   response: NextApiResponse
 ) => NextApiHandler | Promise<NextApiHandler> | Promise<void>;
 
-function withAxiomNextApiHandler(handler: NextApiHandler): NextApiHandler {
+export function withAxiomNextApiHandler(handler: AxiomApiHandler): NextApiHandler {
   return async (req, res) => {
     const report: RequestReport = config.generateRequestMeta(req);
     const logger = new Logger({}, report, false, 'lambda');
@@ -124,13 +133,44 @@ function withAxiomNextApiHandler(handler: NextApiHandler): NextApiHandler {
   };
 }
 
+type ParsedUrlQuery = GetServerSidePropsContext['query'];
+export type AxiomContext<
+  Q extends ParsedUrlQuery = ParsedUrlQuery,
+  D extends PreviewData = PreviewData
+> = GetServerSidePropsContext<Q, D> & { log: Logger };
+export type AxiomGetServerSideProps<
+  P extends { [key: string]: any } = { [key: string]: any },
+  Q extends ParsedUrlQuery = ParsedUrlQuery,
+  D extends PreviewData = PreviewData
+> = (context: AxiomContext<Q, D>) => Promise<GetServerSidePropsResult<P>>;
+
+export function withAxiomNextServerSidePropsHandler(handler: AxiomGetServerSideProps): GetServerSideProps {
+  return async (context) => {
+    const report: RequestReport = config.generateRequestMeta(context.req);
+    const logger = new Logger({}, report, false, 'lambda');
+    const axiomContext = context as AxiomContext;
+    axiomContext.log = logger;
+
+    try {
+      const result = await handler(axiomContext);
+      await logger.flush();
+      return result;
+    } catch (error: any) {
+      logger.error('Error in getServerSideProps handler', { error });
+      logger.attachResponseStatus(500);
+      await logger.flush();
+      throw error;
+    }
+  };
+}
+
 export type AxiomRequest = NextRequest & { log: Logger };
 export type AxiomMiddleware = (
   request: AxiomRequest,
   event: NextFetchEvent
 ) => NextMiddlewareResult | Promise<NextMiddlewareResult>;
 
-function withAxiomNextEdgeFunction(handler: NextMiddleware): NextMiddleware {
+export function withAxiomNextEdgeFunction(handler: NextMiddleware): NextMiddleware {
   return async (req, ev) => {
     const report: RequestReport = {
       startTime: new Date().getTime(),
@@ -171,13 +211,13 @@ function logEdgeReport(report: any) {
   }
 }
 
-type WithAxiomParam = NextConfig | NextApiHandler | NextMiddleware;
+type WithAxiomParam = NextConfig | AxiomApiHandler | NextMiddleware;
 
 function isNextConfig(param: WithAxiomParam): param is NextConfig {
   return typeof param == 'object';
 }
 
-function isApiHandler(param: WithAxiomParam): param is NextApiHandler {
+function isApiHandler(param: WithAxiomParam): param is AxiomApiHandler {
   const isFunction = typeof param == 'function';
 
   // Vercel defines EdgeRuntime for edge functions, but Netlify defines NEXT_RUNTIME = 'edge'
@@ -187,12 +227,15 @@ function isApiHandler(param: WithAxiomParam): param is NextApiHandler {
 // withAxiom can be called either with NextConfig, which will add proxy rewrites
 // to improve deliverability of Web-Vitals and logs, or with NextApiRequest or
 // NextMiddleware which will automatically log exceptions and flush logs.
-export function withAxiom<T extends WithAxiomParam>(param: T): T {
+export function withAxiom(param: NextConfig): NextConfig;
+export function withAxiom(param: AxiomApiHandler): NextApiHandler;
+export function withAxiom(param: NextMiddleware): NextMiddleware;
+export function withAxiom(param: WithAxiomParam) {
   if (isNextConfig(param)) {
-    return withAxiomNextConfig(param) as T;
+    return withAxiomNextConfig(param);
   } else if (isApiHandler(param)) {
-    return withAxiomNextApiHandler(param) as T;
+    return withAxiomNextApiHandler(param);
   } else {
-    return withAxiomNextEdgeFunction(param) as T;
+    return withAxiomNextEdgeFunction(param);
   }
 }
