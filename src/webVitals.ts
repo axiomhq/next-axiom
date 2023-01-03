@@ -1,6 +1,6 @@
 import { NextWebVitalsMetric } from 'next/app';
 import { throttle } from './shared';
-import config, { isVercel } from './config';
+import config, { isVercel, Version } from './config';
 
 const url = config.getWebVitalsEndpoint();
 
@@ -23,6 +23,7 @@ function sendMetrics() {
   const body = JSON.stringify(config.wrapWebVitalsObject(collectedMetrics));
   const headers = {
     'Content-Type': 'application/json',
+    'User-Agent': 'next-axiom/v' + Version,
   };
   if (config.token) {
     headers['Authorization'] = `Bearer ${config.token}`;
