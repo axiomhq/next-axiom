@@ -1,4 +1,4 @@
-import config, { isVercel } from './config';
+import config, { isVercel, Version } from './config';
 import { NetlifyInfo } from './platform/netlify';
 import { isNoPrettyPrint, throttle } from './shared';
 
@@ -140,7 +140,8 @@ export class Logger {
     // clear pending logs
     this.logEvents = [];
     const headers = {
-      'content-type': 'application/json',
+      'Content-Type': 'application/json',
+      'User-Agent': 'next-axiom/v' + Version,
     };
     if (config.token) {
       headers['Authorization'] = `Bearer ${config.token}`;
