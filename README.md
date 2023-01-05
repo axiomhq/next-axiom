@@ -3,7 +3,7 @@
 
 <div align="center">
 
-[![build](https://img.shields.io/github/workflow/status/axiomhq/next-axiom/CI?ghcache=unused)](https://github.com/axiomhq/next-axiom/actions?query=workflow%3ACI)
+[![build](https://img.shields.io/github/actions/workflow/status/axiomhq/next-axiom/ci.yml?branch=main&ghcache=unused)](https://github.com/axiomhq/next-axiom/actions?query=workflow%3ACI)
 [![Latest release](https://img.shields.io/github/release/axiomhq/next-axiom.svg)](https://github.com/axiomhq/next-axiom/releases/latest)
 [![License](https://img.shields.io/github/license/axiomhq/next-axiom.svg?color=blue)](https://opensource.org/licenses/MIT)
 
