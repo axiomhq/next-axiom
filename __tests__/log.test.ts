@@ -82,3 +82,15 @@ test('flushing child loggers', async () => {
   await log.flush();
   expect(fetch).toHaveBeenCalledTimes(3);
 });
+
+test('throwing exception', async () => {
+  global.fetch = jest.fn() as jest.Mock;
+  const err = new Error('test');
+  log.error('hello, world!', err);
+  await log.flush();
+  expect(fetch).toHaveBeenCalledTimes(1);
+  const payload = JSON.parse((fetch as jest.Mock).mock.calls[0][1].body);
+  expect(Object.keys(payload[0].fields).length).toEqual(3); // { name, message, stack }
+  expect(payload[0].fields.message).toEqual(err.message);
+  expect(payload[0].fields.name).toEqual(err.name);
+});
