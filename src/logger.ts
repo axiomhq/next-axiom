@@ -156,7 +156,11 @@ export class Logger {
         const fetch = await require('whatwg-fetch');
         await fetch(url, reqOptions);
       } else if (config.isBrowser && isVercel && navigator.sendBeacon) {
-        navigator.sendBeacon(url, body);
+        // sendBeacon fails if message size is greater than 64kb, so
+        // we fall back to fetch.
+        if (!navigator.sendBeacon(url, body)) {
+          await fetch(url, reqOptions);
+        }
       } else {
         await fetch(url, reqOptions);
       }
