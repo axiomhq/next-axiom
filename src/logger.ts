@@ -164,10 +164,10 @@ export class Logger {
         // sendBeacon fails if message size is greater than 64kb, so
         // we fall back to fetch.
         if (!navigator.sendBeacon(url, body)) {
-          sendFallback()
+          sendFallback();
         }
       } else {
-        sendFallback()
+        sendFallback();
       }
     } catch (e) {
       console.error(`Failed to send logs to Axiom: ${e}`);
