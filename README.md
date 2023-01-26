@@ -65,7 +65,7 @@ module.exports = withAxiom({
 
 ### Web Vitals
 
-:warning: Web-Vitals aren't supported yet in Next.js 13 and above. Please use Next.js 12 or below.
+:warning: Web-Vitals are not yet supported in Next.js 13 and above. Please use Next.js 12 or below.
 
 Go to `pages/_app.js` or `pages/_app.ts` and add the following line to report web vitals:
 
