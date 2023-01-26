@@ -10,6 +10,7 @@ import {
 } from 'next';
 import { NextFetchEvent, NextMiddleware, NextRequest } from 'next/server';
 import { NextMiddlewareResult } from 'next/dist/server/web/types';
+import { ParsedUrlQuery } from 'querystring';
 import { Logger, RequestReport } from './logger';
 import { Rewrite } from 'next/dist/lib/load-custom-routes';
 import { EndpointType } from './shared';
@@ -133,8 +134,7 @@ export function withAxiomNextApiHandler(handler: AxiomApiHandler): NextApiHandle
   };
 }
 
-type ParsedUrlQuery = GetServerSidePropsContext['query'];
-export type AxiomContext<
+export type AxiomGetServerSidePropsContext<
   Q extends ParsedUrlQuery = ParsedUrlQuery,
   D extends PreviewData = PreviewData
 > = GetServerSidePropsContext<Q, D> & { log: Logger };
@@ -142,13 +142,13 @@ export type AxiomGetServerSideProps<
   P extends { [key: string]: any } = { [key: string]: any },
   Q extends ParsedUrlQuery = ParsedUrlQuery,
   D extends PreviewData = PreviewData
-> = (context: AxiomContext<Q, D>) => Promise<GetServerSidePropsResult<P>>;
+> = (context: AxiomGetServerSidePropsContext<Q, D>) => Promise<GetServerSidePropsResult<P>>;
 
 export function withAxiomNextServerSidePropsHandler(handler: AxiomGetServerSideProps): GetServerSideProps {
   return async (context) => {
     const report: RequestReport = config.generateRequestMeta(context.req);
     const logger = new Logger({}, report, false, 'lambda');
-    const axiomContext = context as AxiomContext;
+    const axiomContext = context as AxiomGetServerSidePropsContext;
     axiomContext.log = logger;
 
     try {
@@ -239,3 +239,4 @@ export function withAxiom(param: WithAxiomParam) {
     return withAxiomNextEdgeFunction(param);
   }
 }
+export const withAxiomGetServerSideProps = withAxiomNextServerSidePropsHandler;
