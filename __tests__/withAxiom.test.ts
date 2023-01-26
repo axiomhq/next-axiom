@@ -1,5 +1,5 @@
 import { Logger, withAxiom } from '../src/index';
-import { withAxiomNextServerSidePropsHandler } from '../src/withAxiom';
+import { withAxiomGetServerSideProps, withAxiomNextServerSidePropsHandler } from '../src/withAxiom';
 import { GetServerSideProps, GetServerSidePropsContext, NextApiRequest, NextApiResponse } from 'next';
 import 'whatwg-fetch';
 import { NextFetchEvent, NextRequest, NextResponse } from 'next/server';
@@ -57,14 +57,13 @@ test('withAxiom(NextConfig) with fallback rewrites (regression test for #21)', a
   if (config.rewrites) await config.rewrites();
 });
 
-
- test('withAxiom(GetServerSideProps)', async () => {
-   const getServerSideProps: GetServerSideProps = async (context: GetServerSidePropsContext) => {
-     return {
-       props: {},
-     };
-   };
-   const handler = withAxiomGetServerSideProps(getServerSideProps);
-   expect(handler).toBeInstanceOf(Function);
-   // TODO: Make sure we have a AxiomGetServerSideProps
- });
+test('withAxiom(GetServerSideProps)', async () => {
+  const getServerSideProps: GetServerSideProps = async (context: GetServerSidePropsContext) => {
+    return {
+      props: {},
+    };
+  };
+  const handler = withAxiomGetServerSideProps(getServerSideProps);
+  expect(handler).toBeInstanceOf(Function);
+  // TODO: Make sure we have a AxiomGetServerSideProps
+});
