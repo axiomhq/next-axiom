@@ -64,7 +64,7 @@ function interceptNextApiResponse(req: AxiomAPIRequest, res: NextApiResponse): [
     allPromises.push(
       (async () => {
         req.log.attachResponseStatus(res.statusCode);
-        await req.log.flush();
+        req.log.flush();
         resSend(body);
       })()
     );
@@ -75,7 +75,7 @@ function interceptNextApiResponse(req: AxiomAPIRequest, res: NextApiResponse): [
     allPromises.push(
       (async () => {
         req.log.attachResponseStatus(res.statusCode);
-        await req.log.flush();
+        req.log.flush();
         resJson(json);
       })()
     );
@@ -86,7 +86,7 @@ function interceptNextApiResponse(req: AxiomAPIRequest, res: NextApiResponse): [
     allPromises.push(
       (async () => {
         req.log.attachResponseStatus(res.statusCode);
-        await req.log.flush();
+        req.log.flush();
         resEnd(cb);
       })()
     );
@@ -112,12 +112,12 @@ function withAxiomNextApiHandler(handler: NextApiHandler): NextApiHandler {
 
     try {
       await handler(axiomRequest, wrappedRes);
-      await logger.flush();
+      logger.flush();
       await Promise.all(allPromises);
     } catch (error: any) {
       logger.error('Error in API handler', { error });
       logger.attachResponseStatus(500);
-      await logger.flush();
+      logger.flush();
       await Promise.all(allPromises);
       throw error;
     }
