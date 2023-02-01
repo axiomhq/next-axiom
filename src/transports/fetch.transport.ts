@@ -13,12 +13,16 @@ export default class FetchTransport implements Transport {
   async log(event: LogEvent): Promise<void> {
     this.logEvents.push(event);
     if (this.autoFlush) {
-        this.throttledSendLogs()
+      this.throttledSendLogs()
     }
     return Promise.resolve();
   }
 
   async sendLogs() {
+    if (!this.logEvents.length) {
+      return
+    }
+
     const method = 'POST';
     const keepalive = true;
     const body = JSON.stringify(this.logEvents);
