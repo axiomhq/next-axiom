@@ -11,7 +11,7 @@ on:
       - "v*"
 
 jobs:
-  check-format:
+  lint:
     name: Check format
     runs-on: ubuntu-latest
     steps:
@@ -20,7 +20,7 @@ jobs:
         with:
           node-version: 17
       - run: npm install
-      - run: npm run check-format
+      - run: npm run lint
   unittests:
     name: Check Tests
     runs-on: ubuntu-latest
@@ -52,7 +52,7 @@ jobs:
   publish:
     name: Publish
     needs: 
-      - check-format
+      - lint
       - build
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')

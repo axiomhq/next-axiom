@@ -17,7 +17,7 @@
     "build": "tsc",
     "prepare": "npm run build",
     "format": "prettier --write src/*.ts __tests__/*.ts",
-    "check-format": "prettier -c src/*.ts __tests__/*.ts",
+    "lint": "prettier -c src/*.ts __tests__/*.ts",
     "test": "jest"
   },
   "repository": {
