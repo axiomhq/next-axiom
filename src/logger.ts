@@ -1,8 +1,10 @@
-import config, { isVercel, Version } from './config';
+import config, { isVercel } from './config';
 import { NetlifyInfo } from './platform/netlify';
-import { isNoPrettyPrint, throttle } from './shared';
+import Transport from './transports/transport';
+import ConsoleTransport from './transports/console.transport';
+import LogDrainTransport from './transports/log-drain.transport';
+import FetchTransport from './transports/fetch.transport';
 
-const url = config.getLogsEndpoint();
 const LOG_LEVEL = process.env.AXIOM_LOG_LEVEL || 'debug';
 
 export interface LogEvent {
@@ -44,19 +46,28 @@ export interface PlatformInfo {
 }
 
 export class Logger {
-  public logEvents: LogEvent[] = [];
-  throttledSendLogs = throttle(this.sendLogs, 1000);
   children: Logger[] = [];
   public logLevel: string;
+  private transport: Transport;
 
   constructor(
     private args: { [key: string]: any } = {},
     private req: RequestReport | null = null,
-    private autoFlush: Boolean = true,
+    private autoFlush: boolean = true,
     public source: 'frontend' | 'lambda' | 'edge' = 'frontend',
     logLevel?: string
   ) {
     this.logLevel = logLevel || LOG_LEVEL || 'debug';
+    // decide which transport to use, if log drain is set, use that, otherwise use fetch, or fallback to console
+    if (!config.isEnvVarsSet()) {
+      this.transport = new ConsoleTransport();
+    } else if (isVercel && !config.isBrowser) {
+      // if running in a lambda or edge function and axiom log drain is enabled,
+      // use the log drain transport
+      this.transport = new LogDrainTransport();
+    } else {
+      this.transport = new FetchTransport(autoFlush);
+    }
   }
 
   debug = (message: string, args: { [key: string]: any } = {}) => {
@@ -109,135 +120,29 @@ export class Logger {
       }
     }
 
-    this.logEvents.push(logEvent);
-    if (this.autoFlush) {
-      this.throttledSendLogs();
-    }
+    this.transport.log(logEvent);
+    // TODO: should we call flush here? should the child loggers flush as well?
+    // if (this.autoFlush) {
+    //   this.flush();
+    // }
   };
 
   attachResponseStatus = (statusCode: number) => {
-    this.logEvents = this.logEvents.map((log) => {
-      if (log.request) {
-        log.request.statusCode = statusCode;
-      }
-      return log;
-    });
+    // TODO: find a better way to handle response status
+    // this.logEvents = this.logEvents.map((log) => {
+    //   if (log.request) {
+    //     log.request.statusCode = statusCode;
+    //   }
+    //   return log;
+    // });
   };
 
-  async sendLogs() {
-    if (!this.logEvents.length) {
-      return;
-    }
-
-    if (!config.isEnvVarsSet()) {
-      // if AXIOM ingesting url is not set, fallback to printing to console
-      // to avoid network errors in development environments
-      this.logEvents.forEach((ev) => prettyPrint(ev));
-      this.logEvents = [];
-      return;
-    }
-
-    const method = 'POST';
-    const keepalive = true;
-    const body = JSON.stringify(this.logEvents);
-    // clear pending logs
-    this.logEvents = [];
-    const headers = {
-      'Content-Type': 'application/json',
-      'User-Agent': 'next-axiom/v' + Version,
-    };
-    if (config.token) {
-      headers['Authorization'] = `Bearer ${config.token}`;
-    }
-    const reqOptions: RequestInit = { body, method, keepalive, headers };
-
-    function sendFallback() {
-      // Do not leak network errors; does not affect the running app
-      fetch(url, reqOptions).catch(console.error);
-    }
-
-    try {
-      if (typeof fetch === 'undefined') {
-        const fetch = await require('whatwg-fetch');
-        fetch(url, reqOptions).catch(console.error);
-      } else if (config.isBrowser && isVercel && navigator.sendBeacon) {
-        // sendBeacon fails if message size is greater than 64kb, so
-        // we fall back to fetch.
-        if (!navigator.sendBeacon(url, body)) {
-          sendFallback();
-        }
-      } else {
-        sendFallback();
-      }
-    } catch (e) {
-      console.error(`Failed to send logs to Axiom: ${e}`);
-    }
+  async flush() {
+    await Promise.all([this.transport.flush(), ...this.children.map((c) => c.flush())]);
   }
-
-  flush = async () => {
-    await Promise.all([this.sendLogs(), ...this.children.map((c) => c.flush())]);
-  };
 }
 
 export const log = new Logger();
-
-const levelColors = {
-  info: {
-    terminal: '32',
-    browser: 'lightgreen',
-  },
-  debug: {
-    terminal: '36',
-    browser: 'lightblue',
-  },
-  warn: {
-    terminal: '33',
-    browser: 'yellow',
-  },
-  error: {
-    terminal: '31',
-    browser: 'red',
-  },
-};
-
-export function prettyPrint(ev: LogEvent) {
-  const hasFields = Object.keys(ev.fields).length > 0;
-  // check whether pretty print is disabled
-  if (isNoPrettyPrint) {
-    let msg = `${ev.level} - ${ev.message}`;
-    if (hasFields) {
-      msg += ' ' + JSON.stringify(ev.fields);
-    }
-    console.log(msg);
-    return;
-  }
-  // print indented message, instead of [object]
-  // We use the %o modifier instead of JSON.stringify because stringify will print the
-  // object as normal text, it loses all the functionality the browser gives for viewing
-  // objects in the console, such as expanding and collapsing the object.
-  let msgString = '';
-  let args: any[] = [ev.level, ev.message];
-
-  if (config.isBrowser) {
-    msgString = '%c%s - %s';
-    args = [`color: ${levelColors[ev.level].browser};`, ...args];
-  } else {
-    msgString = `\x1b[${levelColors[ev.level].terminal}m%s\x1b[0m - %s`;
-  }
-  // we check if the fields object is not empty, otherwise its printed as <empty string>
-  // or just "".
-  if (hasFields) {
-    msgString += ' %o';
-    args.push(ev.fields);
-  }
-
-  if (ev.request) {
-    msgString += ' %o';
-    args.push(ev.request);
-  }
-
-  console.log.apply(console, [msgString, ...args]);
-}
 
 function jsonFriendlyErrorReplacer(key: string, value: any) {
   if (value instanceof Error) {

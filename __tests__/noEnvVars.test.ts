@@ -1,7 +1,6 @@
 /**
  * @jest-environment jsdom
  */
-
 // clear Axiom env vars
 process.env.AXIOM_URL = '';
 process.env.AXIOM_DATASET = '';
@@ -19,13 +18,14 @@ const mockedLog = jest.spyOn(global.console, 'log').mockImplementation();
 test('sending logs on localhost should fallback to console', () => {
   log.info('hello, world!');
   jest.advanceTimersByTime(1000);
-  expect(fetch).toHaveBeenCalledTimes(0);
   expect(mockedLog).toHaveBeenCalledTimes(1);
+  expect(fetch).toHaveBeenCalledTimes(0);
 });
 
 test('webVitals should not be sent when envVars are not set', () => {
   const metric: NextWebVitalsMetric = { id: '1', startTime: 1234, value: 1, name: 'FCP', label: 'web-vital' };
   reportWebVitals(metric);
   jest.advanceTimersByTime(1000);
+  expect(mockedLog).toHaveBeenCalledTimes(1);
   expect(fetch).toHaveBeenCalledTimes(0);
 });

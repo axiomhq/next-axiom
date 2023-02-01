@@ -19,6 +19,7 @@ const fetcher = async (args: any[]) => {
 
 export default function Home() {
   const { data, error } = useSWR('/api/hello', fetcher)
+  console.log(error)
 
   if (error) return <div>Failed to load</div>
   if (!data) return <div>Loading...</div>

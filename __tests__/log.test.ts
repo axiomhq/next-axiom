@@ -1,96 +1,88 @@
 /**
  * @jest-environment jsdom
  */
-// set axiom env vars before importing logger
-process.env.AXIOM_INGEST_ENDPOINT = 'https://example.co/api/test';
+// clear axiom env vars before importing logger
+process.env.AXIOM_TOKEN = '';
+process.env.AXIOM_INGEST_ENDPOINT = '';
 import { log } from '../src/logger';
 
-jest.useFakeTimers();
+const mockedLog = jest.spyOn(global.console, 'log').mockImplementation();
 
-test('sending logs from browser', async () => {
-  global.fetch = jest.fn() as jest.Mock;
+const getMockCallDetails = (mockedLog: jest.SpyInstance, callIndex = 0) => {
+  const payload = (mockedLog as jest.Mock).mock.calls[callIndex];
+  const level = payload[2];
+  const msg = payload[3];
+  const fields = payload[4];
 
-  log.info('hello, world!');
-  expect(fetch).toHaveBeenCalledTimes(0);
+  return { level, msg, fields };
+};
 
-  jest.advanceTimersByTime(1000);
-  expect(fetch).toHaveBeenCalledTimes(1);
-
-  log.info('hello, world!');
-  expect(fetch).toHaveBeenCalledTimes(1);
-
-  await log.flush();
-  expect(fetch).toHaveBeenCalledTimes(2);
-});
-
-test('with', async () => {
-  global.fetch = jest.fn() as jest.Mock;
-
+test('with() should create child logger', async () => {
   const logger = log.with({ foo: 'bar' });
   logger.info('hello, world!', { bar: 'baz' });
-  expect(fetch).toHaveBeenCalledTimes(0);
+  expect(mockedLog).toHaveBeenCalledTimes(1);
 
-  jest.advanceTimersByTime(1000);
-  expect(fetch).toHaveBeenCalledTimes(1);
-  const payload = JSON.parse((fetch as jest.Mock).mock.calls[0][1].body);
-  expect(payload.length).toBe(1);
-  const fst = payload[0];
-  expect(fst.level).toBe('info');
-  expect(fst.message).toBe('hello, world!');
-  expect(Object.keys(fst.fields).length).toBe(2);
-  expect(fst.fields.foo).toBe('bar');
-  expect(fst.fields.bar).toBe('baz');
+  const { level, msg, fields } = getMockCallDetails(mockedLog);
+  expect(level).toEqual('info');
+  expect(msg).toEqual('hello, world!');
+  expect(Object.keys(fields).length).toBe(2);
+  expect(fields.foo).toBe('bar');
+  expect(fields.bar).toBe('baz');
+
+  mockedLog.mockClear();
 });
 
-test('passing non-object', async () => {
-  global.fetch = jest.fn() as jest.Mock;
-
+test('passing non-object should be wrapped in object', async () => {
   const logger = log.with({ foo: 'bar' });
   const args = 'baz';
   logger.info('hello, world!', args as unknown as object);
-  expect(fetch).toHaveBeenCalledTimes(0);
+  expect(mockedLog).toHaveBeenCalledTimes(1);
 
-  jest.advanceTimersByTime(1000);
-  expect(fetch).toHaveBeenCalledTimes(1);
-  const payload = JSON.parse((fetch as jest.Mock).mock.calls[0][1].body);
-  expect(payload.length).toBe(1);
-  const fst = payload[0];
-  expect(fst.level).toBe('info');
-  expect(fst.message).toBe('hello, world!');
-  expect(fst.fields.foo).toBe('bar');
-  expect(fst.fields.args).toBe('baz');
+  const { level, msg, fields } = getMockCallDetails(mockedLog);
+  expect(level).toBe('info');
+  expect(msg).toBe('hello, world!');
+  expect(fields.foo).toBe('bar');
+  expect(fields.args).toBe('baz');
+
+  mockedLog.mockClear();
 });
 
-test('flushing child loggers', async () => {
-  global.fetch = jest.fn() as jest.Mock;
-
+test('flushing parent logger should flush children', async () => {
   log.info('hello, world!');
+
   const logger1 = log.with({ foo: 'bar' });
   logger1.debug('logger1');
+
   const logger2 = logger1.with({ bar: 'foo' });
+  logger2.flush = jest.fn();
   logger2.debug('logger2');
-  expect(fetch).toHaveBeenCalledTimes(0);
+
+  expect(mockedLog).toHaveBeenCalledTimes(3);
   await log.flush();
 
-  expect(fetch).toHaveBeenCalledTimes(3);
+  expect(logger2.flush).toHaveBeenCalledTimes(1);
 
-  const payload = JSON.parse((fetch as jest.Mock).mock.calls[2][1].body);
-  expect(Object.keys(payload[0].fields).length).toEqual(2);
-  expect(payload[0].fields.foo).toEqual('bar');
-  expect(payload[0].fields.bar).toEqual('foo');
+  const { fields } = getMockCallDetails(mockedLog, 2);
+  expect(fields).toBeTruthy();
+  expect(Object.keys(fields).length).toEqual(2);
+  expect(fields.foo).toEqual('bar');
+  expect(fields.bar).toEqual('foo');
   // ensure there is nothing was left unflushed
   await log.flush();
-  expect(fetch).toHaveBeenCalledTimes(3);
+  expect(mockedLog).toHaveBeenCalledTimes(3);
+
+  // console.log(mockedFlush.mock.calls)
+  mockedLog.mockClear();
 });
 
-test('throwing exception', async () => {
-  global.fetch = jest.fn() as jest.Mock;
+test('throwing exception should be handled as error object', async () => {
   const err = new Error('test');
   log.error('hello, world!', err);
-  await log.flush();
-  expect(fetch).toHaveBeenCalledTimes(1);
-  const payload = JSON.parse((fetch as jest.Mock).mock.calls[0][1].body);
-  expect(Object.keys(payload[0].fields).length).toEqual(3); // { name, message, stack }
-  expect(payload[0].fields.message).toEqual(err.message);
-  expect(payload[0].fields.name).toEqual(err.name);
+  expect(mockedLog).toHaveBeenCalledTimes(1);
+  const { fields } = getMockCallDetails(mockedLog);
+  expect(Object.keys(fields).length).toEqual(3); // { name, message, stack }
+  expect(fields.message).toEqual(err.message);
+  expect(fields.name).toEqual(err.name);
+
+  mockedLog.mockClear();
 });
