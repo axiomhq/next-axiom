@@ -1,4 +1,5 @@
 export const isNoPrettyPrint = process.env.AXIOM_NO_PRETTY_PRINT == 'true' ? true : false;
+export const enableLogDrain = process.env.ENABLE_AXIOM_LOG_DRAIN == 'true' ? true : false;
 
 export enum EndpointType {
   webVitals = 'web-vitals',

@@ -4,6 +4,7 @@ import Transport from './transports/transport';
 import ConsoleTransport from './transports/console.transport';
 import LogDrainTransport from './transports/log-drain.transport';
 import FetchTransport from './transports/fetch.transport';
+import { enableLogDrain } from './shared';
 
 const LOG_LEVEL = process.env.AXIOM_LOG_LEVEL || 'debug';
 
@@ -61,7 +62,7 @@ export class Logger {
     // decide which transport to use, if log drain is set, use that, otherwise use fetch, or fallback to console
     if (!config.isEnvVarsSet()) {
       this.transport = new ConsoleTransport();
-    } else if (isVercel && !config.isBrowser) {
+    } else if (isVercel && !config.isBrowser && enableLogDrain) {
       // if running in a lambda or edge function and axiom log drain is enabled,
       // use the log drain transport
       this.transport = new LogDrainTransport();
@@ -121,10 +122,6 @@ export class Logger {
     }
 
     this.transport.log(logEvent);
-    // TODO: should we call flush here? should the child loggers flush as well?
-    // if (this.autoFlush) {
-    //   this.flush();
-    // }
   };
 
   attachResponseStatus = (statusCode: number) => {

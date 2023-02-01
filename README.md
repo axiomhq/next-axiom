@@ -127,6 +127,19 @@ You can also disable logging completely by setting the log level to `off`:
 export AXIOM_LOG_LEVEL=off
 ```
 
+### Performance notes
+
+- The `withAxiom` wrapper that is used with the server-side code utilizes fetch to make requests
+  to axiom, the fetch uses `keep-alive` to ensure delivery of logs. If this hurts the execution
+  time of your serverless functioncs, you can switch to using the Axiom+Vercel integration, the log
+  drain will send the logs to axiom, but there is a [limit of 4KB per log output](https://vercel.com/docs/concepts/limits/overview#logs).
+
+  to enable such functionality export the following environment variable:
+
+  ```sh
+  export ENABLE_AXIOM_LOG_DRAIN=true
+  ```
+
 ### License
 
 Distributed under the [MIT License](LICENSE).
