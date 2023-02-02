@@ -49,7 +49,7 @@ export interface PlatformInfo {
 export class Logger {
   children: Logger[] = [];
   public logLevel: string;
-  private transport: Transport;
+  public transport: Transport;
 
   constructor(
     private args: { [key: string]: any } = {},

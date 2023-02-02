@@ -8,6 +8,10 @@ import { log } from '../src/logger';
 
 const mockedLog = jest.spyOn(global.console, 'log').mockImplementation();
 
+afterEach(() => {
+  mockedLog.mockClear();
+});
+
 const getMockCallDetails = (mockedLog: jest.SpyInstance, callIndex = 0) => {
   const payload = (mockedLog as jest.Mock).mock.calls[callIndex];
   const level = payload[2];
@@ -28,8 +32,6 @@ test('with() should create child logger', async () => {
   expect(Object.keys(fields).length).toBe(2);
   expect(fields.foo).toBe('bar');
   expect(fields.bar).toBe('baz');
-
-  mockedLog.mockClear();
 });
 
 test('passing non-object should be wrapped in object', async () => {
@@ -43,8 +45,6 @@ test('passing non-object should be wrapped in object', async () => {
   expect(msg).toBe('hello, world!');
   expect(fields.foo).toBe('bar');
   expect(fields.args).toBe('baz');
-
-  mockedLog.mockClear();
 });
 
 test('flushing parent logger should flush children', async () => {
@@ -70,9 +70,6 @@ test('flushing parent logger should flush children', async () => {
   // ensure there is nothing was left unflushed
   await log.flush();
   expect(mockedLog).toHaveBeenCalledTimes(3);
-
-  // console.log(mockedFlush.mock.calls)
-  mockedLog.mockClear();
 });
 
 test('throwing exception should be handled as error object', async () => {
@@ -83,6 +80,4 @@ test('throwing exception should be handled as error object', async () => {
   expect(Object.keys(fields).length).toEqual(3); // { name, message, stack }
   expect(fields.message).toEqual(err.message);
   expect(fields.name).toEqual(err.name);
-
-  mockedLog.mockClear();
 });

@@ -12,7 +12,12 @@ import FetchTransport from '../../src/transports/fetch.transport';
 jest.useFakeTimers();
 const mockedConsoleLog = jest.spyOn(global.console, 'log').mockImplementation(() => {});
 
+afterEach(() => {
+  (global.fetch as jest.Mock).mockClear();
+})
+
 test('FetchTransport should throttle logs & send using fetch', () => {
+  (global.fetch as jest.Mock).mockClear();
   const transport = new FetchTransport();
   transport.log({ _time: Date.now().toString(), level: 'info', message: 'hello, world!', fields: {} });
   expect(mockedConsoleLog).toHaveBeenCalledTimes(0);
@@ -23,6 +28,7 @@ test('FetchTransport should throttle logs & send using fetch', () => {
 
 test('sending logs from browser should be throttled', async () => {
   log.info('hello, world!');
+  expect(log.transport instanceof FetchTransport).toBe(true);
   expect(fetch).toHaveBeenCalledTimes(0);
 
   jest.advanceTimersByTime(1000);
