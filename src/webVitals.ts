@@ -1,15 +1,15 @@
-import { NextWebVitalsMetric } from 'next/app';
 import { throttle } from './shared';
 import config, { isVercel, Version } from './config';
+import {onLCP, onFID, onCLS, onINP, onFCP, onTTFB, Metric } from 'web-vitals';
 
 const url = config.getWebVitalsEndpoint();
 
-export declare type WebVitalsMetric = NextWebVitalsMetric & { route: string };
+export declare type WebVitalsMetric = Metric |  & { route: string };
 
 const throttledSendMetrics = throttle(sendMetrics, 1000);
 let collectedMetrics: WebVitalsMetric[] = [];
 
-export function reportWebVitals(metric: NextWebVitalsMetric) {
+function reportWebVital(metric: Metric ) {
   collectedMetrics.push({ route: window.__NEXT_DATA__?.page, ...metric });
   // if Axiom env vars are not set, do nothing,
   // otherwise devs will get errors on dev environments
@@ -17,6 +17,19 @@ export function reportWebVitals(metric: NextWebVitalsMetric) {
     return;
   }
   throttledSendMetrics();
+}
+
+export function reportWebVitals() {
+  if (typeof window === 'undefined') {
+    return
+  }
+
+  onCLS(reportWebVital)
+  onFID(reportWebVital)
+  onLCP(reportWebVital)
+  onINP(reportWebVital)
+  onFCP(reportWebVital)
+  onTTFB(reportWebVital)
 }
 
 function sendMetrics() {

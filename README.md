@@ -65,12 +65,14 @@ module.exports = withAxiom({
 
 ### Web Vitals
 
-:warning: Web-Vitals are not yet supported in Next.js 13 and above. Please use Next.js 12 or below.
+next-axiom utilizies google's web-vitals to report the metrics
+to axiom.
 
-Go to `pages/_app.js` or `pages/_app.ts` and add the following line to report web vitals:
+To set it up, updates `pages/_app.js` or `pages/_app.ts` and add the following line to report web vitals:
 
 ```js
-export { reportWebVitals } from 'next-axiom';
+import { reportWebVitals } from 'next-axiom';
+reportWebVitals()
 ```
 
 > **Note**: WebVitals are only sent from production deployments.
