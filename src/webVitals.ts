@@ -9,7 +9,7 @@ export declare type WebVitalsMetric = Metric | { route: string };
 const throttledSendMetrics = throttle(sendMetrics, 1000);
 let collectedMetrics: WebVitalsMetric[] = [];
 
-function reportWebVital(metric: Metric) {
+export function reportWebVital(metric: Metric) {
   collectedMetrics.push({ route: window.__NEXT_DATA__?.page, ...metric });
   // if Axiom env vars are not set, do nothing,
   // otherwise devs will get errors on dev environments

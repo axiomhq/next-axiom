@@ -2,32 +2,32 @@
  * @jest-environment jsdom
  */
 import { jest } from '@jest/globals';
-import { NextWebVitalsMetric } from 'next/app';
 // set axiom env vars before importing webvitals
 process.env.AXIOM_URL = '';
 process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT = 'https://example.co/api/test';
-import { reportWebVitals } from '../src/webVitals';
+import { reportWebVital } from '../src/webVitals';
 import 'whatwg-fetch';
 import { Version } from '../src/config';
+import { Metric } from 'web-vitals';
 
 global.fetch = jest.fn(() => Promise.resolve(new Response('', { status: 204, statusText: 'OK' }))) as jest.Mock;
 jest.useFakeTimers();
 
 test('throttled sendMetrics', async () => {
-  let metricsMatrix: NextWebVitalsMetric[][] = [
+  let metricsMatrix: Metric[][] = [
     [
-      { id: '1', startTime: 1234, value: 1, name: 'FCP', label: 'web-vital' },
-      { id: '2', startTime: 5678, value: 2, name: 'FCP', label: 'web-vital' },
+      { id: '1', value: 2, name: 'FCP', rating: 'good', delta: 1, entries: [], navigationType: 'reload' },
+      { id: '2', value: 1, name: 'FCP', rating: 'poor', delta: 1, entries: [], navigationType: 'reload' },
     ],
-    [{ id: '3', startTime: 9012, value: 3, name: 'FCP', label: 'web-vital' }],
-    [{ id: '4', startTime: 4012, value: 4, name: 'FCP', label: 'web-vital' }],
+    [{ id: '3', value: 1, name: 'FCP', rating: 'poor', delta: 1, entries: [], navigationType: 'reload' }],
+    [{ id: '4', value: 1, name: 'FCP', rating: 'poor', delta: 1, entries: [], navigationType: 'reload' }],
   ];
 
   // report first set of web-vitals
-  metricsMatrix[0].forEach(reportWebVitals);
+  metricsMatrix[0].forEach(reportWebVital);
   // skip 100ms and report another webVital
   jest.advanceTimersByTime(100);
-  metricsMatrix[1].forEach(reportWebVitals);
+  metricsMatrix[1].forEach(reportWebVital);
   // ensure fetch has not been called yet for any the previously reported
   // web-vitals
   expect(fetch).toBeCalledTimes(0);
@@ -35,7 +35,7 @@ test('throttled sendMetrics', async () => {
   jest.advanceTimersByTime(1000);
 
   // send the last set of webVitals and wait for them to be sent
-  metricsMatrix[2].forEach(reportWebVitals);
+  metricsMatrix[2].forEach(reportWebVital);
   jest.advanceTimersByTime(1000);
 
   const url = '/_axiom/web-vitals';

@@ -8,9 +8,9 @@ process.env.AXIOM_DATASET = '';
 process.env.AXIOM_TOKEN = '';
 process.env.AXIOM_INGEST_ENDPOINT = '';
 process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT = '';
-import { NextWebVitalsMetric } from 'next/app';
+import { Metric } from 'web-vitals';
 import { log } from '../src/logger';
-import { reportWebVitals } from '../src/webVitals';
+import { reportWebVital, reportWebVitals } from '../src/webVitals';
 
 jest.useFakeTimers();
 global.fetch = jest.fn() as jest.Mock;
@@ -24,8 +24,17 @@ test('sending logs on localhost should fallback to console', () => {
 });
 
 test('webVitals should not be sent when envVars are not set', () => {
-  const metric: NextWebVitalsMetric = { id: '1', startTime: 1234, value: 1, name: 'FCP', label: 'web-vital' };
-  reportWebVitals(metric);
+  reportWebVitals();
+  const metric: Metric = {
+    id: '1',
+    value: 1,
+    name: 'FCP',
+    rating: 'good',
+    delta: 1,
+    entries: [],
+    navigationType: 'reload',
+  };
+  reportWebVital(metric);
   jest.advanceTimersByTime(1000);
   expect(fetch).toHaveBeenCalledTimes(0);
 });
