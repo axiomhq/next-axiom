@@ -1,4 +1,4 @@
-import { NextApiRequest } from "next";
+import { GetServerSidePropsContext, NextApiRequest } from "next";
 import { LogEvent, RequestReport } from "../logger";
 import { EndpointType } from "../shared";
 import type Provider from "./base";
@@ -50,7 +50,7 @@ export default class GenericConfig implements Provider {
     };
   }
 
-  generateRequestMeta(req: NextApiRequest): RequestReport {
+  generateRequestMeta(req: NextApiRequest | GetServerSidePropsContext['req']): RequestReport {
     return {
       startTime: new Date().getTime(),
       path: req.url!,
@@ -63,7 +63,7 @@ export default class GenericConfig implements Provider {
     };
   }
 
-  getHeaderOrDefault(req: NextApiRequest, headerName: string, defaultValue: any) {
+  getHeaderOrDefault(req: NextApiRequest | GetServerSidePropsContext['req'], headerName: string, defaultValue: any) {
     return req.headers[headerName] ? req.headers[headerName] : defaultValue;
   }
 }
