@@ -54,7 +54,6 @@ export class Logger {
   constructor(
     private args: { [key: string]: any } = {},
     private req: RequestReport | null = null,
-    private autoFlush: boolean = true,
     public source: 'frontend' | 'lambda' | 'edge' = 'frontend',
     logLevel?: string
   ) {
@@ -67,7 +66,7 @@ export class Logger {
       // use the log drain transport
       this.transport = new LogDrainTransport();
     } else {
-      this.transport = new FetchTransport(autoFlush);
+      this.transport = new FetchTransport();
     }
   }
 
@@ -85,13 +84,13 @@ export class Logger {
   };
 
   with = (args: { [key: string]: any }) => {
-    const child = new Logger({ ...this.args, ...args }, this.req, this.autoFlush, this.source);
+    const child = new Logger({ ...this.args, ...args }, this.req, this.source);
     this.children.push(child);
     return child;
   };
 
   withRequest = (req: RequestReport) => {
-    return new Logger({ ...this.args }, req, this.autoFlush, this.source);
+    return new Logger({ ...this.args }, req, this.source);
   };
 
   _log = (level: string, message: string, args: { [key: string]: any } = {}) => {
@@ -122,16 +121,6 @@ export class Logger {
     }
 
     this.transport.log(logEvent);
-  };
-
-  attachResponseStatus = (statusCode: number) => {
-    // TODO: find a better way to handle response status
-    // this.logEvents = this.logEvents.map((log) => {
-    //   if (log.request) {
-    //     log.request.statusCode = statusCode;
-    //   }
-    //   return log;
-    // });
   };
 
   async flush() {

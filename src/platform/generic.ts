@@ -66,4 +66,7 @@ export default class GenericConfig implements Provider {
   getHeaderOrDefault(req: NextApiRequest | GetServerSidePropsContext['req'], headerName: string, defaultValue: any) {
     return req.headers[headerName] ? req.headers[headerName] : defaultValue;
   }
+
+  shouldSendEdgeReport = () => true
+  shouldSendLambdaReport = () => true
 }

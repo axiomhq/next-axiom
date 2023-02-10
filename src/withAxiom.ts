@@ -73,8 +73,6 @@ function interceptNextApiResponse(req: AxiomAPIRequest, res: NextApiResponse): [
   res.send = (body: any) => {
     allPromises.push(
       (async () => {
-        req.log.attachResponseStatus(res.statusCode);
-        await req.log.flush();
         resSend(body);
       })()
     );
@@ -84,8 +82,6 @@ function interceptNextApiResponse(req: AxiomAPIRequest, res: NextApiResponse): [
   res.json = (json: any) => {
     allPromises.push(
       (async () => {
-        req.log.attachResponseStatus(res.statusCode);
-        await req.log.flush();
         resJson(json);
       })()
     );
@@ -95,8 +91,6 @@ function interceptNextApiResponse(req: AxiomAPIRequest, res: NextApiResponse): [
   res.end = (cb?: () => undefined): NextApiResponse => {
     allPromises.push(
       (async () => {
-        req.log.attachResponseStatus(res.statusCode);
-        await req.log.flush();
         resEnd(cb);
       })()
     );
@@ -115,20 +109,23 @@ export type AxiomApiHandler = (
 export function withAxiomNextApiHandler(handler: AxiomApiHandler): NextApiHandler {
   return async (req, res) => {
     const report: RequestReport = config.generateRequestMeta(req);
-    const logger = new Logger({}, report, false, 'lambda');
+    const logger = new Logger({}, report, 'lambda');
     const axiomRequest = req as AxiomAPIRequest;
     axiomRequest.log = logger;
     const [wrappedRes, allPromises] = interceptNextApiResponse(axiomRequest, res);
 
     try {
       await handler(axiomRequest, wrappedRes);
+      report.statusCode = wrappedRes.statusCode;
       await logger.flush();
       await Promise.all(allPromises);
+      logLambdaReport(report);
     } catch (error: any) {
       logger.error('Error in API handler', { error });
-      logger.attachResponseStatus(500);
+      report.statusCode = 500;
       await logger.flush();
       await Promise.all(allPromises);
+      logLambdaReport(report);
       throw error;
     }
   };
@@ -147,17 +144,19 @@ export type AxiomGetServerSideProps<
 export function withAxiomNextServerSidePropsHandler(handler: AxiomGetServerSideProps): GetServerSideProps {
   return async (context) => {
     const report: RequestReport = config.generateRequestMeta(context.req);
-    const logger = new Logger({}, report, false, 'lambda');
+    const logger = new Logger({}, report, 'lambda');
     const axiomContext = context as AxiomGetServerSidePropsContext;
     axiomContext.log = logger;
 
     try {
       const result = await handler(axiomContext);
       await logger.flush();
+      logLambdaReport(report);
       return result;
     } catch (error: any) {
       logger.error('Error in getServerSideProps handler', { error });
-      logger.attachResponseStatus(500);
+      report.statusCode = 500;
+      logLambdaReport(report);
       await logger.flush();
       throw error;
     }
@@ -183,21 +182,21 @@ export function withAxiomNextEdgeFunction(handler: NextMiddleware): NextMiddlewa
       userAgent: req.headers.get('user-agent'),
     };
 
-    const logger = new Logger({}, report, false, 'edge');
+    const logger = new Logger({}, report, 'edge');
     const axiomRequest = req as AxiomRequest;
     axiomRequest.log = logger;
 
     try {
       const res = await handler(axiomRequest, ev);
       if (res) {
-        logger.attachResponseStatus(res.status);
+        report.statusCode = res.status;
       }
       ev.waitUntil(logger.flush());
       logEdgeReport(report);
       return res;
     } catch (error: any) {
       logger.error('Error in edge function', { error });
-      logger.attachResponseStatus(500);
+      report.statusCode = 500;
       ev.waitUntil(logger.flush());
       logEdgeReport(report);
       throw error;
@@ -205,8 +204,14 @@ export function withAxiomNextEdgeFunction(handler: NextMiddleware): NextMiddlewa
   };
 }
 
+function logLambdaReport(report: any) {
+  if (config.shouldSendLambdaReport()) {
+    console.log(`AXIOM_LAMBDA_REPORT::${JSON.stringify(report)}`);
+  }
+}
+
 function logEdgeReport(report: any) {
-  if (config.shoudSendEdgeReport) {
+  if (config.shouldSendEdgeReport()) {
     console.log(`AXIOM_EDGE_REPORT::${JSON.stringify(report)}`);
   }
 }

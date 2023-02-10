@@ -6,7 +6,6 @@ import { EndpointType } from '../shared';
 // configrations per provider, and the functions that are used by the logger. Implement
 // this interface to have special behaviour for your platform.
 export default interface Provider {
-  shoudSendEdgeReport: boolean;
   token: string | undefined;
   environment: string;
   region: string | undefined;
@@ -19,4 +18,6 @@ export default interface Provider {
   generateRequestMeta(req: any): RequestReport;
   getLogsEndpoint(): string
   getWebVitalsEndpoint(): string
+  shouldSendEdgeReport(): boolean
+  shouldSendLambdaReport(): boolean
 }

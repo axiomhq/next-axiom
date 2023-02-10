@@ -7,7 +7,6 @@ const ingestEndpoint = process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT || process.
 
 export default class VercelConfig extends GenericConfig implements Provider {
   provider = 'vercel';
-  shoudSendEdgeReport = true;
   region = process.env.VERCEL_REGION || undefined;
   environment = process.env.VERCEL_ENV || process.env.NODE_ENV;
   token = undefined;
@@ -41,4 +40,8 @@ export default class VercelConfig extends GenericConfig implements Provider {
       source: source,
     };
   }
+
+  shouldSendEdgeReport = () => true
+  // lambda report is automatically sent by vercel
+  shouldSendLambdaReport = () => false
 }

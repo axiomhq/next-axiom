@@ -8,13 +8,11 @@ export default class FetchTransport implements Transport {
   public logEvents: LogEvent[] = [];
   throttledSendLogs = throttle(this.sendLogs, 1000);
 
-  constructor(public autoFlush: boolean = true) {}
+  constructor() {}
 
   async log(event: LogEvent): Promise<void> {
     this.logEvents.push(event);
-    if (this.autoFlush) {
-      this.throttledSendLogs()
-    }
+    this.throttledSendLogs()
     return Promise.resolve();
   }
 

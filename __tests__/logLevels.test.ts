@@ -17,37 +17,37 @@ test('log levels', async () => {
   expect(mockedLog).toHaveBeenCalledTimes(0);
 
   // test overriding log level per logger
-  let logger = new Logger({}, null, false, 'frontend', 'error');
+  let logger = new Logger({}, null, 'frontend', 'error');
   logger.debug('hello');
   logger.info('hello');
   logger.warn('hello');
   await logger.flush();
   expect(mockedLog).toHaveBeenCalledTimes(0);
 
-  logger = new Logger({}, null, false, 'frontend', 'warn');
+  logger = new Logger({}, null, 'frontend', 'warn');
   logger.info('hello');
   logger.debug('hello');
   await logger.flush();
   expect(mockedLog).toHaveBeenCalledTimes(0);
 
-  logger = new Logger({}, null, false, 'frontend', 'info');
+  logger = new Logger({}, null, 'frontend', 'info');
   logger.debug('hello');
   await logger.flush();
   expect(mockedLog).toHaveBeenCalledTimes(0);
 
   // disabled logging
-  logger = new Logger({}, null, false, 'frontend', 'off');
+  logger = new Logger({}, null, 'frontend', 'off');
   logger.error('no logs');
   await logger.flush();
   expect(mockedLog).toHaveBeenCalledTimes(0);
 
-  logger = new Logger({}, null, false, 'frontend', 'error');
+  logger = new Logger({}, null, 'frontend', 'error');
   logger.warn('warn');
   logger.error('error');
   await logger.flush();
   expect(mockedLog).toHaveBeenCalledTimes(1);
 
-  logger = new Logger({}, null, false, 'frontend', 'debug');
+  logger = new Logger({}, null, 'frontend', 'debug');
   logger.warn('hello');
   await logger.flush();
   expect(mockedLog).toHaveBeenCalledTimes(2);
