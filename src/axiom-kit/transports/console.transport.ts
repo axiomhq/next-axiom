@@ -1,7 +1,8 @@
-import Transport from './transport';
-import { LogEvent } from '../logger';
-import config from '../config';
-import { isNoPrettyPrint } from '../shared';
+import Transport from '../logging/transport';
+import { LogEvent } from '../logging/logger';
+import { isBrowser } from '../platform';
+
+export const isNoPrettyPrint = process.env.AXIOM_NO_PRETTY_PRINT == 'true' ? true : false;
 
 const levelColors = {
   info: {
@@ -46,7 +47,7 @@ export default class ConsoleTransport implements Transport {
     let msgString = '';
     let args: any[] = [ev.level, ev.message];
 
-    if (config.isBrowser) {
+    if (isBrowser) {
       msgString = '%c%s - %s';
       args = [`color: ${levelColors[ev.level].browser};`, ...args];
     } else {

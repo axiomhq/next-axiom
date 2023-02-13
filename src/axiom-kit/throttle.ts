@@ -1,12 +1,4 @@
-export const isNoPrettyPrint = process.env.AXIOM_NO_PRETTY_PRINT == 'true' ? true : false;
-export const enableLogDrain = process.env.ENABLE_AXIOM_LOG_DRAIN == 'true' ? true : false;
-
-export enum EndpointType {
-  webVitals = 'web-vitals',
-  logs = 'logs',
-}
-
-export const throttle = (fn: Function, wait: number) => {
+const throttle = (fn: Function, wait: number) => {
   let lastFn: ReturnType<typeof setTimeout>, lastTime: number;
   return function (this: any) {
     const context = this,
@@ -26,3 +18,5 @@ export const throttle = (fn: Function, wait: number) => {
     }, Math.max(wait - (Date.now() - lastTime), 0));
   };
 };
+
+export default throttle;

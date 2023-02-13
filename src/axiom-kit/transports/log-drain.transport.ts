@@ -1,5 +1,5 @@
-import Transport from "./transport";
-import { LogEvent } from '../logger'
+import Transport from "../logging/transport";
+import { LogEvent } from '../logging/logger'
 
 export default class LogDrainTransport implements Transport {
     log(event: LogEvent): Promise<void> {

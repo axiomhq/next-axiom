@@ -1,14 +1,14 @@
-import config, { isVercel, Version } from '../config';
-import { LogEvent } from '../logger';
-import { throttle } from '../shared';
-import Transport from './transport';
+import { Version } from "../../config";
+import { LogEvent } from "../logging/logger";
+import Transport from "../logging/transport";
+import { isBrowser, isVercel } from "../platform";
+import throttle from '../throttle';
 
 export default class FetchTransport implements Transport {
-  public url = config.getLogsEndpoint();
   public logEvents: LogEvent[] = [];
   throttledSendLogs = throttle(this.sendLogs, 1000);
 
-  constructor() {}
+  constructor(public endpoint: string, public token?: string) {}
 
   async log(event: LogEvent): Promise<void> {
     this.logEvents.push(event);
@@ -31,22 +31,22 @@ export default class FetchTransport implements Transport {
       'Content-Type': 'application/json',
       'User-Agent': 'next-axiom/v' + Version,
     };
-    if (config.token) {
-      headers['Authorization'] = `Bearer ${config.token}`;
+    if (this.token) {
+      headers['Authorization'] = `Bearer ${this.token}`;
     }
     const reqOptions: RequestInit = { body, method, keepalive, headers };
 
     // Do not leak network errors; does not affect the running app
-    const sendFallback = () => fetch(this.url, reqOptions).catch(console.error);
+    const sendFallback = () => fetch(this.endpoint, reqOptions).catch(console.error);
 
     try {
       if (typeof fetch === 'undefined') {
         const fetch = await require('whatwg-fetch');
-        fetch(this.url, reqOptions).catch(console.error);
-      } else if (config.isBrowser && isVercel && navigator.sendBeacon) {
+        fetch(this.endpoint, reqOptions).catch(console.error);
+      } else if (isBrowser && isVercel && navigator.sendBeacon) {
         // sendBeacon fails if message size is greater than 64kb, so
         // we fall back to fetch.
-        if (!navigator.sendBeacon(this.url, body)) {
+        if (!navigator.sendBeacon(this.endpoint, body)) {
           await sendFallback();
         }
       } else {
