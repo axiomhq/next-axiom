@@ -129,6 +129,22 @@ You can also disable logging completely by setting the log level to `off`:
 export AXIOM_LOG_LEVEL=off
 ```
 
+### getServerSideProps
+
+To be able to use next-axiom with `getServerSideProps` you need to wrap your function with `withAxiomGetServerSideProps`, becasue there is no
+way at the moment to automatically detected if getServerSideProps is used.
+
+```ts
+import { withAxiomGetServerSideProps } from 'next-axiom'
+export const getServerSideProps = withAxiomGetServerSideProps(async ({ req, log })  => {
+  log.info('Hello, world!');
+  return {
+    props: {
+    },
+  }
+});
+
+
 ### License
 
 Distributed under the [MIT License](LICENSE).
