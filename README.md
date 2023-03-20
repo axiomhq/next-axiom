@@ -21,7 +21,7 @@ For more information, check out the [official documentation](https://axiom.co/do
 
 ### Using Vercel Integration
 
-Make sure you have the [Axiom Vercel integration](https://www.axiom.co/vercel) installed. Once it is done, perform the steps below: 
+Make sure you have the [Axiom Vercel integration](https://www.axiom.co/vercel) installed. Once it is done, perform the steps below:
 
 - In your Next.js project, run install `next-axiom` as follows:
 
@@ -65,14 +65,22 @@ module.exports = withAxiom({
 
 ### Web Vitals
 
-next-axiom utilizies google's web-vitals to report the metrics
-to axiom.
+next-axiom provides a component that you can append to your layout to report web vitals to Axiom.
 
-To set it up, updates `pages/_app.js` or `pages/_app.ts` and add the following line to report web vitals:
+To set it up, update `pages/_app.js` or `app/layout.tsx` and add `<AxiomReporter />` to report web vitals:
 
 ```js
-import { reportWebVitals } from 'next-axiom';
-reportWebVitals()
+import { AxiomReporter } from 'next-axiom';
+
+function RootLayout({ Component, pageProps }: AppProps) {
+
+  return (
+    <>
+      <Component {...pageProps} />
+      <AxiomReporter />
+    </>
+  );
+}
 ```
 
 > **Note**: WebVitals are only sent from production deployments.

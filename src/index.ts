@@ -1,5 +1,6 @@
-export { reportWebVitals, reportWebVital } from './webVitals';
+export { reportWebVital } from './webVitals';
 export { log, Logger } from './logger';
+export { AxiomReporter } from './components/reporter';
 export {
   withAxiom,
   withAxiomGetServerSideProps,

@@ -1,6 +1,7 @@
+import 'client-only';
 import { throttle } from './shared';
-import config, { isVercel, Version } from './config';
-import { onLCP, onFID, onCLS, onINP, onFCP, onTTFB, Metric } from 'web-vitals';
+import config, { isVercel } from './config';
+import { Metric } from 'web-vitals';
 
 const url = config.getWebVitalsEndpoint();
 
@@ -19,24 +20,10 @@ export function reportWebVital(metric: Metric) {
   throttledSendMetrics();
 }
 
-export function reportWebVitals() {
-  if (typeof window === 'undefined') {
-    return;
-  }
-
-  onCLS(reportWebVital);
-  onFID(reportWebVital);
-  onLCP(reportWebVital);
-  onINP(reportWebVital);
-  onFCP(reportWebVital);
-  onTTFB(reportWebVital);
-}
-
 function sendMetrics() {
   const body = JSON.stringify(config.wrapWebVitalsObject(collectedMetrics));
   const headers = {
     'Content-Type': 'application/json',
-    'User-Agent': 'next-axiom/v' + Version,
   };
   if (config.token) {
     headers['Authorization'] = `Bearer ${config.token}`;
