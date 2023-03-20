@@ -148,7 +148,7 @@ export const getServerSideProps = withAxiomGetServerSideProps(async ({ req, log 
 - The `withAxiom` wrapper that is used with the server-side code utilizes fetch to make requests
   to axiom, the fetch uses `keep-alive` to ensure delivery of logs. If this hurts the execution
   time of your serverless functioncs, you can switch to using the Axiom+Vercel integration, the log
-  drain will send the logs to axiom, but there is a [limit of 4KB per log output](https://vercel.com/docs/concepts/limits/overview#logs).
+  drain will send the logs to axiom, but there is a [limit of 4KB per log output](https://vercel.com/docs/concepts/limits/overview#logs) and it won't have the full metadata.
 
   to enable such functionality export the following environment variable:
 
