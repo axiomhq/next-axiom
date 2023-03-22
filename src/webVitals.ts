@@ -1,13 +1,18 @@
 import { NextWebVitalsMetric } from 'next/app';
-import { LoggingSource } from './axiom-kit/logging/config';
-import NextLogger from './logger';
+import { createLogger } from '@axiomhq/kit';
 
-const log = new NextLogger(LoggingSource.browser);
+const log = createLogger({}, true);
+// log.formatEvents((e) => {
+// TODO: create a format for web-vitals, actually this is very specific for vercel
+// })
 
 export function reportWebVitals(metric: NextWebVitalsMetric) {
-  if (!log.isEnvVarsSet()) {
+  if (!log.config.adapter.isEnvVarsSet()) {
     return;
   }
-  log.logWebVital({ route: window.__NEXT_DATA__?.page, ...metric });
+
+  // TODO: find a way to provide the format
+  // log.logWebVital({ route: window.__NEXT_DATA__?.page, ...metric });
+  log.info('web-vitals', { route: window.__NEXT_DATA__?.page, ...metric });
   log.flush();
 }

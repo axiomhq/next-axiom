@@ -1,5 +1,4 @@
-import NextLogger from './logger';
-export { NextLogger };
+export { log } from './logger';
 export { reportWebVitals } from './webVitals';
 export {
   withAxiom,
@@ -11,5 +10,3 @@ export {
   AxiomMiddleware,
   AxiomGetServerSidePropsContext,
 } from './withAxiom';
-
-export const log = new NextLogger();

@@ -1,43 +1,25 @@
-import { Logger } from './axiom-kit/logging/logger';
-import VercelAdapter from './axiom-kit/adapters/vercel-adapter';
-import { isVercel } from './axiom-kit/platform';
-import { LoggingSource } from './axiom-kit/logging/config';
-import Adapter from './axiom-kit/adapters/adapter';
+import { createLogger, Logger, LogLevel } from '@axiomhq/kit';
 import { NextWebVitalsMetric } from 'next/app';
 
-export declare type WebVitalsMetric = NextWebVitalsMetric & { route: string };
+export const log = createLogger();
 
-export default class NextLogger extends Logger {
-  adapter: Adapter;
+export function logWebVital(logger: Logger, metric: WebVitalsMetric) {
+  logger._log(LogLevel.info, 'web-vitals', { webVitals: [metric] });
+}
 
-  constructor(source: LoggingSource = LoggingSource.browser) {
-    if (isVercel) {
-      const adapter = new VercelAdapter(source);
-      super(adapter.getConfig());
-      this.adapter = adapter;
-    }
-  }
-
-  isEnvVarsSet(): boolean {
-    return this.adapter.isEnvVarsSet();
-  }
-
-  logWebVital(metric: WebVitalsMetric) {
-    this._log('info', 'web-vitals', { webVitals: [metric] });
-  }
-
-  logLambdaReport(report: any) {
-    if (this.adapter.shouldSendLambdaReport()) {
-      console.log(`AXIOM_LAMBDA_REPORT::${JSON.stringify(report)}`);
-    }
-  }
-
-  logEdgeReport(report: RequestReport) {
-    if (this.adapter.shouldSendEdgeReport()) {
-      console.log(`AXIOM_EDGE_REPORT::${JSON.stringify(report)}`);
-    }
+export function logLambdaReport(logger: Logger, report: any) {
+  if (logger.config.adapter.shouldSendLambdaReport()) {
+    console.log(`AXIOM_LAMBDA_REPORT::${JSON.stringify(report)}`);
   }
 }
+
+export function logEdgeReport(logger: Logger, report: RequestReport) {
+  if (logger.config.adapter.shouldSendEdgeReport()) {
+    console.log(`AXIOM_EDGE_REPORT::${JSON.stringify(report)}`);
+  }
+}
+
+export declare type WebVitalsMetric = NextWebVitalsMetric & { route: string };
 
 export interface RequestReport {
   startTime: number;

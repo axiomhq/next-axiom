@@ -49,6 +49,7 @@
     "typescript": "^4.6.4"
   },
   "dependencies": {
+    "@axiomhq/kit": "file:../axiom-js/packages/kit",
     "whatwg-fetch": "^3.6.2"
   }
 }

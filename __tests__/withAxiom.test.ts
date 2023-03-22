@@ -1,8 +1,9 @@
-import { Logger, withAxiom } from '../src/index';
+import { withAxiom } from '../src/index';
 import { withAxiomGetServerSideProps, withAxiomNextServerSidePropsHandler } from '../src/withAxiom';
 import { GetServerSideProps, GetServerSidePropsContext, NextApiRequest, NextApiResponse } from 'next';
 import 'whatwg-fetch';
 import { NextFetchEvent, NextRequest, NextResponse } from 'next/server';
+import { Logger } from '@axiomhq/kit';
 
 test('withAxiom(NextConfig)', async () => {
   const config = withAxiom({

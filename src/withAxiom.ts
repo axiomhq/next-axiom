@@ -11,9 +11,9 @@ import {
 import { NextFetchEvent, NextMiddleware, NextRequest } from 'next/server';
 import { NextMiddlewareResult } from 'next/dist/server/web/types';
 import { ParsedUrlQuery } from 'querystring';
-import NextLogger, { RequestReport } from './logger';
+import { logEdgeReport, logLambdaReport, RequestReport } from './logger';
 import { Rewrite } from 'next/dist/lib/load-custom-routes';
-import { LoggingSource } from './axiom-kit/logging/config';
+import { createLogger, Logger, LoggingSource } from '@axiomhq/kit';
 import VercelAdapter from './axiom-kit/adapters/vercel-adapter';
 
 declare global {
@@ -28,7 +28,8 @@ export function withAxiomNextConfig(nextConfig: NextConfig): NextConfig {
       const adapter = new VercelAdapter(LoggingSource.build);
 
       if (!adapter.isEnvVarsSet()) {
-        const log = new NextLogger(LoggingSource.build);
+        const log = createLogger();
+        log.config.source = LoggingSource.build;
         log.warn(
           'axiom: Envvars not detected. If this is production please see https://github.com/axiomhq/next-axiom for help'
         );
@@ -88,7 +89,7 @@ function interceptNextApiResponse(req: AxiomAPIRequest, res: NextApiResponse): [
   return [res, allPromises];
 }
 
-export type AxiomAPIRequest = NextApiRequest & { log: NextLogger };
+export type AxiomAPIRequest = NextApiRequest & { log: Logger };
 export type AxiomApiHandler = (
   request: AxiomAPIRequest,
   response: NextApiResponse
@@ -97,7 +98,7 @@ export type AxiomApiHandler = (
 export function withAxiomNextApiHandler(handler: AxiomApiHandler): NextApiHandler {
   return async (req, res) => {
     const report: RequestReport = buildRequestReport(req);
-    const logger = new NextLogger(LoggingSource.lambda);
+    const logger = createLogger();
     const axiomRequest = req as AxiomAPIRequest;
     axiomRequest.log = logger;
     const [wrappedRes, allPromises] = interceptNextApiResponse(axiomRequest, res);
@@ -107,13 +108,13 @@ export function withAxiomNextApiHandler(handler: AxiomApiHandler): NextApiHandle
       report.statusCode = wrappedRes.statusCode;
       await logger.flush();
       await Promise.all(allPromises);
-      logger.logLambdaReport(report);
+      logLambdaReport(logger, report);
     } catch (error: any) {
       logger.error('Error in API handler', { error });
       report.statusCode = 500;
       await logger.flush();
       await Promise.all(allPromises);
-      logger.logLambdaReport(report);
+      logLambdaReport(logger, report);
       throw error;
     }
   };
@@ -122,7 +123,7 @@ export function withAxiomNextApiHandler(handler: AxiomApiHandler): NextApiHandle
 export type AxiomGetServerSidePropsContext<
   Q extends ParsedUrlQuery = ParsedUrlQuery,
   D extends PreviewData = PreviewData
-> = GetServerSidePropsContext<Q, D> & { log: NextLogger };
+> = GetServerSidePropsContext<Q, D> & { log: Logger };
 export type AxiomGetServerSideProps<
   P extends { [key: string]: any } = { [key: string]: any },
   Q extends ParsedUrlQuery = ParsedUrlQuery,
@@ -132,26 +133,27 @@ export type AxiomGetServerSideProps<
 export function withAxiomNextServerSidePropsHandler(handler: AxiomGetServerSideProps): GetServerSideProps {
   return async (context) => {
     const report: RequestReport = buildRequestReport(context.req);
-    const logger = new NextLogger(LoggingSource.lambda);
+    const logger = createLogger();
+    // const logger = new NextLogger(LoggingSource.lambda);
     const axiomContext = context as AxiomGetServerSidePropsContext;
     axiomContext.log = logger;
 
     try {
       const result = await handler(axiomContext);
       await logger.flush();
-      logger.logLambdaReport(report);
+      logLambdaReport(logger, report);
       return result;
     } catch (error: any) {
       logger.error('Error in getServerSideProps handler', { error });
       report.statusCode = 500;
-      logger.logLambdaReport(report);
+      logLambdaReport(logger, report);
       await logger.flush();
       throw error;
     }
   };
 }
 
-export type AxiomRequest = NextRequest & { log: NextLogger };
+export type AxiomRequest = NextRequest & { log: Logger };
 export type AxiomMiddleware = (
   request: AxiomRequest,
   event: NextFetchEvent
@@ -170,7 +172,7 @@ export function withAxiomNextEdgeFunction(handler: NextMiddleware): NextMiddlewa
       userAgent: req.headers.get('user-agent'),
     };
 
-    const logger = new NextLogger(LoggingSource.edge);
+    const logger = createLogger();
     const axiomRequest = req as AxiomRequest;
     axiomRequest.log = logger;
 
@@ -180,13 +182,13 @@ export function withAxiomNextEdgeFunction(handler: NextMiddleware): NextMiddlewa
         report.statusCode = res.status;
       }
       ev.waitUntil(logger.flush());
-      logger.logEdgeReport(report);
+      logEdgeReport(logger, report);
       return res;
     } catch (error: any) {
       logger.error('Error in edge function', { error });
       report.statusCode = 500;
       ev.waitUntil(logger.flush());
-      logger.logEdgeReport(report);
+      logEdgeReport(logger, report);
       throw error;
     }
   };
