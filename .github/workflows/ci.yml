@@ -33,6 +33,22 @@ jobs:
           node-version: 17
       - run: npm install
       - run: npm test
+  e2e:
+    name: E2E
+    needs: 
+      - check-format
+      - unittests
+    runs-on: ubuntu-latest
+    env:
+      BASE_URL: 'we should get it from vercel somehow'
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 17
+      - run: cd e2e
+      - run: npm install
+      - run: npm test
   build:
     name: Build
     runs-on: ubuntu-latest
