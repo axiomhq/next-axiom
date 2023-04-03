@@ -141,6 +141,7 @@ export const getServerSideProps = withAxiomGetServerSideProps(async ({ req, log 
     },
   }
 });
+```
 
 ## FAQ
 ### How can I send logs from Vercel preview deployments?
@@ -148,11 +149,11 @@ The Axiom Vercel integration sets up an environment variable called `NEXT_PUBLIC
 
 ### How can I extend the logger?
 You can use `log.with` to create an intermediate logger, for example:
-```typescript
+```ts
 const logger = log.with({ userId: 42 })
 logger.info("Hi") // will ingest { ..., "message": "Hi", "fields" { "userId": 42 }}
 ```
 
-### License
+## License
 
 Distributed under the [MIT License](LICENSE).
