@@ -3,7 +3,7 @@
  */
 import { jest } from '@jest/globals';
 import { NextWebVitalsMetric } from 'next/app';
-// set axiom env vars before importing webvitals
+// set axiom env vars before importing web-vitals
 process.env.AXIOM_URL = '';
 process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT = 'https://example.co/api/test';
 import { reportWebVitals } from '../src/webVitals';
@@ -31,7 +31,7 @@ test('throttled sendMetrics', async () => {
   // ensure fetch has not been called yet for any the previously reported
   // web-vitals
   expect(fetch).toBeCalledTimes(0);
-  // skip ahead of time to send the previous webvitals
+  // skip ahead of time to send the previous web-vitals
   jest.advanceTimersByTime(1000);
 
   // send the last set of webVitals and wait for them to be sent

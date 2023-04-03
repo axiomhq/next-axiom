@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 // set axiom env vars before importing logger
-process.env.AXIOM_INGEST_ENDPOINT = 'https://example.co/api/test';
+process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT = 'https://example.co/api/test';
 import { log } from '../src/logger';
 
 jest.useFakeTimers();
@@ -78,7 +78,7 @@ test('flushing child loggers', async () => {
   expect(Object.keys(payload[0].fields).length).toEqual(2);
   expect(payload[0].fields.foo).toEqual('bar');
   expect(payload[0].fields.bar).toEqual('foo');
-  // ensure there is nothing was left unflushed
+  // ensure there is nothing was left un-flushed
   await log.flush();
   expect(fetch).toHaveBeenCalledTimes(3);
 });

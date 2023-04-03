@@ -1,7 +1,6 @@
 import Client from '@axiomhq/axiom-node';
 import { describe, it } from '@jest/globals'
 
-
 describe('Browser e2e tests', () => {
     const axiom = new Client({
         token: process.env.NEXT_PUBLIC_AXIOM_TOKEN,

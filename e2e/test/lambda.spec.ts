@@ -1,6 +1,5 @@
 import Client from '@axiomhq/axiom-node';
 import { describe, it } from '@jest/globals'
-import { url } from 'inspector';
 
 describe('Lambda e2e tests', () => {
     const axiom = new Client({
