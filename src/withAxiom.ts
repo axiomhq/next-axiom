@@ -206,7 +206,7 @@ export function withAxiomNextEdgeFunction(handler: NextMiddleware): NextMiddlewa
 }
 
 function logEdgeReport(report: any) {
-  if (config.shoudSendEdgeReport) {
+  if (config.shouldSendEdgeReport) {
     console.log(`AXIOM_EDGE_REPORT::${JSON.stringify(report)}`);
   }
 }

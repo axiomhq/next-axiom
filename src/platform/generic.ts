@@ -1,26 +1,30 @@
-import { GetServerSidePropsContext, NextApiRequest } from "next";
-import { LogEvent, RequestReport } from "../logger";
-import { EndpointType } from "../shared";
-import type Provider from "./base";
+import { GetServerSidePropsContext, NextApiRequest } from 'next';
+import { LogEvent, RequestReport } from '../logger';
+import { EndpointType } from '../shared';
+import type Provider from './base';
+
+const token = process.env.NEXT_PUBLIC_AXIOM_TOKEN;
+const dataset = process.env.NEXT_PUBLIC_AXIOM_DATASET;
+const axiomUrl = process.env.NEXT_PUBLIC_AXIOM_URL || 'https://cloud.axiom.co';
+const environment: string = process.env.NODE_ENV;
 
 // This is the generic config class for all platforms that doesn't have a special
 // implementation (e.g: vercel, netlify). All config classes extends this one.
 export default class GenericConfig implements Provider {
   proxyPath = '/_axiom';
   isBrowser = typeof window !== 'undefined';
-  shoudSendEdgeReport = false;
-  token = process.env.AXIOM_TOKEN;
-  dataset = process.env.AXIOM_DATASET;
-  environment: string = process.env.NODE_ENV;
-  axiomUrl = process.env.AXIOM_URL || 'https://cloud.axiom.co';
+  shouldSendEdgeReport = false;
+  token = token;
+  environment = environment;
   region = process.env.REGION || undefined;
+  axiomUrl = axiomUrl;
 
   isEnvVarsSet(): boolean {
-    return !!(this.axiomUrl && process.env.AXIOM_DATASET && process.env.AXIOM_TOKEN);
+    return !!(this.axiomUrl && dataset && token);
   }
 
   getIngestURL(_: EndpointType): string {
-    return `${this.axiomUrl}/api/v1/datasets/${this.dataset}/ingest`;
+    return `${this.axiomUrl}/v1/datasets/${dataset}/ingest`;
   }
 
   getLogsEndpoint(): string {
@@ -32,19 +36,19 @@ export default class GenericConfig implements Provider {
   }
 
   wrapWebVitalsObject(metrics: any[]): any {
-    return metrics.map(m => ({
-        webVital: m,
-        _time: new Date().getTime(),
-        platform: {
-          environment: this.environment,
-          source: 'web-vital',
-        },
-    }))
+    return metrics.map((m) => ({
+      webVital: m,
+      _time: new Date().getTime(),
+      platform: {
+        environment: environment,
+        source: 'web-vital',
+      },
+    }));
   }
 
   injectPlatformMetadata(logEvent: LogEvent, source: string) {
     logEvent.platform = {
-      environment: this.environment,
+      environment: environment,
       region: this.region,
       source: source + '-log',
     };
