@@ -2,8 +2,8 @@
  * @jest-environment jsdom
  */
 // set axiom env vars before importing logger
-process.env.AXIOM_INGEST_ENDPOINT = 'https://example.co/api/test';
-process.env.AXIOM_LOG_LEVEL = 'error';
+process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT = 'https://example.co/api/test';
+process.env.NEXT_PUBLIC_AXIOM_LOG_LEVEL = 'error';
 import { log, Logger } from '../src/logger';
 
 jest.useFakeTimers();

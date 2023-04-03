@@ -1,5 +1,5 @@
-process.env.AXIOM_URL = undefined;
-process.env.AXIOM_INGEST_ENDPOINT = 'https://api.axiom.co/v1/integrations/vercel';
+process.env.NEXT_PUBLIC_AXIOM_URL = undefined;
+process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT = 'https://api.axiom.co/v1/integrations/vercel';
 
 import config from '../src/config';
 import { EndpointType } from '../src/shared';

@@ -3,7 +3,7 @@ import { NetlifyInfo } from './platform/netlify';
 import { isNoPrettyPrint, throttle } from './shared';
 
 const url = config.getLogsEndpoint();
-const LOG_LEVEL = process.env.AXIOM_LOG_LEVEL || 'debug';
+const LOG_LEVEL = process.env.NEXT_PUBLIC_AXIOM_LOG_LEVEL || 'debug';
 
 export interface LogEvent {
   level: string;
