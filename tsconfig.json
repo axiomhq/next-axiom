@@ -37,6 +37,7 @@
   ],
   "exclude": [
     "node_modules",
+    "e2e"
   ],
   "compileOnSave": false
 }
