@@ -46,9 +46,8 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 17
-      - run: cd e2e
       - run: npm install
-      - run: npm test
+      - run: npm run e2e
   build:
     name: Build
     runs-on: ubuntu-latest

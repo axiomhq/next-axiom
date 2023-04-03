@@ -18,7 +18,8 @@
     "prepare": "npm run build",
     "format": "prettier --write src/*.ts __tests__/*.ts",
     "check-format": "prettier -c src/*.ts __tests__/*.ts",
-    "test": "jest __tests__/"
+    "test": "jest __tests__/",
+    "e2e": "jest e2e/test/"
   },
   "repository": {
     "type": "git",
