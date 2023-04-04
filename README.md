@@ -141,8 +141,19 @@ export const getServerSideProps = withAxiomGetServerSideProps(async ({ req, log 
     },
   }
 });
+```
 
+## FAQ
+### How can I send logs from Vercel preview deployments?
+The Axiom Vercel integration sets up an environment variable called `NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT`, which by default is only enabled for the production environment. To send logs from preview deployments, go to your site settings in Vercel and enable preview deployments for that environment variable.
 
-### License
+### How can I extend the logger?
+You can use `log.with` to create an intermediate logger, for example:
+```ts
+const logger = log.with({ userId: 42 })
+logger.info("Hi") // will ingest { ..., "message": "Hi", "fields" { "userId": 42 }}
+```
+
+## License
 
 Distributed under the [MIT License](LICENSE).
