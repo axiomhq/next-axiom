@@ -3,10 +3,38 @@ import { NetlifyInfo } from './platform/netlify';
 import { isNoPrettyPrint, throttle } from './shared';
 
 const url = config.getLogsEndpoint();
-const LOG_LEVEL = process.env.NEXT_PUBLIC_AXIOM_LOG_LEVEL || 'debug';
+
+const resolveLogLevel = (l: LogLevel) => {
+  switch (l) {
+    case LogLevel.error:
+      return 'error';
+    case LogLevel.info:
+      return 'info';
+    case LogLevel.warn:
+      return 'warn';
+    default:
+      return 'debug';
+  }
+};
+
+const resolveLogLevelFromString = (l?: string) => {
+  switch (l) {
+    case 'error':
+      return LogLevel.error;
+    case 'info':
+      return LogLevel.info;
+    case 'warn':
+      return LogLevel.warn;
+    case 'off':
+      return LogLevel.off;
+    default:
+      return LogLevel.debug;
+  }
+};
+const LOG_LEVEL = resolveLogLevelFromString(process.env.NEXT_PUBLIC_AXIOM_LOG_LEVEL);
 
 export interface LogEvent {
-  level: string;
+  level: LogLevel;
   message: string;
   fields: {};
   _time: string;
@@ -47,29 +75,29 @@ export class Logger {
   public logEvents: LogEvent[] = [];
   throttledSendLogs = throttle(this.sendLogs, 1000);
   children: Logger[] = [];
-  public logLevel: string;
+  public logLevel: LogLevel;
 
   constructor(
     private args: { [key: string]: any } = {},
     private req: RequestReport | null = null,
     private autoFlush: Boolean = true,
     public source: 'frontend' | 'lambda' | 'edge' = 'frontend',
-    logLevel?: string
+    logLevel?: LogLevel
   ) {
-    this.logLevel = logLevel || LOG_LEVEL || 'debug';
+    this.logLevel = logLevel || LOG_LEVEL; // todo: read log level from env var
   }
 
   debug = (message: string, args: { [key: string]: any } = {}) => {
-    this._log('debug', message, args);
+    this._log(LogLevel.debug, message, args);
   };
   info = (message: string, args: { [key: string]: any } = {}) => {
-    this._log('info', message, args);
+    this._log(LogLevel.info, message, args);
   };
   warn = (message: string, args: { [key: string]: any } = {}) => {
-    this._log('warn', message, args);
+    this._log(LogLevel.warn, message, args);
   };
   error = (message: string, args: { [key: string]: any } = {}) => {
-    this._log('error', message, args);
+    this._log(LogLevel.error, message, args);
   };
 
   with = (args: { [key: string]: any }) => {
@@ -82,7 +110,7 @@ export class Logger {
     return new Logger({ ...this.args }, req, this.autoFlush, this.source);
   };
 
-  _log = (level: string, message: string, args: { [key: string]: any } = {}) => {
+  _log = (level: LogLevel, message: string, args: { [key: string]: any } = {}) => {
     if (LogLevel[level] < LogLevel[this.logLevel]) {
       return;
     }
@@ -142,7 +170,7 @@ export class Logger {
     const body = JSON.stringify(this.logEvents);
     // clear pending logs
     this.logEvents = [];
-    const headers = {
+    const headers: HeadersInit = {
       'Content-Type': 'application/json',
       'User-Agent': 'next-axiom/v' + Version,
     };
@@ -217,12 +245,13 @@ export function prettyPrint(ev: LogEvent) {
   // objects in the console, such as expanding and collapsing the object.
   let msgString = '';
   let args: any[] = [ev.level, ev.message];
+  const logLevel = resolveLogLevel(ev.level);
 
   if (config.isBrowser) {
     msgString = '%c%s - %s';
-    args = [`color: ${levelColors[ev.level].browser};`, ...args];
+    args = [`color: ${levelColors[logLevel].browser};`, ...args];
   } else {
-    msgString = `\x1b[${levelColors[ev.level].terminal}m%s\x1b[0m - %s`;
+    msgString = `\x1b[${levelColors[logLevel].terminal}m%s\x1b[0m - %s`;
   }
   // we check if the fields object is not empty, otherwise its printed as <empty string>
   // or just "".

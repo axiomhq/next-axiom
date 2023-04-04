@@ -21,7 +21,7 @@ export function reportWebVitals(metric: NextWebVitalsMetric) {
 
 function sendMetrics() {
   const body = JSON.stringify(config.wrapWebVitalsObject(collectedMetrics));
-  const headers = {
+  const headers: HeadersInit = {
     'Content-Type': 'application/json',
     'User-Agent': 'next-axiom/v' + Version,
   };
