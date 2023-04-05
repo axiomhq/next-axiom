@@ -18,6 +18,7 @@
     "noImplicitAny": true,
     "strictPropertyInitialization": false,
     "noUnusedLocals": true,
+    "preserveConstEnums": true,
     /* Debugging Options */
     "traceResolution": false /* Report module resolution log messages. */,
     "listEmittedFiles": false /* Print names of generated files part of the compilation. */,

@@ -4,37 +4,8 @@ import { isNoPrettyPrint, throttle } from './shared';
 
 const url = config.getLogsEndpoint();
 
-const resolveLogLevel = (l: LogLevel) => {
-  switch (l) {
-    case LogLevel.error:
-      return 'error';
-    case LogLevel.info:
-      return 'info';
-    case LogLevel.warn:
-      return 'warn';
-    default:
-      return 'debug';
-  }
-};
-
-const resolveLogLevelFromString = (l?: string) => {
-  switch (l) {
-    case 'error':
-      return LogLevel.error;
-    case 'info':
-      return LogLevel.info;
-    case 'warn':
-      return LogLevel.warn;
-    case 'off':
-      return LogLevel.off;
-    default:
-      return LogLevel.debug;
-  }
-};
-const LOG_LEVEL = resolveLogLevelFromString(process.env.NEXT_PUBLIC_AXIOM_LOG_LEVEL);
-
 export interface LogEvent {
-  level: LogLevel;
+  level: string;
   message: string;
   fields: {};
   _time: string;
@@ -51,6 +22,23 @@ export enum LogLevel {
   error = 3,
   off = 100,
 }
+
+const resolveLogLevelFromString = (l?: string) => {
+  switch (l) {
+    case 'error':
+      return LogLevel.error;
+    case 'info':
+      return LogLevel.info;
+    case 'warn':
+      return LogLevel.warn;
+    case 'off':
+      return LogLevel.off;
+    default:
+      return LogLevel.debug;
+  }
+};
+
+const ENVIRONMENT_LOG_LEVEL = resolveLogLevelFromString(process.env.NEXT_PUBLIC_AXIOM_LOG_LEVEL);
 
 export interface RequestReport {
   startTime: number;
@@ -72,10 +60,10 @@ export interface PlatformInfo {
 }
 
 export class Logger {
+  public globalLevel: LogLevel;
   public logEvents: LogEvent[] = [];
-  throttledSendLogs = throttle(this.sendLogs, 1000);
-  children: Logger[] = [];
-  public logLevel: LogLevel;
+  protected children: Logger[] = [];
+  private throttledSendLogs = throttle(this.sendLogs, 1000);
 
   constructor(
     private args: { [key: string]: any } = {},
@@ -84,7 +72,7 @@ export class Logger {
     public source: 'frontend' | 'lambda' | 'edge' = 'frontend',
     logLevel?: LogLevel
   ) {
-    this.logLevel = logLevel || LOG_LEVEL; // todo: read log level from env var
+    this.globalLevel = logLevel != undefined ? logLevel : ENVIRONMENT_LOG_LEVEL;
   }
 
   debug = (message: string, args: { [key: string]: any } = {}) => {
@@ -111,10 +99,17 @@ export class Logger {
   };
 
   _log = (level: LogLevel, message: string, args: { [key: string]: any } = {}) => {
-    if (LogLevel[level] < LogLevel[this.logLevel]) {
+    // check that log level is higher than the logger set level
+    if (level < this.globalLevel) {
       return;
     }
-    const logEvent: LogEvent = { level, message, _time: new Date(Date.now()).toISOString(), fields: this.args || {} };
+
+    const logEvent: LogEvent = {
+      level: LogLevel[level],
+      message,
+      _time: new Date(Date.now()).toISOString(),
+      fields: this.args || {},
+    };
 
     // check if passed args is an object, if its not an object, add it to fields.args
     if (args instanceof Error) {
@@ -209,7 +204,7 @@ export class Logger {
 
 export const log = new Logger();
 
-const levelColors = {
+const levelColors: { [key: string]: { [key: string]: string } } = {
   info: {
     terminal: '32',
     browser: 'lightgreen',
@@ -245,7 +240,7 @@ export function prettyPrint(ev: LogEvent) {
   // objects in the console, such as expanding and collapsing the object.
   let msgString = '';
   let args: any[] = [ev.level, ev.message];
-  const logLevel = resolveLogLevel(ev.level);
+  const logLevel = ev.level;
 
   if (config.isBrowser) {
     msgString = '%c%s - %s';
