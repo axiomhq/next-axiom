@@ -7,6 +7,8 @@ describe('Edge e2e tests', () => {
         url: process.env.NEXT_PUBLIC_AXIOM_URL
     });
 
+    const dataset = process.env.NEXT_PUBLIC_AXIOM_DATASET
+
     it('ingest from edge function', async () => {
         const startTime = new Date(Date.now()).toISOString();
         // call route that ingests logs
@@ -14,7 +16,7 @@ describe('Edge e2e tests', () => {
         expect(resp.status).toEqual(200)
 
         // check dataset for ingested logs
-        const qResp = await axiom.query(`['generic'] | where ['message'] == "NEXT_AXIOM::EDGE_LOG"`, {
+        const qResp = await axiom.query(`['${dataset}'] | where ['message'] == "NEXT_AXIOM::EDGE_LOG"`, {
             startTime,
         })
         expect(qResp.matches).toBeDefined()
