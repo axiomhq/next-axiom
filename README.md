@@ -59,13 +59,11 @@ module.exports = withAxiom({
 });
 ```
 
-:warning: `next-axiom` is still experimental for non-Vercel platforms and is subject to change.
-
 ## Usage
 
 ### Web Vitals
 
-:warning: Web-Vitals are not yet supported in Next.js 13 and above. Please use Next.js 12 or below.
+> **Warning**: Web-Vitals are not yet supported in Next.js 13 and above. Please use Next.js 12 or below. We [submitted a patch](https://github.com/vercel/next.js/pull/47319) and as soon as Next.js 13.2.5 is out, we'll add support here.
 
 Go to `pages/_app.js` or `pages/_app.ts` and add the following line to report web vitals:
 
@@ -77,8 +75,6 @@ export { reportWebVitals } from 'next-axiom';
 
 Wrapping your handlers in `withAxiom` will make `req.log` available and log
 exceptions:
-
-:warning: Nextjs 13.x server side components are not yet supported.
 
 ```ts
 import { withAxiom, AxiomAPIRequest } from 'next-axiom';
