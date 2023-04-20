@@ -1,7 +1,7 @@
 'use client';
 
 import './globals.css';
-import { useAxiom } from 'next-axiom';
+import { useReportWebVitals } from 'next-axiom';
 
 // export const metadata = {
 //   title: 'Create Next App',
@@ -9,7 +9,7 @@ import { useAxiom } from 'next-axiom';
 // }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  useAxiom();
+  useReportWebVitals();
   return (
     <html lang="en">
       <body>{children}</body>

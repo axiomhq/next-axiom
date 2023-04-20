@@ -1,6 +1,6 @@
 export { reportWebVitals, reportWebVitalsWithPath } from './webVitals';
 export { log, Logger } from './logger';
-export { useAxiom } from './useAxiom';
+export { useReportWebVitals, useLogger } from './hooks';
 export {
   withAxiom,
   withAxiomGetServerSideProps,
