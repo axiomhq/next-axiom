@@ -1,6 +1,8 @@
 import { useReportWebVitals } from 'next/web-vitals';
 import { reportWebVitals } from './webVitals';
+import { usePathname } from 'next/navigation';
 
 export function useAxiom() {
-  useReportWebVitals(reportWebVitals);
+  const path = usePathname();
+  useReportWebVitals((metric) => reportWebVitals(metric, path));
 }
