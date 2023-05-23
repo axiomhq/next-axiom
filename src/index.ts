@@ -11,3 +11,4 @@ export {
   AxiomMiddleware,
   AxiomGetServerSidePropsContext,
 } from './withAxiom';
+export { AxiomWebVitals } from './components';
