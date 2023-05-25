@@ -1,0 +1,41 @@
+{
+  "name": "next-axiom",
+  "description": "Send WebVitals from your Next.js project to Axiom.",
+  "version": "0.18.0",
+  "author": "Axiom, Inc.",
+  "license": "MIT",
+  "contributors": [
+    "Arne Bahlo <arne@axiom.co>",
+    "Islam Shehata <islam@axiom.co>"
+  ],
+  "engines": {
+    "node": ">=16"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -b",
+    "format": "prettier --write src/*.ts __tests__/*.ts",
+    "lint": "prettier -c src/*.ts __tests__/*.ts",
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/axiomhq/next-axiom.git"
+  },
+  "keywords": [
+    "web-vitals",
+    "axiom",
+    "observability",
+    "performance",
+    "nextjs"
+  ],
+  "bugs": {
+    "url": "https://github.com/axiomhq/next-axiom/issues"
+  },
+  "homepage": "https://github.com/axiomhq/next-axiom#readme",
+  "devDependencies": {
+    "next": ">=13.4",
+    "core": "*"
+  }
+}

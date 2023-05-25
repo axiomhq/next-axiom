@@ -1,8 +1,10 @@
 /node_modules
 /tsconfig.tsbuildinfo
-/src/*.d.ts
-/src/*.js
-/src/*.js.map
+/**/*.d.ts
+/**/*.js
+/**/*.js.map
 /dist/
+/**/*/dist/
 /.vscode
 .envrc
+.turbo

@@ -1,12 +1,12 @@
-import { log } from 'next-axiom'
-import {AppProps} from "next/app";
+import { log } from 'next12-axiom';
+import { AppProps } from 'next/app';
 
-export { reportWebVitals } from 'next-axiom'
+export { reportWebVitals } from 'next12-axiom';
 
-log.info('Hello from frontend', { foo: 'bar' })
+log.info('Hello from frontend', { foo: 'bar' });
 
 function MyApp({ Component, pageProps }: AppProps) {
-  return <Component {...pageProps} />
+  return <Component {...pageProps} />;
 }
 
-export default MyApp
+export default MyApp;

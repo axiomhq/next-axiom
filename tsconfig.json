@@ -17,7 +17,6 @@
     "noImplicitThis": true,
     "noImplicitAny": true,
     "strictPropertyInitialization": false,
-    "suppressImplicitAnyIndexErrors": true,
     "noUnusedLocals": true,
     /* Debugging Options */
     "traceResolution": false /* Report module resolution log messages. */,
@@ -30,13 +29,20 @@
       "es2016",
       "es2017"
     ],
-    "outDir": "dist/"
+    "outDir": "dist/",
+    "composite": true
   },
-  "include": [
-    "src/index.ts"
+  "references": [
+    {"path": "libs/core"},
+    {"path": "packages/next-axiom"},
+    {"path": "packages/next12-axiom"}
   ],
   "exclude": [
     "node_modules",
+    "dist",
+    ".git",
+    ".github"
   ],
-  "compileOnSave": false
+  "files": [],
+  "compileOnSave": true
 }

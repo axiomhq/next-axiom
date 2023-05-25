@@ -1,4 +1,4 @@
-import { withAxiomGetServerSideProps } from 'next-axiom';
+import { withAxiomGetServerSideProps } from 'next12-axiom';
 
 export const getServerSideProps = withAxiomGetServerSideProps(async ({ req, log }) => {
   log.info('Hello from server side');
