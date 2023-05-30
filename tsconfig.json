@@ -33,7 +33,7 @@
     "composite": true
   },
   "references": [
-    {"path": "libs/core"},
+    {"path": "libs/next-axiom-core"},
     {"path": "packages/next-axiom"},
     {"path": "packages/next12-axiom"}
   ],
