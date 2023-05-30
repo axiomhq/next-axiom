@@ -1,6 +1,6 @@
 import { useReportWebVitals as useNextReportWebVitals } from 'next/web-vitals';
 import { usePathname } from 'next/navigation';
-import { Logger } from 'core';
+import { Logger } from 'next-axiom-core';
 import { reportWebVitals } from './webVitals';
 
 export function useReportWebVitals() {

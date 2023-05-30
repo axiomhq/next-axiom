@@ -1,2 +1,2 @@
-export * from 'core';
+export * from 'next-axiom-core';
 export * from './withAxiom';

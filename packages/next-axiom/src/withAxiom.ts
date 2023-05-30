@@ -1,7 +1,7 @@
 import { NextConfig } from 'next';
 import { NextMiddleware, NextRequest, NextResponse } from 'next/server';
 import { Rewrite } from 'next/dist/lib/load-custom-routes';
-import { EndpointType, config, Logger, RequestReport } from 'core';
+import { EndpointType, config, Logger, RequestReport } from 'next-axiom-core';
 import { generateRequestMeta } from './lib';
 
 declare global {

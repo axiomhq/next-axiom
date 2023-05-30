@@ -1,9 +1,10 @@
 {
-  "name": "core",
+  "name": "next-axiom-core",
   "description": "Send WebVitals from your Next.js project to Axiom.",
   "version": "0.18.0",
   "author": "Axiom, Inc.",
   "license": "MIT",
+  "private": true,
   "contributors": [
     "Arne Bahlo <arne@axiom.co>",
     "Islam Shehata <islam@axiom.co>"
