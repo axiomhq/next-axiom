@@ -17,6 +17,7 @@
   "scripts": {
     "build": "turbo build",
     "lint": "turbo lint",
+    "format": "turbo format",
     "test": "turbo test"
   },
   "repository": {

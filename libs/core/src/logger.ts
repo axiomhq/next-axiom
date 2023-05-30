@@ -181,7 +181,7 @@ export class Logger {
 
 export const log = new Logger();
 
-const levelColors: {[key: string]: any} = {
+const levelColors: { [key: string]: any } = {
   info: {
     terminal: '32',
     browser: 'lightgreen',

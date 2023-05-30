@@ -15,8 +15,8 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc -b",
-    "format": "prettier --write src/*.ts __tests__/*.ts",
-    "lint": "prettier -c src/*.ts __tests__/*.ts",
+    "format": "prettier --write src/*.ts test/*.ts",
+    "lint": "prettier -c src/*.ts test/*.ts",
     "test": "jest"
   },
   "repository": {

@@ -13,6 +13,6 @@ export const generateRequestMeta = (req: NextRequest) => {
     userAgent: getHeaderOrDefault(req, 'user-agent', ''),
     scheme: 'https',
     ip: getHeaderOrDefault(req, 'x-forwarded-for', ''),
-    region: '' // TODO: get region from nextjs request object ?,
+    region: '', // TODO: get region from nextjs request object ?,
   };
 };
