@@ -11,15 +11,23 @@ on:
       - "v*"
 
 jobs:
-  lint:
-    name: Lint
+  build:
+    name: Build
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node:
+          - 16.x
+          - 17.x
+          - 18.x
+          - 19.x
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: 17
+          node-version: ${{ matrix.node }}
       - run: npm install
+      - run: npm run build
       - run: npm run lint
   unittests:
     name: Check Tests
@@ -30,29 +38,13 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: 17
-      - run: npm install
-      - run: npm test
-  build:
-    name: Build
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node:
-          - 15.x
-          - 16.x
-          - 17.x
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node }}
+          node-version: 16
       - run: npm install
       - run: npm run build
+      - run: npm test
   publish:
     name: Publish
     needs: 
-      - lint
       - build
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')
