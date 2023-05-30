@@ -1,4 +1,4 @@
-import { log } from 'next-axiom';
+import { log } from 'next12-axiom';
 import { GetStaticProps } from 'next';
 import useSWR from 'swr';
 

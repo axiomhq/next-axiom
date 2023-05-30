@@ -12,8 +12,6 @@
   "engines": {
     "node": ">=16"
   },
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
   "scripts": {
     "build": "turbo build",
     "lint": "turbo lint",
@@ -46,11 +44,7 @@
     "typescript": "^4.6.4",
     "turbo": "^1.9.9"
   },
-  "dependencies": {
-    "whatwg-fetch": "^3.6.2"
-  },
   "workspaces": [
-    "libs/core",
     "packages/*",
     "examples/*"
   ]
