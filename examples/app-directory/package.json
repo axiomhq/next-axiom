@@ -9,15 +9,14 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@types/node": "18.15.12",
-    "@types/react": "18.0.37",
-    "@types/react-dom": "18.0.11",
-    "eslint": "8.38.0",
-    "eslint-config-next": "13.3.0",
     "next": "^13.4.0",
     "next-axiom": "*",
     "react": "18.2.0",
-    "react-dom": "18.2.0",
-    "typescript": "5.0.4"
+    "react-dom": "18.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "18.0.37",
+    "@types/react-dom": "18.0.11",
+    "eslint-config-next": "13.3.0"
   }
 }

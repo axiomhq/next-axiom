@@ -1,13 +1,9 @@
 node_modules
 dist
 .next
-/tsconfig.tsbuildinfo
-/**/*/tsconfig.tsbuildinfo
-/**/*.d.ts
+tsconfig.tsbuildinfo
 /**/*.js
 /**/*.js.map
-/dist/
-/**/*/dist/
 /.vscode
 .envrc
 .turbo
