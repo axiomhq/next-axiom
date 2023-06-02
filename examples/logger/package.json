@@ -1,4 +1,6 @@
 {
+  "name": "logger-example",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -7,18 +9,16 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "next": "^12.0",
+    "next": "^12.2.0",
     "next12-axiom": "*",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "swr": "^1.3.0"
   },
   "devDependencies": {
-    "eslint": "8.12.0",
     "eslint-config-next": "12.1.4",
     "@types/node": "18.11.9",
     "@types/react": "18.0.25",
-    "@types/react-dom": "18.0.9",
-    "typescript": "4.9.3"
+    "@types/react-dom": "18.0.9"
   }
 }

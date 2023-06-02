@@ -1,4 +1,6 @@
-/node_modules
+node_modules
+dist
+.next
 /tsconfig.tsbuildinfo
 /**/*/tsconfig.tsbuildinfo
 /**/*.d.ts

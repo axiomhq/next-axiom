@@ -34,8 +34,10 @@
     "url": "https://github.com/axiomhq/next-axiom/issues"
   },
   "homepage": "https://github.com/axiomhq/next-axiom#readme",
-  "devDependencies": {
-    "core": "*",
-    "next": ">=12.1 <13.0.0"
+  "dependencies": {
+    "next-axiom-core": "*"
+  },
+  "peerDependencies": {
+    "next": ">=12.2.0 <13.0.0"
   }
 }

@@ -1,4 +1,3 @@
-import { GetServerSidePropsContext, NextApiRequest } from "next";
 import { LogEvent, RequestReport } from "../logger";
 import { EndpointType } from "../shared";
 import type Provider from "./base";
@@ -8,10 +7,10 @@ import type Provider from "./base";
 export default class GenericConfig implements Provider {
   proxyPath = '/_axiom';
   isBrowser = typeof window !== 'undefined';
-  shoudSendEdgeReport = false;
+  shouldSendEdgeReport = false;
   token = process.env.AXIOM_TOKEN;
   dataset = process.env.AXIOM_DATASET;
-  environment: string = process.env.NODE_ENV;
+  environment: string = process.env.NODE_ENV || '';
   axiomUrl = process.env.AXIOM_URL || 'https://cloud.axiom.co';
   region = process.env.REGION || undefined;
 
@@ -50,7 +49,7 @@ export default class GenericConfig implements Provider {
     };
   }
 
-  generateRequestMeta(req: NextApiRequest | GetServerSidePropsContext['req']): RequestReport {
+  generateRequestMeta(req: any | any['req']): RequestReport {
     return {
       startTime: new Date().getTime(),
       path: req.url!,
@@ -63,7 +62,7 @@ export default class GenericConfig implements Provider {
     };
   }
 
-  getHeaderOrDefault(req: NextApiRequest | GetServerSidePropsContext['req'], headerName: string, defaultValue: any) {
+  getHeaderOrDefault(req: any | any['req'], headerName: string, defaultValue: any) {
     return req.headers[headerName] ? req.headers[headerName] : defaultValue;
   }
 }
