@@ -1,8 +1,8 @@
-import { config, isVercel, Version } from './config';
+import { config as configurator, isVercel, Version } from './config';
 import { NetlifyInfo } from './platform/netlify';
 import { isNoPrettyPrint, throttle } from './shared';
 
-const url = config.getLogsEndpoint();
+const url = configurator.getLogsEndpoint();
 const LOG_LEVEL = process.env.AXIOM_LOG_LEVEL || 'debug';
 
 export interface LogEvent {
@@ -43,20 +43,28 @@ export interface PlatformInfo {
   source?: string;
 }
 
+export type LoggerConfig = {
+  args?: { [key: string]: any };
+  logLevel?: LogLevel;
+  autoFlush?: boolean;
+  source?: string;
+  req?: any;
+};
+
 export class Logger {
   public logEvents: LogEvent[] = [];
   throttledSendLogs = throttle(this.sendLogs, 1000);
   children: Logger[] = [];
   public logLevel: string;
+  public config: LoggerConfig = {
+    autoFlush: true,
+    source: 'browser',
+    logLevel: LogLevel.debug,
+  }
 
-  constructor(
-    private args: { [key: string]: any } = {},
-    private req: RequestReport | null = null,
-    private autoFlush: Boolean = true,
-    public source: 'frontend' | 'lambda' | 'edge' = 'frontend',
-    logLevel?: string
-  ) {
-    this.logLevel = logLevel || LOG_LEVEL || 'debug';
+  constructor(public initConfig: LoggerConfig = {}) {
+    this.config = { ...this.config, ...initConfig };
+    this.logLevel = this.config.logLevel ? this.config.logLevel.toString() : LOG_LEVEL || 'debug';
   }
 
   debug = (message: string, args: { [key: string]: any } = {}) => {
@@ -73,20 +81,26 @@ export class Logger {
   };
 
   with = (args: { [key: string]: any }) => {
-    const child = new Logger({ ...this.args, ...args }, this.req, this.autoFlush, this.source);
+    const config = { ...this.config, args: { ...this.config.args, ...args } };
+    const child = new Logger(config);
     this.children.push(child);
     return child;
   };
 
-  withRequest = (req: RequestReport) => {
-    return new Logger({ ...this.args }, req, this.autoFlush, this.source);
+  withRequest = (req: any) => {
+    return new Logger({ ...this.config, req: { ...this.config.req, ...req } });
   };
 
   _log = (level: string, message: string, args: { [key: string]: any } = {}) => {
     if (LogLevel[level] < LogLevel[this.logLevel]) {
       return;
     }
-    const logEvent: LogEvent = { level, message, _time: new Date(Date.now()).toISOString(), fields: this.args || {} };
+    const logEvent: LogEvent = {
+      level,
+      message,
+      _time: new Date(Date.now()).toISOString(),
+      fields: this.config.args || {},
+    };
 
     // check if passed args is an object, if its not an object, add it to fields.args
     if (args instanceof Error) {
@@ -98,19 +112,19 @@ export class Logger {
       logEvent.fields = { ...logEvent.fields, args: args };
     }
 
-    config.injectPlatformMetadata(logEvent, this.source);
+    configurator.injectPlatformMetadata(logEvent, this.config.source!);
 
-    if (this.req != null) {
-      logEvent.request = this.req;
+    if (this.config.req != null) {
+      logEvent.request = this.config.req;
       if (logEvent.platform) {
-        logEvent.platform.route = this.req.path;
+        logEvent.platform.route = this.config.req.path;
       } else if (logEvent.vercel) {
-        logEvent.vercel.route = this.req.path;
+        logEvent.vercel.route = this.config.req.path;
       }
     }
 
     this.logEvents.push(logEvent);
-    if (this.autoFlush) {
+    if (this.config.autoFlush) {
       this.throttledSendLogs();
     }
   };
@@ -129,7 +143,7 @@ export class Logger {
       return;
     }
 
-    if (!config.isEnvVarsSet()) {
+    if (!configurator.isEnvVarsSet()) {
       // if AXIOM ingesting url is not set, fallback to printing to console
       // to avoid network errors in development environments
       this.logEvents.forEach((ev) => prettyPrint(ev));
@@ -146,8 +160,8 @@ export class Logger {
       'Content-Type': 'application/json',
       'User-Agent': 'next-axiom/v' + Version,
     };
-    if (config.token) {
-      headers['Authorization'] = `Bearer ${config.token}`;
+    if (configurator.token) {
+      headers['Authorization'] = `Bearer ${configurator.token}`;
     }
     const reqOptions: RequestInit = { body, method, keepalive, headers };
 
@@ -160,7 +174,7 @@ export class Logger {
       if (typeof fetch === 'undefined') {
         const fetch = await require('whatwg-fetch');
         fetch(url, reqOptions).catch(console.error);
-      } else if (config.isBrowser && isVercel && navigator.sendBeacon) {
+      } else if (configurator.isBrowser && isVercel && navigator.sendBeacon) {
         // sendBeacon fails if message size is greater than 64kb, so
         // we fall back to fetch.
         if (!navigator.sendBeacon(url, body)) {
@@ -179,7 +193,7 @@ export class Logger {
   };
 }
 
-export const log = new Logger();
+export const log = new Logger({});
 
 const levelColors: { [key: string]: any } = {
   info: {
@@ -218,7 +232,7 @@ export function prettyPrint(ev: LogEvent) {
   let msgString = '';
   let args: any[] = [ev.level, ev.message];
 
-  if (config.isBrowser) {
+  if (configurator.isBrowser) {
     msgString = '%c%s - %s';
     args = [`color: ${levelColors[ev.level].browser};`, ...args];
   } else {

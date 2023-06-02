@@ -1,11 +1,11 @@
 import Image from 'next/image';
 import { Inter } from 'next/font/google';
 import styles from './page.module.css';
-import { useLogger } from 'next-axiom';
+import { useLogger, withAxiom } from 'next-axiom';
 
 const inter = Inter({ subsets: ['latin'] });
 
-export default function Home() {
+function Home() {
   const [logger] = useLogger();
 
   logger.info('Hello', { foo: 'bar' });
@@ -85,3 +85,6 @@ export default function Home() {
     </main>
   );
 }
+
+export default Home;
+// export default withAxiom(Home);
