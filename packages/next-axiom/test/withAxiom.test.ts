@@ -1,7 +1,8 @@
 import 'whatwg-fetch';
-import { GetServerSideProps, GetServerSidePropsContext, NextApiRequest, NextApiResponse } from 'next';
+import { NextApiRequest, NextApiResponse } from 'next';
 import { NextFetchEvent, NextRequest, NextResponse } from 'next/server';
-import { Logger, withAxiom } from '../src/index';
+import { withAxiom } from '../src/index';
+import { Logger } from 'next-axiom-core';
 
 test('withAxiom(NextConfig)', async () => {
   const config = withAxiom({
