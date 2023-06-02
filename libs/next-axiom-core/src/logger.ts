@@ -60,7 +60,7 @@ export class Logger {
     autoFlush: true,
     source: 'browser',
     logLevel: LogLevel.debug,
-  }
+  };
 
   constructor(public initConfig: LoggerConfig = {}) {
     this.config = { ...this.config, ...initConfig };

@@ -113,7 +113,7 @@ export type AxiomApiHandler = (
 export function withAxiomNextApiHandler(handler: AxiomApiHandler): NextApiHandler {
   return async (req, res) => {
     const report: RequestReport = config.generateRequestMeta(req);
-    const logger = new Logger({ req: report, autoFlush: false, source: 'lambda'});
+    const logger = new Logger({ req: report, autoFlush: false, source: 'lambda' });
     const axiomRequest = req as AxiomAPIRequest;
     axiomRequest.log = logger;
     const [wrappedRes, allPromises] = interceptNextApiResponse(axiomRequest, res);
@@ -145,7 +145,7 @@ export type AxiomGetServerSideProps<
 export function withAxiomNextServerSidePropsHandler(handler: AxiomGetServerSideProps): GetServerSideProps {
   return async (context) => {
     const report: RequestReport = config.generateRequestMeta(context.req);
-    const logger = new Logger({ req: report, autoFlush: false, source: 'lambda'});
+    const logger = new Logger({ req: report, autoFlush: false, source: 'lambda' });
     const axiomContext = context as AxiomGetServerSidePropsContext;
     axiomContext.log = logger;
 
@@ -181,7 +181,7 @@ export function withAxiomNextEdgeFunction(handler: NextMiddleware): NextMiddlewa
       userAgent: req.headers.get('user-agent'),
     };
 
-    const logger = new Logger({ req: report, autoFlush: false, source: 'edge'});
+    const logger = new Logger({ req: report, autoFlush: false, source: 'edge' });
     const axiomRequest = req as AxiomRequest;
     axiomRequest.log = logger;
 
