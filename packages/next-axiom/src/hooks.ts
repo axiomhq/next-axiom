@@ -8,7 +8,12 @@ export function useReportWebVitals() {
   useNextReportWebVitals((metric) => reportWebVitals(metric, path));
 }
 
-export function useLogger(config: LoggerConfig = {}): [Logger] {
-  const logger = new Logger(config); // FIXME: Provide request data and source
-  return [logger];
+let logger: Logger;
+
+export function useLogger(config: LoggerConfig = {}): Logger {
+  if (!logger) {
+    console.log('creating new logger')
+    logger = new Logger(config); // FIXME: Provide request data and source
+  }
+  return logger;
 }
