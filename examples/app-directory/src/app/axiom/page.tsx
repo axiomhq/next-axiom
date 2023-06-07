@@ -1,17 +1,15 @@
-'use client';
 
 import Image from 'next/image';
 import { Inter } from 'next/font/google';
-import styles from './page.module.css';
-import { useContext } from 'react';
-import { AxiomContext } from './layout';
+import styles from '../page.module.css';
+import { Logger, withAxiom } from 'next-axiom';
 
 const inter = Inter({ subsets: ['latin'] });
 
-function Home() {
-  const logger = useContext(AxiomContext);
+function AxiomLoggerPage() {
+  const logger = new Logger();
   
-  logger.info('Hello', { foo: 'bar' });
+  logger.info('RSC', { foo: 'bar' });
 
   return (
     <main className={styles.main}>
@@ -89,4 +87,4 @@ function Home() {
   );
 }
 
-export default Home;
+export default AxiomLoggerPage;

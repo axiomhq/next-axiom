@@ -1,6 +1,7 @@
 import { NextConfig } from 'next';
 import { Rewrite } from 'next/dist/lib/load-custom-routes';
-import { EndpointType, config, Logger } from 'next-axiom-core';
+import { EndpointType, config, Logger, RequestReport } from 'next-axiom-core';
+import { NextRequest, NextResponse } from 'next/server';
 
 export function withAxiomNextConfig(nextConfig: NextConfig): NextConfig {
   return {
@@ -45,7 +46,41 @@ export function withAxiomNextConfig(nextConfig: NextConfig): NextConfig {
   };
 }
 
-type WithAxiomParam = NextConfig;
+type NextHandler = (
+  req: AxiomRouteHandlerContext
+) => Promise<Response> | Promise<NextResponse> | NextResponse | Response;
+export type AxiomRouteHandlerContext = NextRequest & { log: Logger };
+
+export function withAxiomRouteHandler(handler: NextHandler) {
+  return async (req: Request | NextRequest) => {
+    const report: RequestReport = {
+      startTime: new Date().getTime(),
+      path: req.url!,
+      method: req.method!,
+      host: req.headers.get('host'),
+      userAgent: req.headers.get('user-agent'),
+      scheme: 'https',
+      ip: req.headers.get('x-forwarded-for'),
+      region: '//TODO: region',
+    };
+    const logger = new Logger({ req: report, autoFlush: false, source: 'lambda' });
+    const axiomContext = req as AxiomRouteHandlerContext;
+    axiomContext.log = logger;
+
+    try {
+      const result = await handler(axiomContext);
+      await logger.flush();
+      return result;
+    } catch (error: any) {
+      logger.error('Error in Next route handler', { error });
+      logger.attachResponseStatus(500);
+      await logger.flush();
+      throw error;
+    }
+  };
+}
+
+type WithAxiomParam = NextConfig | NextHandler;
 
 function isNextConfig(param: WithAxiomParam): param is NextConfig {
   return typeof param == 'object';
@@ -54,10 +89,13 @@ function isNextConfig(param: WithAxiomParam): param is NextConfig {
 // withAxiom can be called either with NextConfig, which will add proxy rewrites
 // to improve deliverability of Web-Vitals and logs.
 export function withAxiom(param: NextConfig): NextConfig;
+export function withAxiom(param: NextHandler): NextHandler;
 export function withAxiom(param: WithAxiomParam) {
-  if (isNextConfig(param)) {
+  if (typeof param == 'function') {
+    return withAxiomRouteHandler(param);
+  } else if (isNextConfig(param)) {
     return withAxiomNextConfig(param);
   }
 
-  return withAxiomNextConfig;
+  return withAxiomRouteHandler(param);
 }

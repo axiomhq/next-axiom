@@ -35,6 +35,9 @@
         // A package's `lint` script has no dependencies and
         // can be run whenever. It also has no filesystem outputs.
         "lint": {},
-        "format": {}
+        "format": {},
+        "dev": {
+            "cache": false
+        }
     }
 }

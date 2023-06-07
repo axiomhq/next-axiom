@@ -38,6 +38,7 @@
     "next-axiom-core": "*"
   },
   "peerDependencies": {
-    "next": ">=13.4"
+    "next": ">=13.4",
+    "react": ">18"
   }
 }
