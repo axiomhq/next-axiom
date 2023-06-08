@@ -2,19 +2,22 @@
 import Image from 'next/image';
 import { Inter } from 'next/font/google';
 import styles from '../page.module.css';
-import { Logger, withAxiom } from 'next-axiom';
+import { useLogger } from 'next-axiom';
+import Link from 'next/link';
 
 const inter = Inter({ subsets: ['latin'] });
 
-function AxiomLoggerPage() {
-  const logger = new Logger();
-  
+async function AxiomLoggerPage() {
+  const logger = useLogger();
   logger.info('RSC', { foo: 'bar' });
+
+  await logger.flush();
 
   return (
     <main className={styles.main}>
       <div className={styles.description}>
         <p>
+          <Link href="/">Home</Link>
           Get started by editing&nbsp;
           <code className={styles.code}>src/app/page.tsx</code>
         </p>

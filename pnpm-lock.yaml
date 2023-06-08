@@ -1,4 +1,8 @@
-lockfileVersion: '6.0'
+lockfileVersion: '6.1'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
 
 importers:
 
@@ -105,6 +109,9 @@ importers:
       next-axiom-core:
         specifier: '*'
         version: link:../../libs/next-axiom-core
+      react:
+        specifier: '>=18.0.0'
+        version: 18.2.0
 
   packages/next12-axiom:
     dependencies:

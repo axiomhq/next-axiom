@@ -1,9 +1,8 @@
-import { AxiomRouteHandlerContext, withAxiom } from 'next-axiom';
+import { AxiomRequest, withAxiom } from 'next-axiom';
 
 export const runtime = 'nodejs';
 
-export const GET = withAxiom(async (req: AxiomRouteHandlerContext) => {
-  req.log.info('this is axiom', {runtime: 'nodejs'});
-
+export const GET = withAxiom(async (req: AxiomRequest) => {
+  req.log.info('axiom lambda route');
   return new Response('Hello, Next.js!');
 });

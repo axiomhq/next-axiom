@@ -1,24 +1,22 @@
 'use client';
-
 import Image from 'next/image';
 import { Inter } from 'next/font/google';
-import styles from './page.module.css';
-import Link from 'next/link';
+import styles from '../page.module.css';
 import { useLogger } from 'next-axiom';
+import Link from 'next/link';
 
 const inter = Inter({ subsets: ['latin'] });
 
-function Home() {
+async function AxiomLoggerPage() {
   const logger = useLogger();
- 
-  logger.info('Hello from client', { foo: 'bar' });
+  logger.info('RSC', { foo: 'bar' });
+  await logger.flush()
 
   return (
     <main className={styles.main}>
       <div className={styles.description}>
-        <h1><Link href="/rsc">RSC </Link></h1>
-      <h1><Link href="/client"> Client</Link></h1>
         <p>
+          <Link href="/">Home</Link>
           Get started by editing&nbsp;
           <code className={styles.code}>src/app/page.tsx</code>
         </p>
@@ -91,4 +89,4 @@ function Home() {
   );
 }
 
-export default Home;
+export default AxiomLoggerPage;

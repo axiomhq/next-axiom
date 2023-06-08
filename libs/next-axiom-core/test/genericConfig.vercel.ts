@@ -7,8 +7,8 @@ import { EndpointType } from '../src/shared';
 
 test('reading axiom ingest endpoint', () => {
   let url = config.getIngestURL(EndpointType.webVitals);
-  expect(url).toEqual('https://test.axiom.co/api/v1/datasets/test/ingest');
+  expect(url).toEqual('https://test.axiom.co/v1/datasets/test/ingest');
 
   url = config.getIngestURL(EndpointType.logs);
-  expect(url).toEqual('https://test.axiom.co/api/v1/datasets/test/ingest');
+  expect(url).toEqual('https://test.axiom.co/v1/datasets/test/ingest');
 });

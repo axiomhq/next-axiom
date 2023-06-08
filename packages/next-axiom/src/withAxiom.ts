@@ -3,6 +3,10 @@ import { Rewrite } from 'next/dist/lib/load-custom-routes';
 import { EndpointType, config, Logger, RequestReport } from 'next-axiom-core';
 import { NextRequest, NextResponse } from 'next/server';
 
+declare global {
+  var EdgeRuntime: string;
+}
+
 export function withAxiomNextConfig(nextConfig: NextConfig): NextConfig {
   return {
     ...nextConfig,
@@ -46,10 +50,10 @@ export function withAxiomNextConfig(nextConfig: NextConfig): NextConfig {
   };
 }
 
+export type AxiomRequest = NextRequest & { log: Logger };
 type NextHandler = (
-  req: AxiomRouteHandlerContext
+  req: AxiomRequest
 ) => Promise<Response> | Promise<NextResponse> | NextResponse | Response;
-export type AxiomRouteHandlerContext = NextRequest & { log: Logger };
 
 export function withAxiomRouteHandler(handler: NextHandler) {
   return async (req: Request | NextRequest) => {
@@ -63,8 +67,8 @@ export function withAxiomRouteHandler(handler: NextHandler) {
       ip: req.headers.get('x-forwarded-for'),
       region: '//TODO: region',
     };
-    const logger = new Logger({ req: report, autoFlush: false, source: 'lambda' });
-    const axiomContext = req as AxiomRouteHandlerContext;
+    const logger = new Logger({ req: report, autoFlush: false, source: globalThis.EdgeRuntime ? 'edge' : 'lambda' });
+    const axiomContext = req as AxiomRequest;
     axiomContext.log = logger;
 
     try {

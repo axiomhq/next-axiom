@@ -167,29 +167,31 @@ export class Logger {
 
     function sendFallback() {
       // Do not leak network errors; does not affect the running app
-      fetch(url, reqOptions).catch(console.error);
+      return fetch(url, reqOptions).catch(console.error);
     }
 
     try {
       if (typeof fetch === 'undefined') {
         const fetch = await require('whatwg-fetch');
-        fetch(url, reqOptions).catch(console.error);
+        return fetch(url, reqOptions).catch(console.error);
       } else if (configurator.isBrowser && isVercel && navigator.sendBeacon) {
         // sendBeacon fails if message size is greater than 64kb, so
         // we fall back to fetch.
         if (!navigator.sendBeacon(url, body)) {
-          sendFallback();
+          return sendFallback();
         }
       } else {
-        sendFallback();
+        return sendFallback();
       }
     } catch (e) {
-      console.error(`Failed to send logs to Axiom: ${e}`);
+      console.warn(`Failed to send logs to Axiom: ${e}`);
+      // put the log events back in the queue
+      this.logEvents = [...this.logEvents, JSON.parse(body)];
     }
   }
 
   flush = async () => {
-    await Promise.all([this.sendLogs(), ...this.children.map((c) => c.flush())]);
+    return await Promise.all([this.sendLogs(), ...this.children.map((c) => c.flush())]);
   };
 }
 

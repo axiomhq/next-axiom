@@ -39,6 +39,6 @@
   },
   "peerDependencies": {
     "next": ">=13.4",
-    "react": ">18"
+    "react": ">=18.0.0"
   }
 }

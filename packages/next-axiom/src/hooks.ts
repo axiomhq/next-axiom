@@ -12,7 +12,6 @@ let logger: Logger;
 
 export function useLogger(config: LoggerConfig = {}): Logger {
   if (!logger) {
-    console.log('creating new logger')
     logger = new Logger(config); // FIXME: Provide request data and source
   }
   return logger;
