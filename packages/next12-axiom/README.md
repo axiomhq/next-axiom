@@ -1,5 +1,5 @@
-![next-axiom: The official Next.js library for Axiom](.github/images/banner-dark.svg#gh-dark-mode-only)
-![next-axiom: The official Next.js library for Axiom](.github/images/banner-light.svg#gh-light-mode-only)
+![next-axiom: The official Next.js library for Axiom](../../github/images/banner-dark.svg#gh-dark-mode-only)
+![next-axiom: The official Next.js library for Axiom](../../github/images/banner-light.svg#gh-light-mode-only)
 
 <div align="center">
 
@@ -19,22 +19,20 @@ For more information, check out the [official documentation](https://axiom.co/do
 
 ## Installation
 
-:info: this documentation is for Nextjs13 with app directory support, if you are looking for Nextjs12 support, please check out the [next12-axiom docs](./packages/next12-axiom/README.md).
-
 ### Using Vercel Integration
 
 Make sure you have the [Axiom Vercel integration](https://www.axiom.co/vercel) installed. Once it is done, perform the steps below: 
 
-- In your Next.js project, run install `next-axiom` as follows:
+- In your Next.js project, run install `next12-axiom` as follows:
 
 ```sh
-npm install --save next-axiom
+npm install --save next12-axiom
 ```
 
 - In the `next.config.js` file, wrap your Next.js config in `withAxiom` as follows:
 
 ```js
-const { withAxiom } = require('next-axiom');
+const { withAxiom } = require('next12-axiom');
 
 module.exports = withAxiom({
   // ... your existing config
@@ -45,16 +43,16 @@ module.exports = withAxiom({
 
 Create an API token in [Axiom settings](https://cloud.axiom.co/settings/profile) and export it as `AXIOM_TOKEN`, as well as the Axiom dataset name as `AXIOM_DATASET`. Once it is done, perform the steps below:
 
-- In your Next.js project, run install `next-axiom` as follows:
+- In your Next.js project, run install `next12-axiom` as follows:
 
 ```sh
-npm install --save next-axiom
+npm install --save next12-axiom
 ```
 
 - In the `next.config.js` file, wrap your Next.js config in `withAxiom` as follows:
 
 ```js
-const { withAxiom } = require('next-axiom');
+const { withAxiom } = require('next12-axiom');
 
 module.exports = withAxiom({
   // ... your existing config
@@ -67,22 +65,10 @@ module.exports = withAxiom({
 
 > **Warning**: Web-Vitals are not yet supported in Next.js 13 and above. Please use Next.js 12 or below. We [submitted a patch](https://github.com/vercel/next.js/pull/47319) and as soon as Next.js 13.2.5 is out, we'll add support here.
 
-Go to `app/layout.tsx` and add the following line to import web vitals component:
+Go to `pages/_app.js` or `pages/_app.ts` and add the following line to report web vitals:
 
 ```js
-export { AxiomWebVitals } from 'next-axiom';
-```
-
-then add the component to your layout:
-
-```js
-return (
-  <html>
-    ...
-    <AxiomWebVitals />
-    <div>...</div>
-  </html>
-);
+export { reportWebVitals } from 'next12-axiom';
 ```
 
 > **Note**: WebVitals are only sent from production deployments.
@@ -91,9 +77,9 @@ Wrapping your handlers in `withAxiom` will make `req.log` available and log
 exceptions:
 
 ```ts
-import { withAxiom, AxiomRequest } from 'next-axiom';
+import { withAxiom, AxiomAPIRequest } from 'next12-axiom';
 
-async function handler(req: AxiomRequest) {
+async function handler(req: AxiomAPIRequest, res: NextApiResponse) {
   req.log.info('Login function called');
 
   // You can create intermediate loggers
@@ -106,14 +92,14 @@ async function handler(req: AxiomRequest) {
 export default withAxiom(handler);
 ```
 
-Import and use `useLogger` in the components like this:
+Import and use `log` in the frontend like this:
 
 ```js
-import { useLogger } from `next-axiom`;
+import { log } from `next12-axiom`;
 
 // pages/index.js
 function home() {
-    const log = useLogger();
+    ...
     log.debug('User logged in', { userId: 42 })
     ...
 }
@@ -137,6 +123,21 @@ You can also disable logging completely by setting the log level to `off`:
 export AXIOM_LOG_LEVEL=off
 ```
 
+### getServerSideProps
+
+To be able to use next-axiom with `getServerSideProps` you need to wrap your function with `withAxiomGetServerSideProps`, becasue there is no
+way at the moment to automatically detected if getServerSideProps is used.
+
+```ts
+import { withAxiomGetServerSideProps } from 'next12-axiom'
+export const getServerSideProps = withAxiomGetServerSideProps(async ({ req, log })  => {
+  log.info('Hello, world!');
+  return {
+    props: {
+    },
+  }
+});
+```
 
 ## FAQ
 ### How can I send logs from Vercel preview deployments?
@@ -145,7 +146,7 @@ The Axiom Vercel integration sets up an environment variable called `NEXT_PUBLIC
 ### How can I extend the logger?
 You can use `log.with` to create an intermediate logger, for example:
 ```ts
-const logger = userLogger().with({ userId: 42 })
+const logger = log.with({ userId: 42 })
 logger.info("Hi") // will ingest { ..., "message": "Hi", "fields" { "userId": 42 }}
 ```
 
