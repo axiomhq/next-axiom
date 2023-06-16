@@ -4,12 +4,12 @@ import Image from 'next/image';
 import { Inter } from 'next/font/google';
 import styles from './page.module.css';
 import Link from 'next/link';
-import { useLogger } from 'next-axiom';
+import { Logger } from 'next-axiom';
 
 const inter = Inter({ subsets: ['latin'] });
 
 function Home() {
-  const logger = useLogger();
+  const logger = new Logger();
  
   logger.info('Hello from client', { foo: 'bar' });
 

@@ -10,7 +10,6 @@ const inter = Inter({ subsets: ['latin'] });
 async function AxiomLoggerPage() {
   const logger = useLogger();
   logger.info('RSC', { foo: 'bar' });
-  await logger.flush()
 
   return (
     <main className={styles.main}>

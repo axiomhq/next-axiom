@@ -2,13 +2,13 @@
 import Image from 'next/image';
 import { Inter } from 'next/font/google';
 import styles from '../page.module.css';
-import { useLogger } from 'next-axiom';
+import { Logger } from 'next-axiom';
 import Link from 'next/link';
 
 const inter = Inter({ subsets: ['latin'] });
 
 async function AxiomLoggerPage() {
-  const logger = useLogger();
+  const logger = new Logger();
   logger.info('RSC', { foo: 'bar' });
 
   await logger.flush();
