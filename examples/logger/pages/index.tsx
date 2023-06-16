@@ -1,6 +1,6 @@
 import { log } from 'next12-axiom';
 import { GetStaticProps } from 'next';
-import useSWR from 'swr';
+import useSWR, { Arguments, Fetcher } from 'swr';
 
 export const getStaticProps: GetStaticProps = async (context) => {
   log.info('Hello from SSR', { context });
@@ -9,10 +9,10 @@ export const getStaticProps: GetStaticProps = async (context) => {
   };
 };
 
-const fetcher = async (args: any[]) => {
+const fetcher: Fetcher<{[name: string]: string}> = async (args: any[]) => {
   console.log('Fetching', args);
   log.info('Hello from SWR', { args });
-  const res = await fetch(...args);
+  const res = await fetch(args[0], args[1]);
   return await res.json();
 };
 
