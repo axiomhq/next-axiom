@@ -10,6 +10,13 @@ on:
     tags:
       - "v*"
 
+env:
+  AXIOM_TOKEN: ${{ secrets.TESTING_STAGING_E2E_TOKEN }}
+  AXIOM_URL: ${{ secrets.TESTING_STAGING_API_URL }}
+  AXIOM_ORG_ID: ${{ secrets.TESTING_STAGING_E2E_ORG_ID }}
+  AXIOM_DATASET_SUFFIX: ${{ github.run_id }}
+  PNPM_VERSION: 8.6.0
+
 jobs:
   build:
     name: Build
@@ -23,28 +30,14 @@ jobs:
           - 19.x
     steps:
       - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
       - uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node }}
-      - uses: pnpm/action-setup@v2
-        name: Install pnpm
-        id: pnpm-install
-        with:
-          version: 8
-          run_install: false
-      - name: Get pnpm store directory
-        id: pnpm-cache
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
-      - uses: actions/cache@v3
-        name: Setup pnpm cache
-        with:
-          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
-      - run: pnpm install
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
       - run: pnpm build
       - run: pnpm lint
   unittests:
@@ -87,31 +80,18 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/')
     steps:
       - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
       - uses: actions/setup-node@v3
         with:
-          node-version: ${{ env.NODEVERSION }}
-      - uses: pnpm/action-setup@v2
-        name: Install pnpm
-        id: pnpm-install
-        with:
-          version: 8
-          run_install: false
-      - name: Get pnpm store directory
-        id: pnpm-cache
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
-      - uses: actions/cache@v3
-        name: Setup pnpm cache
-        with:
-          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
-      - name: Installed Depenedencies
-        run: pnpm install
+          node-version: ${{ matrix.node }}
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
       - run: pnpm build
-      - run: pnpm publish --access public
+      - run: pnpm lint
+      - run: pnpm test
+      - run: pnpm publish --access public --filter "packages/**"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTOMATION_TOKEN }}
       - uses: softprops/action-gh-release@v1
