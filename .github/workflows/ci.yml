@@ -43,8 +43,6 @@ jobs:
   unittests:
     name: Check Tests
     runs-on: ubuntu-latest
-    env:
-      AXIOM_INGEST_ENDPOINT: https://example.co/api/test
     steps:
       - uses: actions/checkout@v3
       - uses: pnpm/action-setup@v2
@@ -52,7 +50,7 @@ jobs:
           version: ${{ env.PNPM_VERSION }}
       - uses: actions/setup-node@v3
         with:
-          node-version: ${{ matrix.node }}
+          node-version: 18.x
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
@@ -70,7 +68,7 @@ jobs:
           version: ${{ env.PNPM_VERSION }}
       - uses: actions/setup-node@v3
         with:
-          node-version: ${{ matrix.node }}
+          node-version: 18.x
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
