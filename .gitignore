@@ -2,7 +2,6 @@ node_modules
 dist
 .next
 tsconfig.tsbuildinfo
-/**/*.js
 /**/*.js.map
 /.vscode
 .envrc
