@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "next": "^12.2.0",
-    "next12-axiom": "*",
+    "next12-axiom": "workspace:*",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "swr": "^1.3.0"

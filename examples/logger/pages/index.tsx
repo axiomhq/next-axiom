@@ -12,6 +12,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
 const fetcher = async (args: any[]) => {
   console.log('Fetching', args);
   log.info('Hello from SWR', { args });
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   const res = await fetch(...args);
   return await res.json();

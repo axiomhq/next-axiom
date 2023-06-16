@@ -2,3 +2,4 @@ packages:
   - 'libs/*'
   - 'packages/*'
   - 'examples/*'
+  - 'e2e/*'

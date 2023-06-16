@@ -35,7 +35,7 @@
   },
   "homepage": "https://github.com/axiomhq/next-axiom#readme",
   "dependencies": {
-    "next-axiom-core": "*"
+    "next-axiom-core": "workspace:*"
   },
   "peerDependencies": {
     "next": ">=13.4",

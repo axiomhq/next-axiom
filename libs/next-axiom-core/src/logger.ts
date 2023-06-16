@@ -58,7 +58,7 @@ export class Logger {
   public logLevel: string;
   public config: LoggerConfig = {
     autoFlush: true,
-    source: 'browser',
+    source: 'frontend',
     logLevel: LogLevel.debug,
   };
 

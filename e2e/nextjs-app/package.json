@@ -1,0 +1,25 @@
+{
+    "name": "nextjs-app",
+    "private": true,
+    "description": "e2e tests for axiom-js",
+    "version": "0.1.0",
+    "scripts": {
+        "build": "next build",
+        "dev": "next dev",
+        "format": "prettier --write src/**/*.tsx test/**/*.ts",
+        "lint": "next lint",
+        "e2e": "jest test"
+    },
+    "dependencies": {
+        "next-axiom": "workspace:*",
+        "next": "^13.4.3",
+        "react": "18.2.0",
+        "react-dom": "18.2.0"
+    },
+    "devDependencies": {
+        "@axiomhq/js": "^0.1.0",
+        "@types/react": "^18.0.25",
+        "@types/react-dom": "^18.0.25",
+        "eslint-config-next": "^13.4.0"
+    }
+}
