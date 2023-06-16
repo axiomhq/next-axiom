@@ -9,17 +9,10 @@
 
 </div>
 
-[Axiom](https://axiom.co) unlocks observability at any scale.
+:info: this documentation is for Nextjs13 with app directory support, if you are looking for Nextjs12 support, please check out the [next12-axiom docs](./packages/next12-axiom/README.md).
 
-- **Ingest with ease, store without limits:** Axiom’s next-generation datastore enables ingesting petabytes of data with ultimate efficiency. Ship logs from Kubernetes, AWS, Azure, Google Cloud, DigitalOcean, Nomad, and others.
-- **Query everything, all the time:** Whether DevOps, SecOps, or EverythingOps, query all your data no matter its age. No provisioning, no moving data from cold/archive to “hot”, and no worrying about slow queries. All your data, all. the. time.
-- **Powerful dashboards, for continuous observability:** Build dashboards to collect related queries and present information that’s quick and easy to digest for you and your team. Dashboards can be kept private or shared with others, and are the perfect way to bring together data from different sources.
-
-For more information, check out the [official documentation](https://axiom.co/docs).
 
 ## Installation
-
-:info: this documentation is for Nextjs13 with app directory support, if you are looking for Nextjs12 support, please check out the [next12-axiom docs](./packages/next12-axiom/README.md).
 
 ### Using Vercel Integration
 
@@ -43,7 +36,7 @@ module.exports = withAxiom({
 
 ### Using Any Other Platform
 
-Create an API token in [Axiom settings](https://cloud.axiom.co/settings/profile) and export it as `AXIOM_TOKEN`, as well as the Axiom dataset name as `AXIOM_DATASET`. Once it is done, perform the steps below:
+Create an API token in [Axiom settings](https://cloud.axiom.co/settings/profile) and export it as `NEXT_PUBLIC_AXIOM_TOKEN`, as well as the Axiom dataset name as `NEXT_PUBLIC_AXIOM_DATASET`. Once it is done, perform the steps below:
 
 - In your Next.js project, run install `next-axiom` as follows:
 
@@ -93,22 +86,22 @@ exceptions:
 ```ts
 import { withAxiom, AxiomRequest } from 'next-axiom';
 
-async function handler(req: AxiomRequest) {
+export const GET = withAxiom((req: AxiomRequest) => {
   req.log.info('Login function called');
 
   // You can create intermediate loggers
   const log = req.log.with({ scope: 'user' });
   log.info('User logged in', { userId: 42 });
 
-  res.status(200).text('hi');
-}
+  return NextResponse.json({ hello: 'world' });
+})
 
-export default withAxiom(handler);
 ```
 
-Import and use `useLogger` in the components like this:
+Import and use `useLogger` hook in **client components** like this:
 
 ```js
+'use client';
 import { useLogger } from `next-axiom`;
 
 // pages/index.js
@@ -116,6 +109,22 @@ function home() {
     const log = useLogger();
     log.debug('User logged in', { userId: 42 })
     ...
+}
+```
+
+For **server side components** you will have to create an instance  make sure to flush the logs before component returns
+
+```js
+import { Logger } from `next-axiom`;
+
+function RSC() {
+  const log = new Logger();
+  log.info('...')
+
+  ...
+
+  await log.flush();
+  return (...)
 }
 ```
 
@@ -139,6 +148,7 @@ export AXIOM_LOG_LEVEL=off
 
 
 ## FAQ
+
 ### How can I send logs from Vercel preview deployments?
 The Axiom Vercel integration sets up an environment variable called `NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT`, which by default is only enabled for the production environment. To send logs from preview deployments, go to your site settings in Vercel and enable preview deployments for that environment variable.
 
