@@ -1,6 +1,6 @@
 import { log } from 'next12-axiom';
 import { GetStaticProps } from 'next';
-import useSWR, { Arguments, Fetcher } from 'swr';
+import useSWR, { Fetcher } from 'swr';
 
 export const getStaticProps: GetStaticProps = async (context) => {
   log.info('Hello from SSR', { context });
@@ -9,6 +9,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
   };
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const fetcher: Fetcher<{[name: string]: string}> = async (args: any[]) => {
   console.log('Fetching', args);
   log.info('Hello from SWR', { args });
