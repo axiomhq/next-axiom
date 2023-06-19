@@ -64,9 +64,9 @@ export class Logger {
   constructor(public initConfig: LoggerConfig = {}) {
     // check if user passed a log level, if not the default init value will be used as is.
     if (this.initConfig.logLevel != undefined && this.initConfig.logLevel >= 0) {
-      this.logLevel = this.initConfig.logLevel
+      this.logLevel = this.initConfig.logLevel;
     } else if (LOG_LEVEL) {
-      this.logLevel = LogLevel[LOG_LEVEL]
+      this.logLevel = LogLevel[LOG_LEVEL];
     }
     this.config = { ...this.config, ...initConfig };
   }

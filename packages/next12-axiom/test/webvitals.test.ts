@@ -11,7 +11,9 @@ import { reportWebVitals } from '../src/webVitals';
 
 import { Version } from 'next-axiom-core';
 import 'whatwg-fetch';
-global.fetch = jest.fn(() => Promise.resolve(new Response('', { status: 204, statusText: 'OK' }))) as jest.Mock<typeof fetch>;
+global.fetch = jest.fn(() => Promise.resolve(new Response('', { status: 204, statusText: 'OK' }))) as jest.Mock<
+  typeof fetch
+>;
 jest.useFakeTimers();
 
 test('throttled sendMetrics', async () => {

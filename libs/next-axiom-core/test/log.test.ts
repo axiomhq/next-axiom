@@ -5,10 +5,9 @@ import { test, expect, jest } from '@jest/globals';
 
 jest.useFakeTimers();
 
-
 test('sending logs from browser', async () => {
   global.fetch = jest.fn(async () => {
-    const resp = new Response("", { status: 200 });
+    const resp = new Response('', { status: 200 });
     return Promise.resolve(resp);
   }) as jest.Mock<typeof fetch>;
 
@@ -27,7 +26,7 @@ test('sending logs from browser', async () => {
 
 test('with', async () => {
   global.fetch = jest.fn(async () => {
-    const resp = new Response("", { status: 200 });
+    const resp = new Response('', { status: 200 });
     return Promise.resolve(resp);
   }) as jest.Mock<typeof fetch>;
 
@@ -39,7 +38,7 @@ test('with', async () => {
   expect(fetch).toHaveBeenCalledTimes(1);
   const mockedFetch = fetch as jest.Mock<typeof fetch>;
   const sentPayload = mockedFetch.mock.calls[0][1]?.body?.toString();
-  const payload = JSON.parse(sentPayload ? sentPayload : "{}");
+  const payload = JSON.parse(sentPayload ? sentPayload : '{}');
   expect(payload.length).toBe(1);
   const fst = payload[0];
   expect(fst.level).toBe('info');
@@ -51,7 +50,7 @@ test('with', async () => {
 
 test('passing non-object', async () => {
   global.fetch = jest.fn(async () => {
-    const resp = new Response("", { status: 200 });
+    const resp = new Response('', { status: 200 });
     return Promise.resolve(resp);
   }) as jest.Mock<typeof fetch>;
 
@@ -64,7 +63,7 @@ test('passing non-object', async () => {
   expect(fetch).toHaveBeenCalledTimes(1);
   const mockedFetch = fetch as jest.Mock<typeof fetch>;
   const sentPayload = mockedFetch.mock.calls[0][1]?.body?.toString();
-  const payload = JSON.parse(sentPayload ? sentPayload : "{}");
+  const payload = JSON.parse(sentPayload ? sentPayload : '{}');
   expect(payload.length).toBe(1);
   const fst = payload[0];
   expect(fst.level).toBe('info');
@@ -75,7 +74,7 @@ test('passing non-object', async () => {
 
 test('flushing child loggers', async () => {
   global.fetch = jest.fn(async () => {
-    const resp = new Response("", { status: 200 });
+    const resp = new Response('', { status: 200 });
     return Promise.resolve(resp);
   }) as jest.Mock<typeof fetch>;
 
@@ -91,7 +90,7 @@ test('flushing child loggers', async () => {
 
   const mockedFetch = fetch as jest.Mock<typeof fetch>;
   const sentPayload = mockedFetch.mock.calls[2][1]?.body?.toString();
-  const payload = JSON.parse(sentPayload ? sentPayload : "{}");
+  const payload = JSON.parse(sentPayload ? sentPayload : '{}');
   expect(Object.keys(payload[0].fields).length).toEqual(2);
   expect(payload[0].fields.foo).toEqual('bar');
   expect(payload[0].fields.bar).toEqual('foo');
@@ -102,7 +101,7 @@ test('flushing child loggers', async () => {
 
 test('throwing exception', async () => {
   global.fetch = jest.fn(async () => {
-    const resp = new Response("", { status: 200 });
+    const resp = new Response('', { status: 200 });
     return Promise.resolve(resp);
   }) as jest.Mock<typeof fetch>;
   const err = new Error('test');
@@ -111,7 +110,7 @@ test('throwing exception', async () => {
   expect(fetch).toHaveBeenCalledTimes(1);
   const mockedFetch = fetch as jest.Mock<typeof fetch>;
   const sentPayload = mockedFetch.mock.calls[0][1]?.body?.toString();
-  const payload = JSON.parse(sentPayload ? sentPayload : "{}");
+  const payload = JSON.parse(sentPayload ? sentPayload : '{}');
   expect(Object.keys(payload[0].fields).length).toEqual(3); // { name, message, stack }
   expect(payload[0].fields.message).toEqual(err.message);
   expect(payload[0].fields.name).toEqual(err.name);

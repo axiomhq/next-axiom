@@ -10,7 +10,7 @@ jest.useFakeTimers();
 
 test('sending logs on localhost should fallback to console', () => {
   global.fetch = jest.fn(async () => {
-    const resp = new Response("", { status: 200 });
+    const resp = new Response('', { status: 200 });
     return Promise.resolve(resp);
   }) as jest.Mock<typeof fetch>;
   const mockedLog = jest.spyOn(global.console, 'log').mockImplementation(jest.fn());
