@@ -22,7 +22,7 @@ module.exports = withAxiom({
 
 ### Using Any Other Platform
 
-Create an API token in [Axiom settings](https://cloud.axiom.co/settings/profile) and export it as `AXIOM_TOKEN`, as well as the Axiom dataset name as `AXIOM_DATASET`. Once it is done, perform the steps below:
+Create an API token in [Axiom settings](https://cloud.axiom.co/settings/profile) and export it as `NEXT_PUBLIC_AXIOM_TOKEN`, as well as the Axiom dataset name as `NEXT_PUBLIC_AXIOM_DATASET`. Once it is done, perform the steps below:
 
 - In your Next.js project, run install `next12-axiom` as follows:
 
@@ -95,13 +95,13 @@ Available levels are (from lowest to highest): `debug`, `info`, `warn`, `error`
 For example, if you don't want debug logs to be sent to Axiom:
 
 ```sh
-export AXIOM_LOG_LEVEL=info
+export NEXT_PUBLIC_AXIOM_LOG_LEVEL=info
 ```
 
 You can also disable logging completely by setting the log level to `off`:
 
 ```sh
-export AXIOM_LOG_LEVEL=off
+export NEXT_PUBLIC_AXIOM_LOG_LEVEL=off
 ```
 
 ### getServerSideProps

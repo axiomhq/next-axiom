@@ -1,20 +1,21 @@
 /**
  * @jest-environment jsdom
  */
-import { jest } from '@jest/globals';
+
+import { test, expect, jest } from '@jest/globals';
 import { NextWebVitalsMetric } from 'next/app';
 // set axiom env vars before importing webvitals
 process.env.AXIOM_URL = '';
 process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT = 'https://example.co/api/test';
 import { reportWebVitals } from '../src/webVitals';
-import 'whatwg-fetch';
-import { Version } from 'next-axiom-core';
 
-global.fetch = jest.fn(() => Promise.resolve(new Response('', { status: 204, statusText: 'OK' }))) as jest.Mock;
+import { Version } from 'next-axiom-core';
+import 'whatwg-fetch';
+global.fetch = jest.fn(() => Promise.resolve(new Response('', { status: 204, statusText: 'OK' }))) as jest.Mock<typeof fetch>;
 jest.useFakeTimers();
 
 test('throttled sendMetrics', async () => {
-  let metricsMatrix: NextWebVitalsMetric[][] = [
+  const metricsMatrix: NextWebVitalsMetric[][] = [
     [
       { id: '1', startTime: 1234, value: 1, name: 'FCP', label: 'web-vital' },
       { id: '2', startTime: 5678, value: 2, name: 'FCP', label: 'web-vital' },

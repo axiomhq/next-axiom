@@ -2,6 +2,7 @@ import 'whatwg-fetch';
 import { GetServerSideProps, GetServerSidePropsContext, NextApiRequest, NextApiResponse } from 'next';
 import { NextFetchEvent, NextRequest, NextResponse } from 'next/server';
 import { withAxiom, withAxiomGetServerSideProps, withAxiomNextServerSidePropsHandler } from '../src/index';
+import { test, expect } from '@jest/globals';
 import { Logger } from 'next-axiom-core';
 
 test('withAxiom(NextConfig)', async () => {

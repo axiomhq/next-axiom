@@ -137,13 +137,13 @@ Available levels are (from lowest to highest): `debug`, `info`, `warn`, `error`
 For example, if you don't want debug logs to be sent to Axiom:
 
 ```sh
-export AXIOM_LOG_LEVEL=info
+export NEXT_PUBLIC_AXIOM_LOG_LEVEL=info
 ```
 
 You can also disable logging completely by setting the log level to `off`:
 
 ```sh
-export AXIOM_LOG_LEVEL=off
+export NEXT_PUBLIC_AXIOM_LOG_LEVEL=off
 ```
 
 

@@ -3,7 +3,7 @@ import { NetlifyInfo } from './platform/netlify';
 import { isNoPrettyPrint, throttle } from './shared';
 
 const url = configurator.getLogsEndpoint();
-const LOG_LEVEL = process.env.AXIOM_LOG_LEVEL || 'debug';
+const LOG_LEVEL = process.env.NEXT_PUBLIC_AXIOM_LOG_LEVEL || 'debug';
 
 export interface LogEvent {
   level: string;
@@ -55,29 +55,33 @@ export class Logger {
   public logEvents: LogEvent[] = [];
   throttledSendLogs = throttle(this.sendLogs, 1000);
   children: Logger[] = [];
-  public logLevel: string;
+  public logLevel: LogLevel = LogLevel.debug;
   public config: LoggerConfig = {
     autoFlush: true,
     source: 'frontend',
-    logLevel: LogLevel.debug,
   };
 
   constructor(public initConfig: LoggerConfig = {}) {
+    // check if user passed a log level, if not the default init value will be used as is.
+    if (this.initConfig.logLevel != undefined && this.initConfig.logLevel >= 0) {
+      this.logLevel = this.initConfig.logLevel
+    } else if (LOG_LEVEL) {
+      this.logLevel = LogLevel[LOG_LEVEL]
+    }
     this.config = { ...this.config, ...initConfig };
-    this.logLevel = this.config.logLevel ? this.config.logLevel.toString() : LOG_LEVEL || 'debug';
   }
 
   debug = (message: string, args: { [key: string]: any } = {}) => {
-    this._log('debug', message, args);
+    this._log(LogLevel.debug, message, args);
   };
   info = (message: string, args: { [key: string]: any } = {}) => {
-    this._log('info', message, args);
+    this._log(LogLevel.info, message, args);
   };
   warn = (message: string, args: { [key: string]: any } = {}) => {
-    this._log('warn', message, args);
+    this._log(LogLevel.warn, message, args);
   };
   error = (message: string, args: { [key: string]: any } = {}) => {
-    this._log('error', message, args);
+    this._log(LogLevel.error, message, args);
   };
 
   with = (args: { [key: string]: any }) => {
@@ -91,12 +95,12 @@ export class Logger {
     return new Logger({ ...this.config, req: { ...this.config.req, ...req } });
   };
 
-  _log = (level: string, message: string, args: { [key: string]: any } = {}) => {
-    if (LogLevel[level] < LogLevel[this.logLevel]) {
+  _log = (level: LogLevel, message: string, args: { [key: string]: any } = {}) => {
+    if (level < this.logLevel) {
       return;
     }
     const logEvent: LogEvent = {
-      level,
+      level: LogLevel[level].toString(),
       message,
       _time: new Date(Date.now()).toISOString(),
       fields: this.config.args || {},

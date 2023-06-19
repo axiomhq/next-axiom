@@ -1,8 +1,9 @@
-process.env.AXIOM_URL = undefined;
-process.env.AXIOM_INGEST_ENDPOINT = 'https://axiom.co/api/v1/integrations/vercel';
+process.env.NEXT_PUBLIC_AXIOM_URL = undefined;
+process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT = 'https://axiom.co/api/v1/integrations/vercel';
 
 import { config } from '../src/config';
 import { EndpointType } from '../src/shared';
+import { test, expect } from '@jest/globals';
 
 test('reading vercel ingest endpoint', () => {
   let url = config.getIngestURL(EndpointType.webVitals);
