@@ -12,8 +12,6 @@
             // note: output globs are relative to each package's `package.json`
             // (and not the monorepo root)
             "outputs": [
-                ".next/**",
-                "!.next/cache/**",
                 "dist/**"
             ]
         },
@@ -31,6 +29,10 @@
                 "test/**/*.ts",
                 "test/**/*.tsx"
             ]
+        },
+        "nextjs-app#build": {
+            "dependsOn": ["^build"],
+            "outputs": [".next/**/*"]
         },
         // A package's `lint` script has no dependencies and
         // can be run whenever. It also has no filesystem outputs.

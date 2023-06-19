@@ -1,4 +1,3 @@
-
 import { Logger } from 'next-axiom'
 import Link from 'next/link'
 
@@ -7,6 +6,7 @@ export default async function Home() {
   log.info('AXIOM/NEXT::SERVER_COMPONENT_LOG')
 
   await log.flush()
+  
   return (
     <div>
       <h4>RSC Page</h4>

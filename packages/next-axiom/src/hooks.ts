@@ -9,6 +9,7 @@ export function useReportWebVitals() {
   useNextReportWebVitals((metric) => reportWebVitals(metric, path));
 }
 
+
 export function useLogger(config: LoggerConfig = {}): Logger {
   const path = usePathname();
   useEffect(() => {
@@ -18,6 +19,11 @@ export function useLogger(config: LoggerConfig = {}): Logger {
       }
     };
   }, [path]);
+
+  if(!config.args) {
+    config.args = {};
+  }
+  config.args.path = path;
 
   const logger = new Logger(config);
   return logger; // FIXME: Provide request data and source
