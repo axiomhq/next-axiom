@@ -8,7 +8,7 @@ const LOG_LEVEL = process.env.NEXT_PUBLIC_AXIOM_LOG_LEVEL || 'debug';
 export interface LogEvent {
   level: string;
   message: string;
-  fields: {};
+  fields: any;
   _time: string;
   request?: RequestReport;
   platform?: PlatformInfo;
