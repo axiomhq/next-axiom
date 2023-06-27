@@ -1,4 +1,4 @@
-export { reportWebVitals } from './webVitals';
+export { reportWebVitals, reportWebVitalsWithPath } from './webVitals';
 export { log, Logger } from './logger';
 export {
   withAxiom,

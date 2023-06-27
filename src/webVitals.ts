@@ -10,7 +10,12 @@ const throttledSendMetrics = throttle(sendMetrics, 1000);
 let collectedMetrics: WebVitalsMetric[] = [];
 
 export function reportWebVitals(metric: NextWebVitalsMetric) {
-  collectedMetrics.push({ route: window.__NEXT_DATA__?.page, ...metric });
+  reportWebVitalsWithPath(metric);
+}
+
+export function reportWebVitalsWithPath(metric: NextWebVitalsMetric, path?: string) {
+  const route = path || window.__NEXT_DATA__?.page;
+  collectedMetrics.push({ route, ...metric });
   // if Axiom env vars are not set, do nothing,
   // otherwise devs will get errors on dev environments
   if (!config.isEnvVarsSet()) {
