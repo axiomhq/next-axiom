@@ -11,10 +11,13 @@ export default defineConfig({
   },
   build: {
     lib: {
-        entry: 'src/index.ts',
-        name: 'next12-axiom',
-        formats: ['es', 'umd'],
-        fileName: (format) => `next12-axiom.${format}.js`
+      entry: 'src/index.ts',
+      name: 'next12-axiom',
+      formats: ['es', 'umd'],
+      fileName: (format) => `next12-axiom.${format}.js`
+    },
+    rollupOptions: {
+      external: (id) => id.includes('node_modules')
     },
     commonjsOptions: {
       include: [/next-axiom-core/, /node_modules/],

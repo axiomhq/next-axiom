@@ -17,10 +17,7 @@ export default defineConfig({
       fileName: (format) => `next-axiom.${format}.js`
     },
     rollupOptions: {
-      external: (id) => {
-        console.log(id)
-        return id.includes('node_modules')
-      },
+      external: (id) => id.includes('node_modules')
     },
     commonjsOptions: {
       include: [/next-axiom-core/, /node_modules/],
