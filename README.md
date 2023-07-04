@@ -58,8 +58,6 @@ module.exports = withAxiom({
 
 ### Web Vitals
 
-> **Warning**: Web-Vitals are not yet supported in Next.js 13 and above. Please use Next.js 12 or below. We [submitted a patch](https://github.com/vercel/next.js/pull/47319) and as soon as Next.js 13.2.5 is out, we'll add support here.
-
 Go to `app/layout.tsx` and add the following line to import web vitals component:
 
 ```js
