@@ -1,8 +1,8 @@
-import { config as configurator, isVercel, Version } from './config';
+import { config, isVercel, Version } from './config';
 import { NetlifyInfo } from './platform/netlify';
 import { isNoPrettyPrint, throttle } from './shared';
 
-const url = configurator.getLogsEndpoint();
+const url = config.getLogsEndpoint();
 const LOG_LEVEL = process.env.NEXT_PUBLIC_AXIOM_LOG_LEVEL || 'debug';
 
 export interface LogEvent {
@@ -116,7 +116,7 @@ export class Logger {
       logEvent.fields = { ...logEvent.fields, args: args };
     }
 
-    configurator.injectPlatformMetadata(logEvent, this.config.source!);
+    config.injectPlatformMetadata(logEvent, this.config.source!);
 
     if (this.config.req != null) {
       logEvent.request = this.config.req;
@@ -147,7 +147,7 @@ export class Logger {
       return;
     }
 
-    if (!configurator.isEnvVarsSet()) {
+    if (!config.isEnvVarsSet()) {
       // if AXIOM ingesting url is not set, fallback to printing to console
       // to avoid network errors in development environments
       this.logEvents.forEach((ev) => prettyPrint(ev));
@@ -164,8 +164,8 @@ export class Logger {
       'Content-Type': 'application/json',
       'User-Agent': 'next-axiom/v' + Version,
     };
-    if (configurator.token) {
-      headers['Authorization'] = `Bearer ${configurator.token}`;
+    if (config.token) {
+      headers['Authorization'] = `Bearer ${config.token}`;
     }
     const reqOptions: RequestInit = { body, method, keepalive, headers };
 
@@ -178,7 +178,7 @@ export class Logger {
       if (typeof fetch === 'undefined') {
         const fetch = await require('whatwg-fetch');
         return fetch(url, reqOptions).catch(console.error);
-      } else if (configurator.isBrowser && isVercel && navigator.sendBeacon) {
+      } else if (config.isBrowser && isVercel && navigator.sendBeacon) {
         // sendBeacon fails if message size is greater than 64kb, so
         // we fall back to fetch.
         if (!navigator.sendBeacon(url, body)) {
@@ -238,7 +238,7 @@ export function prettyPrint(ev: LogEvent) {
   let msgString = '';
   let args: any[] = [ev.level, ev.message];
 
-  if (configurator.isBrowser) {
+  if (config.isBrowser) {
     msgString = '%c%s - %s';
     args = [`color: ${levelColors[ev.level].browser};`, ...args];
   } else {
