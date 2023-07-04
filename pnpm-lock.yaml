@@ -141,6 +141,12 @@ importers:
         specifier: 12.1.4
         version: 12.1.4(eslint@8.41.0)(next@12.2.0)(typescript@4.9.3)
 
+  internal/next-axiom-core:
+    dependencies:
+      whatwg-fetch:
+        specifier: ^3.6.2
+        version: 3.6.2
+
   packages/next-axiom:
     dependencies:
       next:
@@ -148,16 +154,10 @@ importers:
         version: 13.4.0(@babel/core@7.22.1)(react-dom@18.2.0)(react@18.2.0)
       next-axiom-core:
         specifier: workspace:*
-        version: link:../next-axiom-core
+        version: link:../../internal/next-axiom-core
       react:
         specifier: '>=18.0.0'
         version: 18.2.0
-
-  packages/next-axiom-core:
-    dependencies:
-      whatwg-fetch:
-        specifier: ^3.6.2
-        version: 3.6.2
 
   packages/next12-axiom:
     dependencies:
@@ -166,7 +166,7 @@ importers:
         version: 12.2.0(@babel/core@7.22.1)(react-dom@18.2.0)(react@18.2.0)
       next-axiom-core:
         specifier: workspace:*
-        version: link:../next-axiom-core
+        version: link:../../internal/next-axiom-core
 
 packages:
 
