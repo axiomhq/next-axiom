@@ -11,10 +11,13 @@
   "engines": {
     "node": ">=16"
   },
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/next-axiom.umd.js",
+  "module": "dist/next-axiom.es.js",
+  "types": "dist/types/index.d.ts",
+  "files": ["dist"],
   "scripts": {
-    "build": "tsc -b",
+    "exportTypes": "rm tsconfig.tsbuildinfo && tsc -b -v",
+    "build": "vite build && pnpm exportTypes",
     "format": "prettier --write src/*.ts test/*.ts",
     "lint": "prettier -c src/*.ts test/*.ts",
     "test": "jest"
@@ -40,5 +43,12 @@
   "peerDependencies": {
     "next": ">=13.4",
     "react": ">=18.0.0"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/next-axiom.es.js",
+      "require": "./dist/next-axiom.umd.js",
+      "types": "./dist/types/index.d.ts"
+    }
   }
 }

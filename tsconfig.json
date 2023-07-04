@@ -18,6 +18,7 @@
     "noImplicitAny": true,
     "strictPropertyInitialization": false,
     "noUnusedLocals": true,
+    "isolatedModules": true,
     /* Debugging Options */
     "traceResolution": false /* Report module resolution log messages. */,
     "listEmittedFiles": false /* Print names of generated files part of the compilation. */,
@@ -33,7 +34,6 @@
     "composite": true
   },
   "references": [
-    {"path": "libs/next-axiom-core"},
     {"path": "packages/next-axiom"},
     {"path": "packages/next12-axiom"}
   ],

@@ -66,7 +66,7 @@ export class Logger {
     if (this.initConfig.logLevel != undefined && this.initConfig.logLevel >= 0) {
       this.logLevel = this.initConfig.logLevel;
     } else if (LOG_LEVEL) {
-      this.logLevel = LogLevel[LOG_LEVEL];
+      this.logLevel = LogLevel[LOG_LEVEL as keyof typeof LogLevel];
     }
     this.config = { ...this.config, ...initConfig };
   }
@@ -194,7 +194,7 @@ export class Logger {
     }
   }
 
-  flush = async () => {
+  flush = async (): Promise<any> => {
     return await Promise.all([this.sendLogs(), ...this.children.map((c) => c.flush())]);
   };
 }

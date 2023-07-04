@@ -4,6 +4,7 @@
   "version": "0.18.0",
   "author": "Axiom, Inc.",
   "license": "MIT",
+  "private": true,
   "contributors": [
     "Arne Bahlo <arne@axiom.co>",
     "Islam Shehata <islam@axiom.co>"
@@ -11,10 +12,11 @@
   "engines": {
     "node": ">=16"
   },
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
   "scripts": {
-    "build": "tsc -b",
+    "exportTypes": "tsc --emitDeclarationOnly",
+    "build1": "pnpm exportTypes && esbuild src/index.ts --bundle --outdir=dist/",
     "format": "prettier --write src/*.ts test/*.ts",
     "lint": "prettier -c src/*.ts test/*.ts",
     "test": "jest"

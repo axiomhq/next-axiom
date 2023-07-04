@@ -38,6 +38,7 @@
     "@types/node": "^17.0.29",
     "@typescript-eslint/eslint-plugin": "^5.59.11",
     "@typescript-eslint/parser": "^5.59.11",
+    "@vitejs/plugin-react": "^4.0.1",
     "eslint": "~8.41.0",
     "eslint-config-turbo": "^1.10.3",
     "eslint-plugin-react": "^7.32.2",
@@ -48,7 +49,8 @@
     "ts-jest": "~29.1",
     "ts-node": "^10.8.0",
     "turbo": "^1.9.9",
-    "typescript": "^4.6.4"
+    "typescript": "^4.6.4",
+    "vite": "^4.3.9"
   },
   "workspaces": [
     "packages/*",
