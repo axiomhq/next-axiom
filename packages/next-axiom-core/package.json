@@ -1,7 +1,7 @@
 {
   "name": "next-axiom-core",
   "description": "Core utils of axiom support for Next.js",
-  "version": "0.18.0",
+  "version": "0.19.0",
   "author": "Axiom, Inc.",
   "license": "MIT",
   "contributors": [
