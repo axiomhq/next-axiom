@@ -15,8 +15,6 @@
   "main": "src/index.ts",
   "types": "src/index.ts",
   "scripts": {
-    "exportTypes": "tsc --emitDeclarationOnly",
-    "build1": "pnpm exportTypes && esbuild src/index.ts --bundle --outdir=dist/",
     "format": "prettier --write src/*.ts test/*.ts",
     "lint": "prettier -c src/*.ts test/*.ts",
     "test": "jest"

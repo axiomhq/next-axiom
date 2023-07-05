@@ -41,6 +41,9 @@ importers:
       jest-environment-jsdom:
         specifier: ~29.1
         version: 29.1.0
+      next-axiom-core:
+        specifier: workspace:*
+        version: link:internal/next-axiom-core
       prettier:
         specifier: 2.6.2
         version: 2.6.2
@@ -152,9 +155,6 @@ importers:
       next:
         specifier: '>=13.4'
         version: 13.4.0(@babel/core@7.22.1)(react-dom@18.2.0)(react@18.2.0)
-      next-axiom-core:
-        specifier: workspace:*
-        version: link:../../internal/next-axiom-core
       react:
         specifier: '>=18.0.0'
         version: 18.2.0
@@ -164,9 +164,6 @@ importers:
       next:
         specifier: '>=12.2.0 <13.0.0'
         version: 12.2.0(@babel/core@7.22.1)(react-dom@18.2.0)(react@18.2.0)
-      next-axiom-core:
-        specifier: workspace:*
-        version: link:../../internal/next-axiom-core
 
 packages:
 

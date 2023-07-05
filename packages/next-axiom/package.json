@@ -11,16 +11,17 @@
   "engines": {
     "node": ">=16"
   },
-  "main": "dist/next-axiom.umd.js",
-  "module": "dist/next-axiom.es.js",
+  "main": "dist/cjs/next-axiom.js",
+  "module": "dist/es/next-axiom.js",
   "types": "dist/types/index.d.ts",
   "files": ["dist"],
   "scripts": {
-    "exportTypes": "rm tsconfig.tsbuildinfo && tsc -b -v",
+    "exportTypes": "tsc -b -v",
     "build": "vite build && pnpm exportTypes",
     "format": "prettier --write src/*.ts test/*.ts",
     "lint": "prettier -c src/*.ts test/*.ts",
-    "test": "jest"
+    "test": "jest",
+    "clean": "rm -rf dist tsconfig.tsbuildinfo"
   },
   "repository": {
     "type": "git",
@@ -37,17 +38,14 @@
     "url": "https://github.com/axiomhq/next-axiom/issues"
   },
   "homepage": "https://github.com/axiomhq/next-axiom#readme",
-  "dependencies": {
-    "next-axiom-core": "workspace:*"
-  },
   "peerDependencies": {
     "next": ">=13.4",
     "react": ">=18.0.0"
   },
   "exports": {
     ".": {
-      "import": "./dist/next-axiom.es.js",
-      "require": "./dist/next-axiom.umd.js",
+      "import": "./dist/es/next-axiom.js",
+      "require": "./dist/cjs/next-axiom.js",
       "types": "./dist/types/index.d.ts"
     }
   }
