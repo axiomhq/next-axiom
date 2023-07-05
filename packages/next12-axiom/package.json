@@ -11,8 +11,8 @@
   "engines": {
     "node": ">=16"
   },
-  "main": "dist/es/next12-axiom.js",
-  "module": "dist/es/next12-axiom.js",
+  "main": "dist/es/index.js",
+  "module": "dist/es/index.js",
   "types": "dist/types/index.d.ts",
   "files": ["dist"],
   "scripts": {
@@ -43,8 +43,8 @@
   },
   "exports": {
     ".": {
-      "import": "./dist/es/next12-axiom.js",
-      "require": "./dist/umd/next12-axiom.js",
+      "import": "./dist/es/index.js",
+      "require": "./dist/cjs/index.js",
       "types": "./dist/types/index.d.ts"
     }
   }

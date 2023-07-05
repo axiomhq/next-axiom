@@ -11,8 +11,8 @@
   "engines": {
     "node": ">=16"
   },
-  "main": "dist/cjs/next-axiom.js",
-  "module": "dist/es/next-axiom.js",
+  "main": "dist/cjs/index.js",
+  "module": "dist/es/index.js",
   "types": "dist/types/index.d.ts",
   "files": ["dist"],
   "scripts": {
@@ -38,15 +38,19 @@
     "url": "https://github.com/axiomhq/next-axiom/issues"
   },
   "homepage": "https://github.com/axiomhq/next-axiom#readme",
+  "dependencies": {
+    "whatwg-fetch": "^3.6.2"
+  },
   "peerDependencies": {
     "next": ">=13.4",
     "react": ">=18.0.0"
   },
   "exports": {
     ".": {
-      "import": "./dist/es/next-axiom.js",
-      "require": "./dist/cjs/next-axiom.js",
+      "import": "./dist/es/index.js",
+      "require": "./dist/cjs/index.js",
+      "default": "./dist/es/index.js",
       "types": "./dist/types/index.d.ts"
-    }
+    } 
   }
 }

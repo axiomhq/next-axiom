@@ -7,7 +7,7 @@
     "sourceMap": true,
     "strict": true,
     "composite": true,
-    "moduleResolution": "node",
+    "moduleResolution": "NodeNext",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
