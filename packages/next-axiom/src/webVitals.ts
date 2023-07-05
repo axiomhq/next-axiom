@@ -9,7 +9,7 @@ const throttledSendMetrics = throttle(sendMetrics, 1000);
 let collectedMetrics: WebVitalsMetric[] = [];
 
 export function reportWebVitals(metric: NextWebVitalsMetric) {
-  reportWebVitalsWithPath(metric)
+  reportWebVitalsWithPath(metric);
 }
 
 export function reportWebVitalsWithPath(metric: NextWebVitalsMetric, path?: string) {
