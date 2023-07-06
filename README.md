@@ -9,22 +9,32 @@
 
 </div>
 
-> **info** This documentation is for Nextjs 13 with app directory support, if you are looking for Nextjs 12 support, please check out the [next12-axiom docs](./packages/next12-axiom/README.md). If you want to migrate to Nextjs 13, please check out the [upgrade guide](#upgrade-to-nextjs-13).
+[Axiom](https://axiom.co) unlocks observability at any scale.
 
+- **Ingest with ease, store without limits:** Axiom’s next-generation datastore enables ingesting petabytes of data with ultimate efficiency. Ship logs from Kubernetes, AWS, Azure, Google Cloud, DigitalOcean, Nomad, and others.
+- **Query everything, all the time:** Whether DevOps, SecOps, or EverythingOps, query all your data no matter its age. No provisioning, no moving data from cold/archive to “hot”, and no worrying about slow queries. All your data, all. the. time.
+- **Powerful dashboards, for continuous observability:** Build dashboards to collect related queries and present information that’s quick and easy to digest for you and your team. Dashboards can be kept private or shared with others, and are the perfect way to bring together data from different sources.
+
+For more information, check out the [official documentation](https://axiom.co/docs).
+
+## Features
+
+- Send Web Vitals from your Next.js application to Axiom for insights into site performance.
+- Send structured logs from your pages, components and routes.
 
 ## Installation
 
-### Using Vercel Integration
+> **Note**:
+Using Next.js 12? Check out our [compatibility package](./packages/next12-axiom/README.md). If are upgrading to Next.js 13, check out the [next-axiom upgrade guide](#upgrade-to-nextjs-13).
 
-Make sure you have the [Axiom Vercel integration](https://www.axiom.co/vercel) installed. Once it is done, perform the steps below: 
 
-- In your Next.js project, run install `next-axiom` as follows:
+In your Next.js project, install next-axiom:
 
 ```sh
 npm install --save next-axiom
 ```
 
-- In the `next.config.js` file, wrap your Next.js config in `withAxiom` as follows:
+In the `next.config.ts` file, wrap your Next.js config in `withAxiom` as follows:
 
 ```js
 const { withAxiom } = require('next-axiom');
@@ -34,52 +44,48 @@ module.exports = withAxiom({
 });
 ```
 
-### Using Any Other Platform
+If you are using the [Vercel integration](https://www.axiom.co/vercel), 
+no further configuration is required. 
 
-Create an API token in [Axiom settings](https://cloud.axiom.co/settings/profile) and export it as `NEXT_PUBLIC_AXIOM_TOKEN`, as well as the Axiom dataset name as `NEXT_PUBLIC_AXIOM_DATASET`. Once it is done, perform the steps below:
-
-- In your Next.js project, run install `next-axiom` as follows:
-
-```sh
-npm install --save next-axiom
-```
-
-- In the `next.config.js` file, wrap your Next.js config in `withAxiom` as follows:
-
-```js
-const { withAxiom } = require('next-axiom');
-
-module.exports = withAxiom({
-  // ... your existing config
-});
-```
+Otherwise create a dataset and an API token in [Axiom settings](https://cloud.axiom.co/settings/profile), then export them as environment variables `NEXT_PUBLIC_AXIOM_DATASET` and `NEXT_PUBLIC_AXIOM_TOKEN`.
 
 ## Usage
 
 ### Web Vitals
 
-Go to `app/layout.tsx` and add the following line to import web vitals component:
+Go to `app/layout.tsx` and add the Web Vitals component:
 
-```js
-export { AxiomWebVitals } from 'next-axiom';
-```
+```tsx
+import { AxiomWebVitals } from 'next-axiom';
 
-then add the component to your layout:
-
-```js
-return (
-  <html>
-    ...
-    <AxiomWebVitals />
-    <div>...</div>
-  </html>
-);
+export default function RootLayout() {
+  return (
+    <html>
+      ...
+      <AxiomWebVitals />
+      <div>...</div>
+    </html>
+  );
+}
 ```
 
 > **Note**: WebVitals are only sent from production deployments.
 
-Wrapping your handlers in `withAxiom` will make `req.log` available and log
-exceptions:
+### Logs
+
+Send logs to Axiom from different parts of your application. Each log function call takes a message and an optional fields object.
+
+```ts
+log.debug("Login attempt", {user: "j_doe", status: "success"}) // results in {"message": "Login attempt", "fields": {"user": "j_doe", "status": "success"}} 
+log.info("Payment completed", {userID: "123", amount: "25USD"})
+log.warn("API rate limit exceeded", {endpoint: "/users/1", rateLimitRemaining: 0})
+log.error("System Error", {code: "500", message: "Internal server error"})
+```
+
+#### Route Handlers
+
+Wrapping your Route Handlers in `withAxiom` will add a logger to your
+request and automatically log exceptions:
 
 ```ts
 import { withAxiom, AxiomRequest } from 'next-axiom';
@@ -96,37 +102,39 @@ export const GET = withAxiom((req: AxiomRequest) => {
 
 ```
 
-Import and use `useLogger` hook in **client components** like this:
+#### Client Components
+For Client Components, you can add a logger to your component with `useLogger`:
 
-```js
+```tsx
 'use client';
 import { useLogger } from `next-axiom`;
 
-// pages/index.js
 function home() {
     const log = useLogger();
     log.debug('User logged in', { userId: 42 })
-    ...
+
+    // ...
 }
 ```
 
-For **server side components** you will have to create an instance  make sure to flush the logs before component returns
+#### Server Components
+For Server Components, create a logger and make sure to call flush before returning:
 
-```js
+```tsx
 import { Logger } from `next-axiom`;
 
 function RSC() {
   const log = new Logger();
-  log.info('...')
+  log.info('User logged in', { userId: 42 })
 
-  ...
+  // ...
 
   await log.flush();
   return (...)
 }
 ```
 
-### Log Levels
+#### Log Levels
 
 The log level defines the lowest level of logs sent to Axiom.
 The default is debug, resulting in all logs being sent.
@@ -138,11 +146,7 @@ For example, if you don't want debug logs to be sent to Axiom:
 export NEXT_PUBLIC_AXIOM_LOG_LEVEL=info
 ```
 
-You can also disable logging completely by setting the log level to `off`:
-
-```sh
-export NEXT_PUBLIC_AXIOM_LOG_LEVEL=off
-```
+You can also disable logging completely by setting the log level to `off`.
 
 ## Upgrade to Next.js 13
 
@@ -151,7 +155,7 @@ next-axiom switched to support Next.js 13 with app directory support starting ve
 - upgrade next-axiom to version 0.19.0 or higher
 - use `useLogger` hook in client components instead of `log` prop
 - for server side components, you will need to create an instance of `Logger` and flush the logs before component returns.
-- for web-vitals, import the the `AxiomWebVitals` component and add it to your layout
+- for web-vitals, remove `reportWebVitals()` and instead add the `AxiomWebVitals` component to your layout.
 
 
 ## FAQ

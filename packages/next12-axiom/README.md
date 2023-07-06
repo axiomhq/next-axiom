@@ -1,3 +1,7 @@
+# next12-axiom
+
+This is the official axiom library to send logs from next 12 applications.
+
 ## Installation
 
 ### Using Vercel Integration
