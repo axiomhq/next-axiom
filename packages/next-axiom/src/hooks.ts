@@ -25,5 +25,5 @@ export function useLogger(config: LoggerConfig = {}): Logger {
   config.args.path = path;
 
   const logger = new Logger(config);
-  return logger; // FIXME: Provide request data and source
+  return logger;
 }

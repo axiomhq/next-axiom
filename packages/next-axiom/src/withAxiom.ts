@@ -63,7 +63,8 @@ export function withAxiomRouteHandler(handler: NextHandler) {
       userAgent: req.headers.get('user-agent'),
       scheme: 'https',
       ip: req.headers.get('x-forwarded-for'),
-      region: '', // FIXME: get region information
+      // FIXME: is there a way to get the region from Request?
+      region:  req instanceof NextRequest ? req.geo?.region : '',
     };
     const isEdgeRuntime = globalThis.EdgeRuntime ? true : false;
 
