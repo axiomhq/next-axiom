@@ -57,14 +57,14 @@ export function withAxiomRouteHandler(handler: NextHandler) {
   return async (req: Request | NextRequest) => {
     const report: RequestReport = {
       startTime: new Date().getTime(),
-      path: req.url!,
-      method: req.method!,
+      path: req.url,
+      method: req.method,
       host: req.headers.get('host'),
       userAgent: req.headers.get('user-agent'),
       scheme: 'https',
       ip: req.headers.get('x-forwarded-for'),
       // FIXME: is there a way to get the region from Request?
-      region:  req instanceof NextRequest ? req.geo?.region : '',
+      region: req instanceof NextRequest ? req.geo?.region : '',
     };
     const isEdgeRuntime = globalThis.EdgeRuntime ? true : false;
 
@@ -75,14 +75,24 @@ export function withAxiomRouteHandler(handler: NextHandler) {
     try {
       const result = await handler(axiomContext);
       await logger.flush();
+      if (isEdgeRuntime) {
+        logEdgeReport(report);
+      }
       return result;
     } catch (error: any) {
       logger.error('Error in Next route handler', { error });
       logger.attachResponseStatus(500);
       await logger.flush();
+      if (isEdgeRuntime) {
+        logEdgeReport(report);
+      }
       throw error;
     }
   };
+}
+
+function logEdgeReport(report: RequestReport) {
+  console.log(`AXIOM_EDGE_REPORT::${JSON.stringify(report)}`);
 }
 
 type WithAxiomParam = NextConfig | NextHandler;
