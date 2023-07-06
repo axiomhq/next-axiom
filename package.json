@@ -10,7 +10,7 @@
     "Islam Shehata <islam@axiom.co>"
   ],
   "engines": {
-    "node": ">=16"
+    "node": ">=18"
   },
   "scripts": {
     "build": "turbo build",
