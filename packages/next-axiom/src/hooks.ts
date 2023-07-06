@@ -4,9 +4,8 @@ import { Logger, LoggerConfig } from 'next-axiom-core';
 import { reportWebVitalsWithPath } from './webVitals';
 import { useEffect } from 'react';
 
-export function useReportWebVitals() {
-  const path = usePathname();
-  useNextReportWebVitals((metric) => reportWebVitalsWithPath(metric, path));
+export function useReportWebVitals(path?: string) {
+  useNextReportWebVitals((metric) => reportWebVitalsWithPath(metric, path || usePathname()));
 }
 
 export function useLogger(config: LoggerConfig = {}): Logger {
