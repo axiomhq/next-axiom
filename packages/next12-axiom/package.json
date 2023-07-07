@@ -11,17 +11,23 @@
   "engines": {
     "node": ">=16"
   },
-  "main": "dist/es/index.js",
-  "module": "dist/es/index.js",
-  "types": "dist/types/index.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "files": ["dist"],
   "scripts": {
     "exportTypes": "tsc -b -v",
-    "build": "vite build && pnpm run exportTypes",
+    "build": "tsup",
     "format": "prettier --write src/*.ts test/*.ts",
     "lint": "prettier -c src/*.ts test/*.ts",
     "test": "jest",
     "clean": "rm -rf dist tsconfig.tsbuildinfo"
+  },
+  "tsup": {
+    "entry": ["src/**/*.ts"],
+    "splitting": false,
+    "sourcemap": true,
+    "clean": true,
+    "dts": true
   },
   "repository": {
     "type": "git",
@@ -41,11 +47,7 @@
   "peerDependencies": {
     "next": ">=12.2.0 <13.0.0"
   },
-  "exports": {
-    ".": {
-      "import": "./dist/es/index.js",
-      "require": "./dist/cjs/index.js",
-      "types": "./dist/types/index.d.ts"
-    }
+  "devDependencies": {
+    "next-axiom-core": "workspace:*"
   }
 }

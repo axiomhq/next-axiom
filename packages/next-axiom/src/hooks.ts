@@ -1,3 +1,4 @@
+"use client";
 import { useReportWebVitals as useNextReportWebVitals } from 'next/web-vitals';
 import { usePathname } from 'next/navigation';
 import { Logger, LoggerConfig } from 'next-axiom-core';

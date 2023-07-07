@@ -11,13 +11,12 @@
   "engines": {
     "node": ">=16"
   },
-  "main": "dist/cjs/index.js",
-  "module": "dist/es/index.js",
-  "types": "dist/types/index.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "files": ["dist"],
   "scripts": {
     "exportTypes": "tsc -b -v",
-    "build": "vite build && pnpm exportTypes",
+    "build": "tsup",
     "format": "prettier --write src/*.ts test/*.ts",
     "lint": "prettier -c src/*.ts test/*.ts",
     "test": "jest",
@@ -45,12 +44,7 @@
     "next": ">=13.4",
     "react": ">=18.0.0"
   },
-  "exports": {
-    ".": {
-      "import": "./dist/es/index.js",
-      "require": "./dist/cjs/index.js",
-      "default": "./dist/es/index.js",
-      "types": "./dist/types/index.d.ts"
-    } 
+  "devDependencies": {
+    "next-axiom-core": "workspace:*"
   }
 }
