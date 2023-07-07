@@ -38,6 +38,7 @@
         // can be run whenever. It also has no filesystem outputs.
         "lint": {},
         "format": {},
+        "clean": {},
         "dev": {
             "cache": false
         }

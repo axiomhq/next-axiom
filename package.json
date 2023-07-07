@@ -16,6 +16,7 @@
     "build": "turbo build",
     "lint": "turbo lint",
     "format": "turbo format",
+    "clean": "turbo clean",
     "test": "turbo test"
   },
   "repository": {
