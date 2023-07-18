@@ -1,4 +1,4 @@
-export * from 'next-axiom-core';
+export * from '@axiomhq/kit';
 export { AxiomWebVitals } from './components';
-export { useReportWebVitals, useLogger } from './hooks';
+export * from './hooks'
 export { withAxiom, AxiomRequest, withAxiomNextConfig, withAxiomRouteHandler } from './withAxiom';

@@ -1,6 +1,6 @@
-import { Logger } from 'next-axiom-core';
+import { Logger } from '@axiomhq/kit';
 
-export * from 'next-axiom-core';
+export * from '@axiomhq/kit';
 export * from './withAxiom';
 export { reportWebVitals, reportWebVitalsWithPath } from './webVitals';
 export const log = new Logger();

@@ -3,7 +3,7 @@ import { GetServerSideProps, GetServerSidePropsContext, NextApiRequest, NextApiR
 import { NextFetchEvent, NextRequest, NextResponse } from 'next/server';
 import { withAxiom, withAxiomGetServerSideProps, withAxiomNextServerSidePropsHandler } from '../src/index';
 import { test, expect } from '@jest/globals';
-import { Logger } from 'next-axiom-core';
+import { Logger } from '@axiomhq/kit';
 
 test('withAxiom(NextConfig)', async () => {
   const config = withAxiom({

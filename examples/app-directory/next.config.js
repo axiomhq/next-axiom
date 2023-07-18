@@ -1,5 +1,4 @@
 // @ts-check
-
 /** @type {import('next').NextConfig} */
 const { withAxiom } = require('next-axiom');
 

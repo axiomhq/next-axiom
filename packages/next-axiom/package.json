@@ -14,10 +14,12 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc -b",
+    "build": "tsc -b && babel --root-mode upward src --out-dir dist/ --extensions \".tsx,.ts,.js,.jsx\" --copy-files",
+    "postbuild": "./postbuild.sh",
     "format": "prettier --write src/*.ts test/*.ts",
     "lint": "prettier -c src/*.ts test/*.ts",
-    "test": "jest"
+    "test": "jest",
+    "clean": "rm tsconfig.tsbuildinfo && rm -r dist"
   },
   "repository": {
     "type": "git",
@@ -34,8 +36,8 @@
     "url": "https://github.com/axiomhq/next-axiom/issues"
   },
   "homepage": "https://github.com/axiomhq/next-axiom#readme",
-  "dependencies": {
-    "next-axiom-core": "workspace:*"
+  "devDependencies": {
+    "@axiomhq/kit": "workspace:*"
   },
   "peerDependencies": {
     "next": ">=13.4",
