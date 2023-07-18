@@ -8,7 +8,7 @@ import type Provider from "./base";
 export default class GenericConfig implements Provider {
   proxyPath = '/_axiom';
   isBrowser = typeof window !== 'undefined';
-  shoudSendEdgeReport = false;
+  shouldSendEdgeReport = false;
   token = process.env.AXIOM_TOKEN;
   dataset = process.env.AXIOM_DATASET;
   environment: string = process.env.NODE_ENV;

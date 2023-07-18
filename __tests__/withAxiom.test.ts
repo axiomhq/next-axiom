@@ -1,8 +1,8 @@
-import { Logger, withAxiom } from '../src/index';
-import { withAxiomGetServerSideProps, withAxiomNextServerSidePropsHandler } from '../src/withAxiom';
-import { GetServerSideProps, GetServerSidePropsContext, NextApiRequest, NextApiResponse } from 'next';
-import 'whatwg-fetch';
+import { test, expect } from '@jest/globals';
+import { NextApiRequest, NextApiResponse } from 'next';
 import { NextFetchEvent, NextRequest, NextResponse } from 'next/server';
+import 'whatwg-fetch';
+import { withAxiom } from '../src/withAxiom';
 
 test('withAxiom(NextConfig)', async () => {
   const config = withAxiom({
@@ -14,16 +14,6 @@ test('withAxiom(NextConfig)', async () => {
 test('withAxiom(NextApiHandler)', async () => {
   const handler = withAxiom((_req: NextApiRequest, res: NextApiResponse) => {
     res.status(200).end();
-  });
-  expect(handler).toBeInstanceOf(Function);
-});
-
-test('withAxiomNextServerSidePropsHandler', async () => {
-  const handler = withAxiomNextServerSidePropsHandler(async (context) => {
-    expect(context.log).toBeInstanceOf(Logger);
-    return {
-      props: {},
-    };
   });
   expect(handler).toBeInstanceOf(Function);
 });
@@ -55,15 +45,4 @@ test('withAxiom(NextConfig) with fallback rewrites (regression test for #21)', a
     rewrites: rewrites as any,
   });
   if (config.rewrites) await config.rewrites();
-});
-
-test('withAxiom(GetServerSideProps)', async () => {
-  const getServerSideProps: GetServerSideProps = async (context: GetServerSidePropsContext) => {
-    return {
-      props: {},
-    };
-  };
-  const handler = withAxiomGetServerSideProps(getServerSideProps);
-  expect(handler).toBeInstanceOf(Function);
-  // TODO: Make sure we have a AxiomGetServerSideProps
 });

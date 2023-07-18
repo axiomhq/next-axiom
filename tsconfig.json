@@ -17,7 +17,6 @@
     "noImplicitThis": true,
     "noImplicitAny": true,
     "strictPropertyInitialization": false,
-    "suppressImplicitAnyIndexErrors": true,
     "noUnusedLocals": true,
     /* Debugging Options */
     "traceResolution": false /* Report module resolution log messages. */,

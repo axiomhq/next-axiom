@@ -17,19 +17,24 @@
 
 For more information, check out the [official documentation](https://axiom.co/docs).
 
+## Features
+
+- Send Web Vitals from your Next.js application to Axiom for insights into site performance.
+- Send structured logs from your pages, components and routes.
+
 ## Installation
 
-### Using Vercel Integration
+> **Note**:
+Using Next.js 12? Check out our [compatibility package](./packages/next12-axiom/README.md). If are upgrading to Next.js 13, check out the [next-axiom upgrade guide](#upgrade-to-nextjs-13).
 
-Make sure you have the [Axiom Vercel integration](https://www.axiom.co/vercel) installed. Once it is done, perform the steps below: 
 
-- In your Next.js project, run install `next-axiom` as follows:
+In your Next.js project, install next-axiom:
 
 ```sh
 npm install --save next-axiom
 ```
 
-- In the `next.config.js` file, wrap your Next.js config in `withAxiom` as follows:
+In the `next.config.ts` file, wrap your Next.js config in `withAxiom` as follows:
 
 ```js
 const { withAxiom } = require('next-axiom');
@@ -39,73 +44,97 @@ module.exports = withAxiom({
 });
 ```
 
-### Using Any Other Platform
+If you are using the [Vercel integration](https://www.axiom.co/vercel), 
+no further configuration is required. 
 
-Create an API token in [Axiom settings](https://cloud.axiom.co/settings/profile) and export it as `AXIOM_TOKEN`, as well as the Axiom dataset name as `AXIOM_DATASET`. Once it is done, perform the steps below:
-
-- In your Next.js project, run install `next-axiom` as follows:
-
-```sh
-npm install --save next-axiom
-```
-
-- In the `next.config.js` file, wrap your Next.js config in `withAxiom` as follows:
-
-```js
-const { withAxiom } = require('next-axiom');
-
-module.exports = withAxiom({
-  // ... your existing config
-});
-```
+Otherwise create a dataset and an API token in [Axiom settings](https://cloud.axiom.co/settings/profile), then export them as environment variables `NEXT_PUBLIC_AXIOM_DATASET` and `NEXT_PUBLIC_AXIOM_TOKEN`.
 
 ## Usage
 
 ### Web Vitals
 
-> **Warning**: Web-Vitals are not yet supported in Next.js 13 and above. Please use Next.js 12 or below. We [submitted a patch](https://github.com/vercel/next.js/pull/47319) and as soon as Next.js 13.2.5 is out, we'll add support here.
+Go to `app/layout.tsx` and add the Web Vitals component:
 
-Go to `pages/_app.js` or `pages/_app.ts` and add the following line to report web vitals:
+```tsx
+import { AxiomWebVitals } from 'next-axiom';
 
-```js
-export { reportWebVitals } from 'next-axiom';
+export default function RootLayout() {
+  return (
+    <html>
+      ...
+      <AxiomWebVitals />
+      <div>...</div>
+    </html>
+  );
+}
 ```
 
 > **Note**: WebVitals are only sent from production deployments.
 
-Wrapping your handlers in `withAxiom` will make `req.log` available and log
-exceptions:
+### Logs
+
+Send logs to Axiom from different parts of your application. Each log function call takes a message and an optional fields object.
 
 ```ts
-import { withAxiom, AxiomAPIRequest } from 'next-axiom';
+log.debug("Login attempt", {user: "j_doe", status: "success"}) // results in {"message": "Login attempt", "fields": {"user": "j_doe", "status": "success"}} 
+log.info("Payment completed", {userID: "123", amount: "25USD"})
+log.warn("API rate limit exceeded", {endpoint: "/users/1", rateLimitRemaining: 0})
+log.error("System Error", {code: "500", message: "Internal server error"})
+```
 
-async function handler(req: AxiomAPIRequest, res: NextApiResponse) {
+#### Route Handlers
+
+Wrapping your Route Handlers in `withAxiom` will add a logger to your
+request and automatically log exceptions:
+
+```ts
+import { withAxiom, AxiomRequest } from 'next-axiom';
+
+export const GET = withAxiom((req: AxiomRequest) => {
   req.log.info('Login function called');
 
   // You can create intermediate loggers
   const log = req.log.with({ scope: 'user' });
   log.info('User logged in', { userId: 42 });
 
-  res.status(200).text('hi');
-}
+  return NextResponse.json({ hello: 'world' });
+})
 
-export default withAxiom(handler);
 ```
 
-Import and use `log` in the frontend like this:
+#### Client Components
+For Client Components, you can add a logger to your component with `useLogger`:
 
-```js
-import { log } from `next-axiom`;
+```tsx
+'use client';
+import { useLogger } from `next-axiom`;
 
-// pages/index.js
 function home() {
-    ...
+    const log = useLogger();
     log.debug('User logged in', { userId: 42 })
-    ...
+
+    // ...
 }
 ```
 
-### Log Levels
+#### Server Components
+For Server Components, create a logger and make sure to call flush before returning:
+
+```tsx
+import { Logger } from `next-axiom`;
+
+function RSC() {
+  const log = new Logger();
+  log.info('User logged in', { userId: 42 })
+
+  // ...
+
+  await log.flush();
+  return (...)
+}
+```
+
+#### Log Levels
 
 The log level defines the lowest level of logs sent to Axiom.
 The default is debug, resulting in all logs being sent.
@@ -114,39 +143,30 @@ Available levels are (from lowest to highest): `debug`, `info`, `warn`, `error`
 For example, if you don't want debug logs to be sent to Axiom:
 
 ```sh
-export AXIOM_LOG_LEVEL=info
+export NEXT_PUBLIC_AXIOM_LOG_LEVEL=info
 ```
 
-You can also disable logging completely by setting the log level to `off`:
+You can also disable logging completely by setting the log level to `off`.
 
-```sh
-export AXIOM_LOG_LEVEL=off
-```
+## Upgrade to Next.js 13
 
-### getServerSideProps
+next-axiom switched to support Next.js 13 with app directory support starting version 0.19.0. If you are upgrading from Next.js 12, you will need to make the following changes:
 
-To be able to use next-axiom with `getServerSideProps` you need to wrap your function with `withAxiomGetServerSideProps`, becasue there is no
-way at the moment to automatically detected if getServerSideProps is used.
+- upgrade next-axiom to version 0.19.0 or higher
+- use `useLogger` hook in client components instead of `log` prop
+- for server side components, you will need to create an instance of `Logger` and flush the logs before component returns.
+- for web-vitals, remove `reportWebVitals()` and instead add the `AxiomWebVitals` component to your layout.
 
-```ts
-import { withAxiomGetServerSideProps } from 'next-axiom'
-export const getServerSideProps = withAxiomGetServerSideProps(async ({ req, log })  => {
-  log.info('Hello, world!');
-  return {
-    props: {
-    },
-  }
-});
-```
 
 ## FAQ
+
 ### How can I send logs from Vercel preview deployments?
 The Axiom Vercel integration sets up an environment variable called `NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT`, which by default is only enabled for the production environment. To send logs from preview deployments, go to your site settings in Vercel and enable preview deployments for that environment variable.
 
 ### How can I extend the logger?
 You can use `log.with` to create an intermediate logger, for example:
 ```ts
-const logger = log.with({ userId: 42 })
+const logger = userLogger().with({ userId: 42 })
 logger.info("Hi") // will ingest { ..., "message": "Hi", "fields" { "userId": 42 }}
 ```
 

@@ -1,14 +1,14 @@
-import config, { isVercel, Version } from './config';
+import { config, isVercel, Version } from './config';
 import { NetlifyInfo } from './platform/netlify';
 import { isNoPrettyPrint, throttle } from './shared';
 
 const url = config.getLogsEndpoint();
-const LOG_LEVEL = process.env.AXIOM_LOG_LEVEL || 'debug';
+const LOG_LEVEL = process.env.NEXT_PUBLIC_AXIOM_LOG_LEVEL || 'debug';
 
 export interface LogEvent {
   level: string;
   message: string;
-  fields: {};
+  fields: any;
   _time: string;
   request?: RequestReport;
   platform?: PlatformInfo;
@@ -27,10 +27,10 @@ export enum LogLevel {
 export interface RequestReport {
   startTime: number;
   statusCode?: number;
-  ip?: string;
-  region?: string;
+  ip?: string | null;
+  region?: string | null;
   path: string;
-  host: string;
+  host?: string | null;
   method: string;
   scheme: string;
   userAgent?: string | null;
@@ -43,50 +43,68 @@ export interface PlatformInfo {
   source?: string;
 }
 
+export type LoggerConfig = {
+  args?: { [key: string]: any };
+  logLevel?: LogLevel;
+  autoFlush?: boolean;
+  source?: string;
+  req?: any;
+};
+
 export class Logger {
   public logEvents: LogEvent[] = [];
   throttledSendLogs = throttle(this.sendLogs, 1000);
   children: Logger[] = [];
-  public logLevel: string;
+  public logLevel: LogLevel = LogLevel.debug;
+  public config: LoggerConfig = {
+    autoFlush: true,
+    source: 'frontend',
+  };
 
-  constructor(
-    private args: { [key: string]: any } = {},
-    private req: RequestReport | null = null,
-    private autoFlush: Boolean = true,
-    public source: 'frontend' | 'lambda' | 'edge' = 'frontend',
-    logLevel?: string
-  ) {
-    this.logLevel = logLevel || LOG_LEVEL || 'debug';
+  constructor(public initConfig: LoggerConfig = {}) {
+    // check if user passed a log level, if not the default init value will be used as is.
+    if (this.initConfig.logLevel != undefined && this.initConfig.logLevel >= 0) {
+      this.logLevel = this.initConfig.logLevel;
+    } else if (LOG_LEVEL) {
+      this.logLevel = LogLevel[LOG_LEVEL as keyof typeof LogLevel];
+    }
+    this.config = { ...this.config, ...initConfig };
   }
 
   debug = (message: string, args: { [key: string]: any } = {}) => {
-    this._log('debug', message, args);
+    this._log(LogLevel.debug, message, args);
   };
   info = (message: string, args: { [key: string]: any } = {}) => {
-    this._log('info', message, args);
+    this._log(LogLevel.info, message, args);
   };
   warn = (message: string, args: { [key: string]: any } = {}) => {
-    this._log('warn', message, args);
+    this._log(LogLevel.warn, message, args);
   };
   error = (message: string, args: { [key: string]: any } = {}) => {
-    this._log('error', message, args);
+    this._log(LogLevel.error, message, args);
   };
 
   with = (args: { [key: string]: any }) => {
-    const child = new Logger({ ...this.args, ...args }, this.req, this.autoFlush, this.source);
+    const config = { ...this.config, args: { ...this.config.args, ...args } };
+    const child = new Logger(config);
     this.children.push(child);
     return child;
   };
 
-  withRequest = (req: RequestReport) => {
-    return new Logger({ ...this.args }, req, this.autoFlush, this.source);
+  withRequest = (req: any) => {
+    return new Logger({ ...this.config, req: { ...this.config.req, ...req } });
   };
 
-  _log = (level: string, message: string, args: { [key: string]: any } = {}) => {
-    if (LogLevel[level] < LogLevel[this.logLevel]) {
+  _log = (level: LogLevel, message: string, args: { [key: string]: any } = {}) => {
+    if (level < this.logLevel) {
       return;
     }
-    const logEvent: LogEvent = { level, message, _time: new Date(Date.now()).toISOString(), fields: this.args || {} };
+    const logEvent: LogEvent = {
+      level: LogLevel[level].toString(),
+      message,
+      _time: new Date(Date.now()).toISOString(),
+      fields: this.config.args || {},
+    };
 
     // check if passed args is an object, if its not an object, add it to fields.args
     if (args instanceof Error) {
@@ -98,19 +116,19 @@ export class Logger {
       logEvent.fields = { ...logEvent.fields, args: args };
     }
 
-    config.injectPlatformMetadata(logEvent, this.source);
+    config.injectPlatformMetadata(logEvent, this.config.source!);
 
-    if (this.req != null) {
-      logEvent.request = this.req;
+    if (this.config.req != null) {
+      logEvent.request = this.config.req;
       if (logEvent.platform) {
-        logEvent.platform.route = this.req.path;
+        logEvent.platform.route = this.config.req.path;
       } else if (logEvent.vercel) {
-        logEvent.vercel.route = this.req.path;
+        logEvent.vercel.route = this.config.req.path;
       }
     }
 
     this.logEvents.push(logEvent);
-    if (this.autoFlush) {
+    if (this.config.autoFlush) {
       this.throttledSendLogs();
     }
   };
@@ -142,7 +160,7 @@ export class Logger {
     const body = JSON.stringify(this.logEvents);
     // clear pending logs
     this.logEvents = [];
-    const headers = {
+    const headers: HeadersInit = {
       'Content-Type': 'application/json',
       'User-Agent': 'next-axiom/v' + Version,
     };
@@ -153,35 +171,37 @@ export class Logger {
 
     function sendFallback() {
       // Do not leak network errors; does not affect the running app
-      fetch(url, reqOptions).catch(console.error);
+      return fetch(url, reqOptions).catch(console.error);
     }
 
     try {
       if (typeof fetch === 'undefined') {
         const fetch = await require('whatwg-fetch');
-        fetch(url, reqOptions).catch(console.error);
+        return fetch(url, reqOptions).catch(console.error);
       } else if (config.isBrowser && isVercel && navigator.sendBeacon) {
         // sendBeacon fails if message size is greater than 64kb, so
         // we fall back to fetch.
         if (!navigator.sendBeacon(url, body)) {
-          sendFallback();
+          return sendFallback();
         }
       } else {
-        sendFallback();
+        return sendFallback();
       }
     } catch (e) {
-      console.error(`Failed to send logs to Axiom: ${e}`);
+      console.warn(`Failed to send logs to Axiom: ${e}`);
+      // put the log events back in the queue
+      this.logEvents = [...this.logEvents, JSON.parse(body)];
     }
   }
 
-  flush = async () => {
-    await Promise.all([this.sendLogs(), ...this.children.map((c) => c.flush())]);
+  flush: any = async () => {
+    return Promise.all([this.sendLogs(), ...this.children.map((c) => c.flush())]);
   };
 }
 
-export const log = new Logger();
+export const log = new Logger({});
 
-const levelColors = {
+const levelColors: { [key: string]: any } = {
   info: {
     terminal: '32',
     browser: 'lightgreen',
