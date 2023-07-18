@@ -2,7 +2,7 @@ import 'whatwg-fetch';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { NextFetchEvent, NextRequest, NextResponse } from 'next/server';
 import { withAxiom } from '../src/index';
-import { Logger } from 'next-axiom-core';
+import { Logger } from '@axiomhq/kit';
 import { test, expect } from '@jest/globals';
 
 test('withAxiom(NextConfig)', async () => {

@@ -17,7 +17,8 @@
     "build": "tsc -b",
     "format": "prettier --write src/*.ts test/*.ts",
     "lint": "prettier -c src/*.ts test/*.ts",
-    "test": "jest"
+    "test": "jest",
+    "clean": "rm -rf dist && rm tsconfig.tsbuildinfo"
   },
   "repository": {
     "type": "git",
@@ -34,8 +35,8 @@
     "url": "https://github.com/axiomhq/next-axiom/issues"
   },
   "homepage": "https://github.com/axiomhq/next-axiom#readme",
-  "dependencies": {
-    "next-axiom-core": "workspace:*"
+  "devDependencies": {
+    "@axiomhq/kit": "workspace:*"
   },
   "peerDependencies": {
     "next": ">=12.2.0 <13.0.0"

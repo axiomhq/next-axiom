@@ -1,4 +1,5 @@
 packages:
+  - 'internal/*'
   - 'packages/*'
   - 'examples/*'
   - 'e2e/*'

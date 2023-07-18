@@ -1,6 +1,6 @@
 import { NextConfig } from 'next';
 import { Rewrite } from 'next/dist/lib/load-custom-routes';
-import { EndpointType, config, Logger, RequestReport } from 'next-axiom-core';
+import { EndpointType, config, Logger, RequestReport } from '@axiomhq/kit';
 import { NextRequest, NextResponse } from 'next/server';
 
 declare global {

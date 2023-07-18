@@ -9,7 +9,7 @@ process.env.AXIOM_URL = '';
 process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT = 'https://example.co/api/test';
 import { reportWebVitals } from '../src/webVitals';
 
-import { Version } from 'next-axiom-core';
+import { Version } from '@axiomhq/kit';
 import 'whatwg-fetch';
 global.fetch = jest.fn(() => Promise.resolve(new Response('', { status: 204, statusText: 'OK' }))) as jest.Mock<
   typeof fetch

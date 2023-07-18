@@ -1,5 +1,5 @@
 import { NextWebVitalsMetric } from 'next/app';
-import { throttle, config, isVercel, Version } from 'next-axiom-core';
+import { throttle, config, isVercel, Version } from '@axiomhq/kit';
 
 const url = config.getWebVitalsEndpoint();
 

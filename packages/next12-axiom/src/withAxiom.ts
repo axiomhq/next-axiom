@@ -12,7 +12,7 @@ import { NextFetchEvent, NextMiddleware, NextRequest } from 'next/server';
 import { NextMiddlewareResult } from 'next/dist/server/web/types';
 import { ParsedUrlQuery } from 'querystring';
 import { Rewrite } from 'next/dist/lib/load-custom-routes';
-import { config, EndpointType, Logger, RequestReport } from 'next-axiom-core';
+import { config, EndpointType, Logger, RequestReport } from '@axiomhq/kit';
 
 declare global {
   var EdgeRuntime: string;
