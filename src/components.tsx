@@ -1,7 +1,8 @@
 'use client';
-import {  useReportWebVitals } from './hooks';
+import React from 'react';
+import { useReportWebVitals } from './webVitals';
 
-export function AxiomWebVitals({ path }: { path?: string}) {
+export function AxiomWebVitals({ path }: { path?: string }) {
   useReportWebVitals(path);
-  return null;
+  return <React.Fragment></React.Fragment>;
 }

@@ -52,7 +52,7 @@ export function withAxiomNextConfig(nextConfig: NextConfig): NextConfig {
   };
 }
 
-export type AxiomRequest = NextRequest & { log: Logger };
+export type AxiomRequest = (NextRequest | Request) & { log: Logger };
 type NextHandler = (req: AxiomRequest) => Promise<Response> | Promise<NextResponse> | NextResponse | Response;
 
 export function withAxiomRouteHandler(handler: NextHandler) {
@@ -69,6 +69,7 @@ export function withAxiomRouteHandler(handler: NextHandler) {
       region: req instanceof NextRequest ? req.geo?.region : '',
     };
     const isEdgeRuntime = globalThis.EdgeRuntime ? true : false;
+    console.log({ isEdgeRuntime: globalThis.EdgeRuntime })
 
     const logger = new Logger({ req: report, source: isEdgeRuntime ? 'edge' : 'lambda' });
     const axiomContext = req as AxiomRequest;

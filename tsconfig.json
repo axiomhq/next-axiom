@@ -18,6 +18,7 @@
     "noImplicitAny": true,
     "strictPropertyInitialization": false,
     "noUnusedLocals": true,
+    "isolatedModules": true,
     /* Debugging Options */
     "traceResolution": false /* Report module resolution log messages. */,
     "listEmittedFiles": false /* Print names of generated files part of the compilation. */,
@@ -32,7 +33,10 @@
     "outDir": "dist/"
   },
   "include": [
-    "src/index.ts"
+    "src/index.ts",
+    "src/hooks.ts",
+    "src/components.tsx",
+    "src/webVitals/**/*",
   ],
   "exclude": [
     "node_modules",

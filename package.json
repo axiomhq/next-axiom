@@ -53,5 +53,16 @@
   },
   "dependencies": {
     "whatwg-fetch": "^3.6.2"
+  },
+  "exports": {
+    ".": "./dist/index.js",
+    "./hooks": {
+      "import": "./dist/hooks.js",
+      "default": "./dist/hooks.js",
+      "types": "./dist/hooks.d.ts"
+    },
+    "./components": "./dist/components.js",
+    "./webvitals": "./dist/webVitals/index.js",
+    "./package.json": "./package.json"
   }
 }

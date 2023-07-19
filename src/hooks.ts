@@ -1,12 +1,8 @@
-import { useReportWebVitals as useNextReportWebVitals } from 'next/web-vitals';
 import { usePathname } from 'next/navigation';
 import { Logger, LoggerConfig } from './logger';
-import { reportWebVitalsWithPath } from './webVitals';
 import { useEffect } from 'react';
 
-export function useReportWebVitals(path?: string) {
-  useNextReportWebVitals((metric) => reportWebVitalsWithPath(metric, path || usePathname()));
-}
+
 
 export function useLogger(config: LoggerConfig = {}): Logger {
   const path = usePathname();

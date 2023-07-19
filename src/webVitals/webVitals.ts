@@ -1,6 +1,6 @@
 import { NextWebVitalsMetric } from 'next/app';
-import { config, isVercel, Version } from './config';
-import { throttle } from './shared';
+import { config, isVercel, Version } from '../config';
+import { throttle } from '../shared';
 
 const url = config.getWebVitalsEndpoint();
 
@@ -50,3 +50,4 @@ function sendMetrics() {
 
   collectedMetrics = [];
 }
+
