@@ -1,6 +1,3 @@
-/**
- * @jest-environment jsdom
- */
 // set axiom env vars before importing logger
 process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT = 'https://example.co/api/test';
 import { log } from '../src/logger';
