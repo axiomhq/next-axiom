@@ -53,11 +53,5 @@
   },
   "dependencies": {
     "whatwg-fetch": "^3.6.2"
-  },
-  "exports": {
-    ".": "./dist/index.js",
-    "./webvitals": "./dist/webVitals/index.js",
-    "./withAxiom": "./dist/withAxiom.js",
-    "./package.json": "./package.json"
   }
 }

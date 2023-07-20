@@ -2,8 +2,6 @@ import { usePathname } from 'next/navigation';
 import { Logger, LoggerConfig } from './logger';
 import { useEffect } from 'react';
 
-
-
 export function useLogger(config: LoggerConfig = {}): Logger {
   const path = usePathname();
   useEffect(() => {

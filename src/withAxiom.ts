@@ -2,7 +2,7 @@ import { NextConfig } from 'next';
 import { Rewrite } from 'next/dist/lib/load-custom-routes';
 import { config } from './config';
 import { Logger, RequestReport } from './logger';
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, type NextResponse } from 'next/server';
 import { EndpointType } from './shared';
 
 declare global {
@@ -57,6 +57,11 @@ type NextHandler = (req: AxiomRequest) => Promise<Response> | Promise<NextRespon
 
 export function withAxiomRouteHandler(handler: NextHandler) {
   return async (req: Request | NextRequest) => {
+    let region = '';
+    if ('geo' in req) {
+      region = req.geo?.region ?? '';
+    }
+
     const report: RequestReport = {
       startTime: new Date().getTime(),
       path: req.url,
@@ -65,8 +70,7 @@ export function withAxiomRouteHandler(handler: NextHandler) {
       userAgent: req.headers.get('user-agent'),
       scheme: 'https',
       ip: req.headers.get('x-forwarded-for'),
-      // FIXME: is there a way to get the region from Request?
-      region: req instanceof NextRequest ? req.geo?.region : '',
+      region,
     };
     const isEdgeRuntime = globalThis.EdgeRuntime ? true : false;
 
