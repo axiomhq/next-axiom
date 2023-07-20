@@ -4,5 +4,6 @@ import { reportWebVitalsWithPath } from './webVitals';
 export { type WebVitalsMetric } from './webVitals';
 
 export function useReportWebVitals(path?: string) {
-    useNextReportWebVitals((metric) => reportWebVitalsWithPath(metric, path || usePathname()));
+    const pathName = usePathname();
+    useNextReportWebVitals((metric) => reportWebVitalsWithPath(metric, path || pathName));
 }
