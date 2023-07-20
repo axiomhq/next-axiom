@@ -152,7 +152,8 @@ You can also disable logging completely by setting the log level to `off`.
 
 next-axiom switched to support Next.js 13 with app directory support starting version 0.19.0. If you are upgrading from Next.js 12, you will need to make the following changes:
 
-- upgrade next-axiom to version 0.19.0 or higher
+- upgrade next-axiom to version 1.0.0 or higher
+- make sure that exported variables has `NEXT_PUBLIC_` prefix, e.g: `NEXT_PUBLIC_AXIOM_TOKEN`
 - use `useLogger` hook in client components instead of `log` prop
 - for server side components, you will need to create an instance of `Logger` and flush the logs before component returns.
 - for web-vitals, remove `reportWebVitals()` and instead add the `AxiomWebVitals` component to your layout.
