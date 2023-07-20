@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import { useReportWebVitals } from './webVitals';
+import { useReportWebVitals } from '.';
 
 export function AxiomWebVitals({ path }: { path?: string }) {
   useReportWebVitals(path);

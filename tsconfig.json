@@ -1,12 +1,12 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "ESNext",
     "module": "CommonJS",
+    "moduleResolution": "node",
     "jsx": "react",
     "allowJs": false,
     "sourceMap": true,
     "strict": true,
-    "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -34,9 +34,8 @@
   },
   "include": [
     "src/index.ts",
-    "src/hooks.ts",
-    "src/components.tsx",
-    "src/webVitals/**/*",
+    "src/withAxiom.ts",
+    "src/webVitals/index.ts",
   ],
   "exclude": [
     "node_modules",

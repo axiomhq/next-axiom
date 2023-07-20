@@ -69,7 +69,6 @@ export function withAxiomRouteHandler(handler: NextHandler) {
       region: req instanceof NextRequest ? req.geo?.region : '',
     };
     const isEdgeRuntime = globalThis.EdgeRuntime ? true : false;
-    console.log({ isEdgeRuntime: globalThis.EdgeRuntime })
 
     const logger = new Logger({ req: report, source: isEdgeRuntime ? 'edge' : 'lambda' });
     const axiomContext = req as AxiomRequest;

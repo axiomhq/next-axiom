@@ -2,7 +2,7 @@
 
 import styles from './page.module.css';
 import Link from 'next/link';
-import { useLogger } from 'next-axiom/hooks';
+import { useLogger } from 'next-axiom';
 
 function Home() {
   const logger = useLogger();

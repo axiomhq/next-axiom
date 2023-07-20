@@ -1,10 +1,9 @@
 'use client';
 import './globals.css';
-import { AxiomWebVitals } from 'next-axiom/components';
+import { AxiomWebVitals } from 'next-axiom/webvitals';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
 
-  console.log({ AxiomWebVitals })
   return (
     <html lang="en">
       <AxiomWebVitals />
