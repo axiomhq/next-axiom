@@ -17,16 +17,14 @@
 
 For more information, check out the [official documentation](https://axiom.co/docs).
 
-## Features
+## Introduction
 
-- Send Web Vitals from your Next.js application to Axiom for insights into site performance.
-- Send structured logs from your pages, components and routes.
+This library allows you to send Web Vitals as well as structured logs from your Next.js application to Axiom.
 
 ## Installation
 
 > **Note**:
-Using Next.js 12? Check out our [compatibility package](./packages/next12-axiom/README.md). If are upgrading to Next.js 13, check out the [next-axiom upgrade guide](#upgrade-to-nextjs-13).
-
+> Using Next.js 12? Use version `0.*`, which will continue to get security patches. Here's the [README for `0.18.0`](https://github.com/axiomhq/next-axiom/tree/v0.18.0). If you're upgrading to Next.js 13, check out the [next-axiom upgrade guide](#upgrade-to-nextjs-13).
 
 In your Next.js project, install next-axiom:
 
@@ -44,8 +42,8 @@ module.exports = withAxiom({
 });
 ```
 
-If you are using the [Vercel integration](https://www.axiom.co/vercel), 
-no further configuration is required. 
+If you are using the [Vercel integration](https://www.axiom.co/vercel),
+no further configuration is required.
 
 Otherwise create a dataset and an API token in [Axiom settings](https://cloud.axiom.co/settings/profile), then export them as environment variables `NEXT_PUBLIC_AXIOM_DATASET` and `NEXT_PUBLIC_AXIOM_TOKEN`.
 
@@ -75,11 +73,11 @@ export default function RootLayout() {
 
 Send logs to Axiom from different parts of your application. Each log function call takes a message and an optional fields object.
 
-```ts
-log.debug("Login attempt", {user: "j_doe", status: "success"}) // results in {"message": "Login attempt", "fields": {"user": "j_doe", "status": "success"}} 
-log.info("Payment completed", {userID: "123", amount: "25USD"})
-log.warn("API rate limit exceeded", {endpoint: "/users/1", rateLimitRemaining: 0})
-log.error("System Error", {code: "500", message: "Internal server error"})
+```typescript
+log.debug('Login attempt', { user: 'j_doe', status: 'success' }); // results in {"message": "Login attempt", "fields": {"user": "j_doe", "status": "success"}}
+log.info('Payment completed', { userID: '123', amount: '25USD' });
+log.warn('API rate limit exceeded', { endpoint: '/users/1', rateLimitRemaining: 0 });
+log.error('System Error', { code: '500', message: 'Internal server error' });
 ```
 
 #### Route Handlers
@@ -87,7 +85,7 @@ log.error("System Error", {code: "500", message: "Internal server error"})
 Wrapping your Route Handlers in `withAxiom` will add a logger to your
 request and automatically log exceptions:
 
-```ts
+```typescript
 import { withAxiom, AxiomRequest } from 'next-axiom';
 
 export const GET = withAxiom((req: AxiomRequest) => {
@@ -98,39 +96,39 @@ export const GET = withAxiom((req: AxiomRequest) => {
   log.info('User logged in', { userId: 42 });
 
   return NextResponse.json({ hello: 'world' });
-})
-
+});
 ```
 
 #### Client Components
+
 For Client Components, you can add a logger to your component with `useLogger`:
 
 ```tsx
 'use client';
-import { useLogger } from `next-axiom`;
+import { useLogger } from 'next-axiom';
 
-function home() {
-    const log = useLogger();
-    log.debug('User logged in', { userId: 42 })
-
-    // ...
+export default function ClientComponent() {
+  const log = useLogger();
+  log.debug('User logged in', { userId: 42 });
+  return <h1>Logged in</h1>;
 }
 ```
 
 #### Server Components
+
 For Server Components, create a logger and make sure to call flush before returning:
 
 ```tsx
-import { Logger } from `next-axiom`;
+import { Logger } from 'next-axiom';
 
-function RSC() {
+export default async function ServerComponent() {
   const log = new Logger();
-  log.info('User logged in', { userId: 42 })
+  log.info('User logged in', { userId: 42 });
 
   // ...
 
   await log.flush();
-  return (...)
+  return <h1>Logged in</h1>;
 }
 ```
 
@@ -152,23 +150,25 @@ You can also disable logging completely by setting the log level to `off`.
 
 next-axiom switched to support Next.js 13 with app directory support starting version 0.19.0. If you are upgrading from Next.js 12, you will need to make the following changes:
 
-- upgrade next-axiom to version 1.0.0 or higher
-- make sure that exported variables has `NEXT_PUBLIC_` prefix, e.g: `NEXT_PUBLIC_AXIOM_TOKEN`
-- use `useLogger` hook in client components instead of `log` prop
-- for server side components, you will need to create an instance of `Logger` and flush the logs before component returns.
-- for web-vitals, remove `reportWebVitals()` and instead add the `AxiomWebVitals` component to your layout.
-
+- Upgrade next-axiom to version 1.0.0 or higher
+- Make sure that exported variables has `NEXT_PUBLIC_` prefix, e.g: `NEXT_PUBLIC_AXIOM_TOKEN`
+- Use `useLogger` hook in client components instead of `log` prop
+- For server side components, you will need to create an instance of `Logger` and flush the logs before component returns.
+- For web-vitals, remove `reportWebVitals()` and instead add the `AxiomWebVitals` component to your layout.
 
 ## FAQ
 
 ### How can I send logs from Vercel preview deployments?
+
 The Axiom Vercel integration sets up an environment variable called `NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT`, which by default is only enabled for the production environment. To send logs from preview deployments, go to your site settings in Vercel and enable preview deployments for that environment variable.
 
 ### How can I extend the logger?
+
 You can use `log.with` to create an intermediate logger, for example:
-```ts
-const logger = userLogger().with({ userId: 42 })
-logger.info("Hi") // will ingest { ..., "message": "Hi", "fields" { "userId": 42 }}
+
+```typescript
+const logger = userLogger().with({ userId: 42 });
+logger.info('Hi'); // will ingest { ..., "message": "Hi", "fields" { "userId": 42 }}
 ```
 
 ## License
