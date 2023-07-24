@@ -23,13 +23,13 @@ This library allows you to send Web Vitals as well as structured logs from your 
 
 ## Installation
 
-> **Note**:
+> **Note**
 > Using Next.js 12? Use version `0.*`, which will continue to get security patches. Here's the [README for `0.18.0`](https://github.com/axiomhq/next-axiom/tree/v0.18.0). If you're upgrading to Next.js 13, check out the [next-axiom upgrade guide](#upgrade-to-nextjs-13).
 
 In your Next.js project, install next-axiom:
 
 ```sh
-npm install --save next-axiom
+npm install --save next-axiom@1.0.0-rc.1
 ```
 
 In the `next.config.ts` file, wrap your Next.js config in `withAxiom` as follows:
