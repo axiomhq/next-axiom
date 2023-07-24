@@ -1,6 +1,6 @@
 import { NextWebVitalsMetric } from 'next/app';
-import { throttle } from './shared';
-import config, { isVercel, Version } from './config';
+import { config, isVercel, Version } from '../config';
+import { throttle } from '../shared';
 
 const url = config.getWebVitalsEndpoint();
 
@@ -9,12 +9,7 @@ export declare type WebVitalsMetric = NextWebVitalsMetric & { route: string };
 const throttledSendMetrics = throttle(sendMetrics, 1000);
 let collectedMetrics: WebVitalsMetric[] = [];
 
-export function reportWebVitals(metric: NextWebVitalsMetric) {
-  reportWebVitalsWithPath(metric);
-}
-
-export function reportWebVitalsWithPath(metric: NextWebVitalsMetric, path?: string) {
-  const route = path || window.__NEXT_DATA__?.page;
+export function reportWebVitalsWithPath(metric: NextWebVitalsMetric, route: string) {
   collectedMetrics.push({ route, ...metric });
   // if Axiom env vars are not set, do nothing,
   // otherwise devs will get errors on dev environments
@@ -26,7 +21,7 @@ export function reportWebVitalsWithPath(metric: NextWebVitalsMetric, path?: stri
 
 function sendMetrics() {
   const body = JSON.stringify(config.wrapWebVitalsObject(collectedMetrics));
-  const headers = {
+  const headers: HeadersInit = {
     'Content-Type': 'application/json',
     'User-Agent': 'next-axiom/v' + Version,
   };
@@ -55,3 +50,4 @@ function sendMetrics() {
 
   collectedMetrics = [];
 }
+

@@ -1,12 +1,12 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "ES2015",
     "module": "CommonJS",
+    "moduleResolution": "node",
     "jsx": "react",
     "allowJs": false,
     "sourceMap": true,
     "strict": true,
-    "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -17,8 +17,8 @@
     "noImplicitThis": true,
     "noImplicitAny": true,
     "strictPropertyInitialization": false,
-    "suppressImplicitAnyIndexErrors": true,
     "noUnusedLocals": true,
+    "isolatedModules": true,
     /* Debugging Options */
     "traceResolution": false /* Report module resolution log messages. */,
     "listEmittedFiles": false /* Print names of generated files part of the compilation. */,
@@ -33,7 +33,9 @@
     "outDir": "dist/"
   },
   "include": [
-    "src/index.ts"
+    "src/index.ts",
+    "src/withAxiom.ts",
+    "src/webVitals/index.ts",
   ],
   "exclude": [
     "node_modules",

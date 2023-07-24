@@ -18,19 +18,17 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: 17
+          node-version: 18
       - run: npm install
       - run: npm run check-format
   unittests:
     name: Check Tests
     runs-on: ubuntu-latest
-    env:
-      AXIOM_INGEST_ENDPOINT: https://example.co/api/test
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: 17
+          node-version: 18
       - run: npm install
       - run: npm test
   build:
@@ -39,9 +37,10 @@ jobs:
     strategy:
       matrix:
         node:
-          - 15.x
-          - 16.x
           - 17.x
+          - 18.x
+          - 19.x
+          - 20.x
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3

@@ -1,20 +1,9 @@
-import {
-  NextConfig,
-  NextApiHandler,
-  NextApiResponse,
-  NextApiRequest,
-  GetServerSideProps,
-  GetServerSidePropsContext,
-  PreviewData,
-  GetServerSidePropsResult,
-} from 'next';
-import { NextFetchEvent, NextMiddleware, NextRequest } from 'next/server';
-import { NextMiddlewareResult } from 'next/dist/server/web/types';
-import { ParsedUrlQuery } from 'querystring';
-import { Logger, RequestReport } from './logger';
+import { NextConfig } from 'next';
 import { Rewrite } from 'next/dist/lib/load-custom-routes';
+import { config } from './config';
+import { Logger, RequestReport } from './logger';
+import { type NextRequest, type NextResponse } from 'next/server';
 import { EndpointType } from './shared';
-import config from './config';
 
 declare global {
   var EdgeRuntime: string;
@@ -63,180 +52,71 @@ export function withAxiomNextConfig(nextConfig: NextConfig): NextConfig {
   };
 }
 
-// Sending logs after res.{json,send,end} is very unreliable.
-// This function overwrites these functions and makes sure logs are sent out
-// before the response is sent.
-function interceptNextApiResponse(req: AxiomAPIRequest, res: NextApiResponse): [NextApiResponse, Promise<void>[]] {
-  const allPromises: Promise<void>[] = [];
+export type AxiomRequest = (NextRequest | Request) & { log: Logger };
+type NextHandler = (req: AxiomRequest) => Promise<Response> | Promise<NextResponse> | NextResponse | Response;
 
-  const resSend = res.send;
-  res.send = (body: any) => {
-    allPromises.push(
-      (async () => {
-        req.log.attachResponseStatus(res.statusCode);
-        await req.log.flush();
-        resSend(body);
-      })()
-    );
-  };
-
-  const resJson = res.json;
-  res.json = (json: any) => {
-    allPromises.push(
-      (async () => {
-        req.log.attachResponseStatus(res.statusCode);
-        await req.log.flush();
-        resJson(json);
-      })()
-    );
-  };
-
-  const resEnd = res.end;
-  res.end = (cb?: () => undefined): NextApiResponse => {
-    allPromises.push(
-      (async () => {
-        req.log.attachResponseStatus(res.statusCode);
-        await req.log.flush();
-        resEnd(cb);
-      })()
-    );
-    return res;
-  };
-
-  return [res, allPromises];
-}
-
-export type AxiomAPIRequest = NextApiRequest & { log: Logger };
-export type AxiomApiHandler = (
-  request: AxiomAPIRequest,
-  response: NextApiResponse
-) => NextApiHandler | Promise<NextApiHandler> | Promise<void>;
-
-export function withAxiomNextApiHandler(handler: AxiomApiHandler): NextApiHandler {
-  return async (req, res) => {
-    const report: RequestReport = config.generateRequestMeta(req);
-    const logger = new Logger({}, report, false, 'lambda');
-    const axiomRequest = req as AxiomAPIRequest;
-    axiomRequest.log = logger;
-    const [wrappedRes, allPromises] = interceptNextApiResponse(axiomRequest, res);
-
-    try {
-      await handler(axiomRequest, wrappedRes);
-      await logger.flush();
-      await Promise.all(allPromises);
-    } catch (error: any) {
-      logger.error('Error in API handler', { error });
-      logger.attachResponseStatus(500);
-      await logger.flush();
-      await Promise.all(allPromises);
-      throw error;
+export function withAxiomRouteHandler(handler: NextHandler) {
+  return async (req: Request | NextRequest) => {
+    let region = '';
+    if ('geo' in req) {
+      region = req.geo?.region ?? '';
     }
-  };
-}
 
-export type AxiomGetServerSidePropsContext<
-  Q extends ParsedUrlQuery = ParsedUrlQuery,
-  D extends PreviewData = PreviewData
-> = GetServerSidePropsContext<Q, D> & { log: Logger };
-export type AxiomGetServerSideProps<
-  P extends { [key: string]: any } = { [key: string]: any },
-  Q extends ParsedUrlQuery = ParsedUrlQuery,
-  D extends PreviewData = PreviewData
-> = (context: AxiomGetServerSidePropsContext<Q, D>) => Promise<GetServerSidePropsResult<P>>;
+    const report: RequestReport = {
+      startTime: new Date().getTime(),
+      path: req.url,
+      method: req.method,
+      host: req.headers.get('host'),
+      userAgent: req.headers.get('user-agent'),
+      scheme: 'https',
+      ip: req.headers.get('x-forwarded-for'),
+      region,
+    };
+    const isEdgeRuntime = globalThis.EdgeRuntime ? true : false;
 
-export function withAxiomNextServerSidePropsHandler(handler: AxiomGetServerSideProps): GetServerSideProps {
-  return async (context) => {
-    const report: RequestReport = config.generateRequestMeta(context.req);
-    const logger = new Logger({}, report, false, 'lambda');
-    const axiomContext = context as AxiomGetServerSidePropsContext;
+    const logger = new Logger({ req: report, source: isEdgeRuntime ? 'edge' : 'lambda' });
+    const axiomContext = req as AxiomRequest;
     axiomContext.log = logger;
 
     try {
       const result = await handler(axiomContext);
       await logger.flush();
+      if (isEdgeRuntime) {
+        logEdgeReport(report);
+      }
       return result;
     } catch (error: any) {
-      logger.error('Error in getServerSideProps handler', { error });
+      logger.error('Error in Next route handler', { error });
       logger.attachResponseStatus(500);
       await logger.flush();
-      throw error;
-    }
-  };
-}
-
-export type AxiomRequest = NextRequest & { log: Logger };
-export type AxiomMiddleware = (
-  request: AxiomRequest,
-  event: NextFetchEvent
-) => NextMiddlewareResult | Promise<NextMiddlewareResult>;
-
-export function withAxiomNextEdgeFunction(handler: NextMiddleware): NextMiddleware {
-  return async (req, ev) => {
-    const report: RequestReport = {
-      startTime: new Date().getTime(),
-      ip: req.ip,
-      region: req.geo?.region,
-      host: req.nextUrl.host,
-      method: req.method,
-      path: req.nextUrl.pathname,
-      scheme: req.nextUrl.protocol.replace(':', ''),
-      userAgent: req.headers.get('user-agent'),
-    };
-
-    const logger = new Logger({}, report, false, 'edge');
-    const axiomRequest = req as AxiomRequest;
-    axiomRequest.log = logger;
-
-    try {
-      const res = await handler(axiomRequest, ev);
-      if (res) {
-        logger.attachResponseStatus(res.status);
+      if (isEdgeRuntime) {
+        logEdgeReport(report);
       }
-      ev.waitUntil(logger.flush());
-      logEdgeReport(report);
-      return res;
-    } catch (error: any) {
-      logger.error('Error in edge function', { error });
-      logger.attachResponseStatus(500);
-      ev.waitUntil(logger.flush());
-      logEdgeReport(report);
       throw error;
     }
   };
 }
 
-function logEdgeReport(report: any) {
-  if (config.shoudSendEdgeReport) {
-    console.log(`AXIOM_EDGE_REPORT::${JSON.stringify(report)}`);
-  }
+function logEdgeReport(report: RequestReport) {
+  console.log(`AXIOM_EDGE_REPORT::${JSON.stringify(report)}`);
 }
 
-type WithAxiomParam = NextConfig | AxiomApiHandler | NextMiddleware;
+type WithAxiomParam = NextConfig | NextHandler;
 
 function isNextConfig(param: WithAxiomParam): param is NextConfig {
   return typeof param == 'object';
 }
 
-function isApiHandler(param: WithAxiomParam): param is AxiomApiHandler {
-  const isFunction = typeof param == 'function';
-
-  // Vercel defines EdgeRuntime for edge functions, but Netlify defines NEXT_RUNTIME = 'edge'
-  return isFunction && typeof globalThis.EdgeRuntime === 'undefined' && process.env.NEXT_RUNTIME != 'edge';
-}
-
 // withAxiom can be called either with NextConfig, which will add proxy rewrites
-// to improve deliverability of Web-Vitals and logs, or with NextApiRequest or
-// NextMiddleware which will automatically log exceptions and flush logs.
+// to improve deliverability of Web-Vitals and logs.
 export function withAxiom(param: NextConfig): NextConfig;
-export function withAxiom(param: AxiomApiHandler): NextApiHandler;
-export function withAxiom(param: NextMiddleware): NextMiddleware;
+export function withAxiom(param: NextHandler): NextHandler;
 export function withAxiom(param: WithAxiomParam) {
-  if (isNextConfig(param)) {
+  if (typeof param == 'function') {
+    return withAxiomRouteHandler(param);
+  } else if (isNextConfig(param)) {
     return withAxiomNextConfig(param);
-  } else if (isApiHandler(param)) {
-    return withAxiomNextApiHandler(param);
-  } else {
-    return withAxiomNextEdgeFunction(param);
   }
+
+  return withAxiomRouteHandler(param);
 }
-export const withAxiomGetServerSideProps = withAxiomNextServerSidePropsHandler;
