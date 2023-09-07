@@ -86,9 +86,9 @@ Wrapping your Route Handlers in `withAxiom` will add a logger to your
 request and automatically log exceptions:
 
 ```typescript
-import { withAxiom, AxiomRequest } from 'next-axiom';
+import { withAxiomRouteHandler, AxiomRequest } from 'next-axiom';
 
-export const GET = withAxiom((req: AxiomRequest) => {
+export const GET = withAxiomRouteHandler((req: AxiomRequest) => {
   req.log.info('Login function called');
 
   // You can create intermediate loggers
