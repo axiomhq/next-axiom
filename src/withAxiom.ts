@@ -53,7 +53,7 @@ export function withAxiomNextConfig(nextConfig: NextConfig): NextConfig {
 }
 
 export type AxiomRequest = NextRequest & { log: Logger };
-type NextHandler = (req: AxiomRequest) => Promise<Response> | Promise<NextResponse> | NextResponse | Response;
+type NextHandler = (req: AxiomRequest, res: NextResponse) => Promise<Response> | Promise<NextResponse> | NextResponse | Response;
 
 export function withAxiomRouteHandler(handler: NextHandler) {
   return async (req: Request | NextRequest) => {
