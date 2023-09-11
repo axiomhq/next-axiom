@@ -53,10 +53,10 @@ export function withAxiomNextConfig(nextConfig: NextConfig): NextConfig {
 }
 
 export type AxiomRequest = NextRequest & { log: Logger };
-type NextHandler = (req: AxiomRequest) => Promise<Response> | Promise<NextResponse> | NextResponse | Response;
+type NextHandler<T = any> = (req: AxiomRequest, routeSegment?: T ) => Promise<Response> | Promise<NextResponse> | NextResponse | Response;
 
 export function withAxiomRouteHandler(handler: NextHandler) {
-  return async (req: Request | NextRequest) => {
+  return async (req: Request | NextRequest, routeSegment: any) => {
     let region = '';
     if ('geo' in req) {
       region = req.geo?.region ?? '';
@@ -76,10 +76,11 @@ export function withAxiomRouteHandler(handler: NextHandler) {
 
     const logger = new Logger({ req: report, source: isEdgeRuntime ? 'edge' : 'lambda' });
     const axiomContext = req as AxiomRequest;
+    const routeSeg = routeSegment
     axiomContext.log = logger;
 
     try {
-      const result = await handler(axiomContext);
+      const result = await handler(axiomContext, routeSeg);
       await logger.flush();
       if (isEdgeRuntime) {
         logEdgeReport(report);
