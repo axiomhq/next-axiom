@@ -58,7 +58,7 @@ type NextHandler<T = any> = (
   arg?: T
 ) => Promise<Response> | Promise<NextResponse> | NextResponse | Response;
 
-export function withAxiomRouteHandler(handler: NextHandler) {
+export function withAxiomRouteHandler(handler: NextHandler): NextHandler {
   return async (req: Request | NextRequest, arg: any) => {
     let region = '';
     if ('geo' in req) {
@@ -113,8 +113,8 @@ function isNextConfig(param: WithAxiomParam): param is NextConfig {
 
 // withAxiom can be called either with NextConfig, which will add proxy rewrites
 // to improve deliverability of Web-Vitals and logs.
-export function withAxiom(param: NextConfig): NextConfig;
 export function withAxiom(param: NextHandler): NextHandler;
+export function withAxiom(param: NextConfig): NextConfig;
 export function withAxiom(param: WithAxiomParam) {
   if (typeof param == 'function') {
     return withAxiomRouteHandler(param);
