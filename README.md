@@ -29,7 +29,7 @@ This library allows you to send Web Vitals as well as structured logs from your 
 In your Next.js project, install next-axiom:
 
 ```sh
-npm install --save next-axiom@1.0.0-rc.1
+npm install --save next-axiom
 ```
 
 In the `next.config.ts` file, wrap your Next.js config in `withAxiom` as follows:
