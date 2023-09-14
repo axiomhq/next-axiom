@@ -194,8 +194,8 @@ export class Logger {
     }
   }
 
-  flush: any = async () => {
-    return Promise.all([this.sendLogs(), ...this.children.map((c) => c.flush())]);
+  flush = async () => {
+    await Promise.all([this.sendLogs(), ...this.children.map((c) => c.flush())]);
   };
 }
 
