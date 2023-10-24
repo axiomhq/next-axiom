@@ -3,7 +3,7 @@ import VercelConfig from './platform/vercel';
 import NetlifyConfig from './platform/netlify';
 
 declare global {
-  var Cloudflare: string;
+  var WebSocketPair: any; // Non-standard global only used on Cloudflare: https://developers.cloudflare.com/workers/runtime-apis/websockets
 }
 
 export const Version = require('../package.json').version;
