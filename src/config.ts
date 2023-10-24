@@ -2,9 +2,15 @@ import GenericConfig from './platform/generic';
 import VercelConfig from './platform/vercel';
 import NetlifyConfig from './platform/netlify';
 
+declare global {
+  var Cloudflare: string;
+}
+
 export const Version = require('../package.json').version;
 export const isVercel = process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT || process.env.AXIOM_INGEST_ENDPOINT;
 export const isNetlify = process.env.NETLIFY == 'true';
+export const isBrowser =
+  typeof window !== 'undefined' || (typeof self !== 'undefined' && typeof Cloudflare === 'undefined');
 
 // Detect the platform provider, and return the appropriate config
 // fallback to generic config if no provider is detected

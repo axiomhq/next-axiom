@@ -2,12 +2,12 @@ import { GetServerSidePropsContext, NextApiRequest } from "next";
 import { LogEvent, RequestReport } from "../logger";
 import { EndpointType } from "../shared";
 import type Provider from "./base";
+import { isBrowser } from "../config";
 
 // This is the generic config class for all platforms that doesn't have a special
 // implementation (e.g: vercel, netlify). All config classes extends this one.
 export default class GenericConfig implements Provider {
   proxyPath = '/_axiom';
-  isBrowser = typeof window !== 'undefined';
   shouldSendEdgeReport = false;
   token = process.env.NEXT_PUBLIC_AXIOM_TOKEN || process.env.AXIOM_TOKEN;
   dataset = process.env.NEXT_PUBLIC_AXIOM_DATASET || process.env.AXIOM_DATASET;
@@ -24,11 +24,11 @@ export default class GenericConfig implements Provider {
   }
 
   getLogsEndpoint(): string {
-    return this.isBrowser ? `${this.proxyPath}/logs` : this.getIngestURL(EndpointType.logs);
+    return isBrowser ? `${this.proxyPath}/logs` : this.getIngestURL(EndpointType.logs);
   }
 
   getWebVitalsEndpoint(): string {
-    return this.isBrowser ? `${this.proxyPath}/logs` : this.getIngestURL(EndpointType.webVitals);
+    return isBrowser ? `${this.proxyPath}/logs` : this.getIngestURL(EndpointType.webVitals);
   }
 
   wrapWebVitalsObject(metrics: any[]): any {
