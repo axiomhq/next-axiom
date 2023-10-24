@@ -1,13 +1,9 @@
 import { NextConfig } from 'next';
 import { Rewrite } from 'next/dist/lib/load-custom-routes';
-import { config } from './config';
+import { config, isEdgeRuntime } from './config';
 import { Logger, RequestReport } from './logger';
 import { type NextRequest, type NextResponse } from 'next/server';
 import { EndpointType } from './shared';
-
-declare global {
-  var EdgeRuntime: string;
-}
 
 export function withAxiomNextConfig(nextConfig: NextConfig): NextConfig {
   return {
@@ -75,7 +71,6 @@ export function withAxiomRouteHandler(handler: NextHandler): NextHandler {
       ip: req.headers.get('x-forwarded-for'),
       region,
     };
-    const isEdgeRuntime = globalThis.EdgeRuntime ? true : false;
 
     const logger = new Logger({ req: report, source: isEdgeRuntime ? 'edge' : 'lambda' });
     const axiomContext = req as AxiomRequest;
