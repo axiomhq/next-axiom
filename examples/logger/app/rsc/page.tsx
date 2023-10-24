@@ -16,6 +16,7 @@ async function AxiomLoggerPage() {
   return (
     <main className={styles.main}>
      <h1><Link href="/">Home</Link></h1>
+     <h1><Link href="/worker">Worker</Link></h1>
     </main>
   );
 }
