@@ -181,7 +181,13 @@ export class Logger {
       } else if (config.isBrowser && isVercel && navigator.sendBeacon) {
         // sendBeacon fails if message size is greater than 64kb, so
         // we fall back to fetch.
-        if (!navigator.sendBeacon(url, body)) {
+        // Navigator has to be bound to ensure it does not error in some browsers
+        // https://xgwang.me/posts/you-may-not-know-beacon/#it-may-throw-error%2C-be-sure-to-catch
+        try {
+          if (!navigator.sendBeacon.bind(navigator)(url, body)) {
+            return sendFallback();
+          }
+        } catch (error) {
           return sendFallback();
         }
       } else {
