@@ -1,8 +1,9 @@
-import { config, isVercel, Version } from './config';
+import { config, isBrowser, isVercel, Version } from './config';
 import { NetlifyInfo } from './platform/netlify';
 import { isNoPrettyPrint, throttle } from './shared';
 
 const url = config.getLogsEndpoint();
+
 const LOG_LEVEL = process.env.NEXT_PUBLIC_AXIOM_LOG_LEVEL || 'debug';
 
 export interface LogEvent {
@@ -178,7 +179,7 @@ export class Logger {
       if (typeof fetch === 'undefined') {
         const fetch = await require('whatwg-fetch');
         return fetch(url, reqOptions).catch(console.error);
-      } else if (config.isBrowser && isVercel && navigator.sendBeacon) {
+      } else if (isBrowser && isVercel && navigator.sendBeacon) {
         // sendBeacon fails if message size is greater than 64kb, so
         // we fall back to fetch.
         // Navigator has to be bound to ensure it does not error in some browsers
@@ -244,7 +245,7 @@ export function prettyPrint(ev: LogEvent) {
   let msgString = '';
   let args: any[] = [ev.level, ev.message];
 
-  if (config.isBrowser) {
+  if (isBrowser) {
     msgString = '%c%s - %s';
     args = [`color: ${levelColors[ev.level].browser};`, ...args];
   } else {

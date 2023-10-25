@@ -12,6 +12,7 @@ function Home() {
   return (
     <main className={styles.main}>
       <h1><Link href="/rsc">RSC Page</Link></h1>
+      <h1><Link href="/worker">Worker</Link></h1>
     </main>
   );
 }

@@ -1,3 +1,4 @@
+import { isBrowser } from '../config';
 import { LogEvent } from '../logger';
 import { EndpointType } from '../shared';
 import type Provider from './base';
@@ -25,6 +26,10 @@ export default class VercelConfig extends GenericConfig implements Provider {
 
   getWebVitalsEndpoint(): string {
     return `${this.proxyPath}/web-vitals`;
+  }
+
+  getLogsEndpoint(): string {
+    return isBrowser ? `${this.proxyPath}/logs` : this.getIngestURL(EndpointType.logs);
   }
 
   wrapWebVitalsObject(metrics: any[]) {

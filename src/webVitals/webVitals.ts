@@ -1,5 +1,5 @@
 import { NextWebVitalsMetric } from 'next/app';
-import { config, isVercel, Version } from '../config';
+import { config, isBrowser, isVercel, Version } from '../config';
 import { throttle } from '../shared';
 
 const url = config.getWebVitalsEndpoint();
@@ -35,7 +35,7 @@ function sendMetrics() {
     fetch(url, reqOptions).catch(console.error);
   }
 
-  if (config.isBrowser && isVercel && navigator.sendBeacon) {
+  if (isBrowser && isVercel && navigator.sendBeacon) {
     try {
       // See https://github.com/vercel/next.js/pull/26601
       // Navigator has to be bound to ensure it does not error in some browsers
