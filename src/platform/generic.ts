@@ -28,7 +28,7 @@ export default class GenericConfig implements Provider {
   }
 
   getWebVitalsEndpoint(): string {
-    return isBrowser ? `${this.proxyPath}/logs` : this.getIngestURL(EndpointType.webVitals);
+    return isBrowser ? `${this.proxyPath}/web-vitals` : this.getIngestURL(EndpointType.webVitals);
   }
 
   wrapWebVitalsObject(metrics: any[]): any {
