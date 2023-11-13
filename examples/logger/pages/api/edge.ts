@@ -1,7 +1,7 @@
 import { withAxiom, AxiomRequest } from 'next-axiom';
 
 export const config = {
-  runtime: 'experimental-edge',
+  runtime: 'edge',
 };
 
 function handler(req: AxiomRequest) {
