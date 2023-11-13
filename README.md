@@ -24,7 +24,7 @@ This library allows you to send Web Vitals as well as structured logs from your 
 ## Installation
 
 > **Note**
-> Using the Pages Router? Use version `0.*`, which will continue to get security patches. Here's the [README for `0.x`](https://github.com/axiomhq/next-axiom/blob/v0.x/README.md). If you're upgrading to Next.js 13, check out the [next-axiom upgrade guide](#upgrade-to-nextjs-13).
+> Using the Pages Router? Use version `0.*`, which will continue to get security patches. Here's the [README for `0.x`](https://github.com/axiomhq/next-axiom/blob/v0.x/README.md). 
 
 In your Next.js project, install next-axiom:
 
