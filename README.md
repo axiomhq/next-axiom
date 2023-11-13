@@ -24,7 +24,7 @@ This library allows you to send Web Vitals as well as structured logs from your 
 ## Installation
 
 > **Note**
-> Using Next.js 12? Use version `0.*`, which will continue to get security patches. Here's the [README for `0.18.0`](https://github.com/axiomhq/next-axiom/tree/v0.18.0). If you're upgrading to Next.js 13, check out the [next-axiom upgrade guide](#upgrade-to-nextjs-13).
+> Using the Pages Router? Use version `0.*`, which will continue to get security patches. Here's the [README for `0.x`](https://github.com/axiomhq/next-axiom/blob/v0.x/README.md). If you're upgrading to Next.js 13, check out the [next-axiom upgrade guide](#upgrade-to-nextjs-13).
 
 In your Next.js project, install next-axiom:
 
@@ -146,9 +146,9 @@ export NEXT_PUBLIC_AXIOM_LOG_LEVEL=info
 
 You can also disable logging completely by setting the log level to `off`.
 
-## Upgrade to Next.js 13
+## Upgrade to the App Router
 
-next-axiom switched to support Next.js 13 with app directory support starting version 0.19.0. If you are upgrading from Next.js 12, you will need to make the following changes:
+next-axiom switched to support the App Router starting with version 1.0. If you are upgrading a Pages Router app with next-axiom v0.x to the App Router, you will need to make the following changes:
 
 - Upgrade next-axiom to version 1.0.0 or higher
 - Make sure that exported variables has `NEXT_PUBLIC_` prefix, e.g: `NEXT_PUBLIC_AXIOM_TOKEN`
