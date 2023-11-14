@@ -1,9 +1,21 @@
 import { usePathname } from 'next/navigation';
 import { Logger, LoggerConfig } from './logger';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
+import { useDeepMemo } from './util';
 
 export function useLogger(config: LoggerConfig = {}): Logger {
   const path = usePathname();
+
+  const memoizedConfig = useDeepMemo({
+    ...config,
+    args: {
+      ...(config.args ?? {}),
+      path,
+    },
+  });
+
+  const logger = useMemo(() => new Logger(memoizedConfig), [memoizedConfig]);
+
   useEffect(() => {
     return () => {
       if (logger) {
@@ -12,11 +24,5 @@ export function useLogger(config: LoggerConfig = {}): Logger {
     };
   }, [path]);
 
-  if (!config.args) {
-    config.args = {};
-  }
-  config.args.path = path;
-
-  const logger = new Logger(config);
   return logger;
 }
