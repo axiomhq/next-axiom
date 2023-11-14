@@ -1,10 +1,8 @@
-
 import Image from 'next/image';
 import { Inter } from 'next/font/google';
 import styles from '../page.module.css';
 import { Logger } from 'next-axiom';
 import Link from 'next/link';
-
 const inter = Inter({ subsets: ['latin'] });
 
 async function AxiomLoggerPage() {
@@ -15,8 +13,12 @@ async function AxiomLoggerPage() {
 
   return (
     <main className={styles.main}>
-     <h1><Link href="/">Home</Link></h1>
-     <h1><Link href="/worker">Worker</Link></h1>
+      <h1>
+        <Link href="/">Home</Link>
+      </h1>
+      <h1>
+        <Link href="/worker">Worker</Link>
+      </h1>
     </main>
   );
 }
