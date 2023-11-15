@@ -52,6 +52,7 @@
     "typescript": "^5.1.6"
   },
   "dependencies": {
+    "@trpc/server": "^10.43.3",
     "whatwg-fetch": "^3.6.2"
   }
 }

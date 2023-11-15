@@ -6,10 +6,11 @@
  * TL;DR - This is where all the tRPC server stuff is created and plugged in. The pieces you will
  * need to use are documented accordingly near the end.
  */
-import { initTRPC } from "@trpc/server";
-import { type NextRequest } from "next/server";
-import superjson from "superjson";
-import { ZodError } from "zod";
+import { initTRPC } from '@trpc/server';
+import superjson from 'superjson';
+import { ZodError } from 'zod';
+import { type NextRequest } from 'next/server';
+import { axiomTRPCMiddleware, type axiomTRPCMiddlewareCtx } from 'next-axiom';
 
 /**
  * 1. CONTEXT
@@ -48,9 +49,18 @@ export const createInnerTRPCContext = (opts: CreateContextOptions) => {
 export const createTRPCContext = (opts: { req: NextRequest }) => {
   // Fetch stuff that depends on the request
 
-  return createInnerTRPCContext({
-    headers: opts.req.headers,
-  });
+  return {
+    req: opts.req,
+    axiomTRPCMeta: {
+      foo: 'bar',
+      random: Math.random(),
+    },
+    ...createInnerTRPCContext({
+      headers: opts.req.headers,
+    }),
+    // optional, but gives better errors if the context
+    // doesn't match what the axiomTRPCMiddleware expects
+  } satisfies axiomTRPCMiddlewareCtx;
 };
 
 /**
@@ -68,8 +78,7 @@ const t = initTRPC.context<typeof createTRPCContext>().create({
       ...shape,
       data: {
         ...shape.data,
-        zodError:
-          error.cause instanceof ZodError ? error.cause.flatten() : null,
+        zodError: error.cause instanceof ZodError ? error.cause.flatten() : null,
       },
     };
   },
@@ -96,4 +105,8 @@ export const createTRPCRouter = t.router;
  * guarantee that a user querying is authorized, but you can still access user session data if they
  * are logged in.
  */
-export const publicProcedure = t.procedure;
+
+// we probably want all procedures to log, so we attach the axiomMiddleware to a base procedure
+const baseProcedure = t.procedure.use(axiomTRPCMiddleware);
+
+export const publicProcedure = baseProcedure;

@@ -5,3 +5,4 @@ export * from './config';
 export { withAxiom, type AxiomRequest, withAxiomNextConfig, withAxiomRouteHandler } from './withAxiom';
 export * from './webVitals';
 export { useLogger } from './hooks';
+export { axiomTRPCMiddleware, type axiomTRPCMiddlewareCtx } from './trpc';
