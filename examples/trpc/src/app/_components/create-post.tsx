@@ -1,19 +1,18 @@
-"use client";
+'use client';
 
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
-import { api } from "~/trpc/react";
-import styles from "../index.module.css";
+import { api } from '~/trpc/react';
 
 export function CreatePost() {
   const router = useRouter();
-  const [name, setName] = useState("");
+  const [name, setName] = useState('');
 
   const createPost = api.post.create.useMutation({
     onSuccess: () => {
       router.refresh();
-      setName("");
+      setName('');
     },
   });
 
@@ -23,21 +22,10 @@ export function CreatePost() {
         e.preventDefault();
         createPost.mutate({ name });
       }}
-      className={styles.form}
     >
-      <input
-        type="text"
-        placeholder="Title"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        className={styles.input}
-      />
-      <button
-        type="submit"
-        className={styles.submitButton}
-        disabled={createPost.isLoading}
-      >
-        {createPost.isLoading ? "Submitting..." : "Submit"}
+      <input type="text" placeholder="Title" value={name} onChange={(e) => setName(e.target.value)} />
+      <button type="submit" disabled={createPost.isLoading}>
+        {createPost.isLoading ? 'Submitting...' : 'Submit'}
       </button>
     </form>
   );
