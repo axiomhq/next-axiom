@@ -2,8 +2,8 @@
 import { log } from 'next-axiom';
 
 addEventListener('message', async (event: MessageEvent<number>) => {
-    log.info("fired from worker")
-    log.info(event.data.toString())
-    await log.flush()
-    postMessage('done')
-})
+  log.info('fired from worker');
+  log.info(event.data.toString());
+  await log.flush();
+  postMessage('done');
+});
