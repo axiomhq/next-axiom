@@ -1,8 +1,8 @@
-import { test, expect } from '@jest/globals';
+import { test, expect } from 'vitest';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { NextFetchEvent, NextRequest, NextResponse } from 'next/server';
-import 'whatwg-fetch';
 import { withAxiom } from '../src/withAxiom';
+import 'whatwg-fetch';
 
 test('withAxiom(NextConfig)', async () => {
   const config = withAxiom({
