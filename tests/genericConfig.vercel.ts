@@ -6,7 +6,7 @@ vi.hoisted(() => {
   // stub axiom env vars before importing logger
   vi.stubEnv('NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT', '');
   vi.stubEnv('NEXT_PUBLIC_AXIOM_URL', 'https://api.axiom.co');
-  vi.stubEnv('NEXT_PUBLIC_AXIOM_DATASET', 'tesst');
+  vi.stubEnv('NEXT_PUBLIC_AXIOM_DATASET', 'test');
 });
 
 describe('unknown env config tests', () => {
