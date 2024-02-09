@@ -1,20 +1,23 @@
-// set axiom env vars before importing logger
-process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT = 'https://example.co/api/test';
 import { log } from '../src/logger';
-import { test, expect, jest } from '@jest/globals';
+import { test, expect, vi, vitest } from 'vitest';
 
-jest.useFakeTimers();
+vi.hoisted(() => {
+  // set axiom env vars before importing logger
+  vi.stubEnv('NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT', 'https://example.co/api/test');
+});
+
+vi.useFakeTimers();
 
 test('sending logs from browser', async () => {
-  global.fetch = jest.fn(async () => {
+  global.fetch = vi.fn(async () => {
     const resp = new Response('', { status: 200 });
     return Promise.resolve(resp);
-  }) as jest.Mock<typeof fetch>;
+  });
 
   log.info('hello, world!');
   expect(fetch).toHaveBeenCalledTimes(0);
 
-  jest.advanceTimersByTime(1000);
+  vi.advanceTimersByTime(1000);
   expect(fetch).toHaveBeenCalledTimes(1);
 
   log.info('hello, world!');
@@ -25,18 +28,18 @@ test('sending logs from browser', async () => {
 });
 
 test('with', async () => {
-  global.fetch = jest.fn(async () => {
+  global.fetch = vi.fn(async () => {
     const resp = new Response('', { status: 200 });
     return Promise.resolve(resp);
-  }) as jest.Mock<typeof fetch>;
+  });
 
   const logger = log.with({ foo: 'bar' });
   logger.info('hello, world!', { bar: 'baz' });
   expect(fetch).toHaveBeenCalledTimes(0);
 
-  jest.advanceTimersByTime(1000);
+  vi.advanceTimersByTime(1000);
   expect(fetch).toHaveBeenCalledTimes(1);
-  const mockedFetch = fetch as jest.Mock<typeof fetch>;
+  const mockedFetch = fetch as vitest.Mock<typeof fetch>;
   const sentPayload = mockedFetch.mock.calls[0][1]?.body?.toString();
   const payload = JSON.parse(sentPayload ? sentPayload : '{}');
   expect(payload.length).toBe(1);
@@ -49,19 +52,19 @@ test('with', async () => {
 });
 
 test('passing non-object', async () => {
-  global.fetch = jest.fn(async () => {
+  global.fetch = vi.fn(async () => {
     const resp = new Response('', { status: 200 });
     return Promise.resolve(resp);
-  }) as jest.Mock<typeof fetch>;
+  }) as vitest.Mock<typeof fetch>;
 
   const logger = log.with({ foo: 'bar' });
   const args = 'baz';
   logger.info('hello, world!', args as unknown as object);
   expect(fetch).toHaveBeenCalledTimes(0);
 
-  jest.advanceTimersByTime(1000);
+  vi.advanceTimersByTime(1000);
   expect(fetch).toHaveBeenCalledTimes(1);
-  const mockedFetch = fetch as jest.Mock<typeof fetch>;
+  const mockedFetch = fetch as vitest.Mock<typeof fetch>;
   const sentPayload = mockedFetch.mock.calls[0][1]?.body?.toString();
   const payload = JSON.parse(sentPayload ? sentPayload : '{}');
   expect(payload.length).toBe(1);
@@ -73,10 +76,10 @@ test('passing non-object', async () => {
 });
 
 test('flushing child loggers', async () => {
-  global.fetch = jest.fn(async () => {
+  global.fetch = vitest.fn(async () => {
     const resp = new Response('', { status: 200 });
     return Promise.resolve(resp);
-  }) as jest.Mock<typeof fetch>;
+  });
 
   log.info('hello, world!');
   const logger1 = log.with({ foo: 'bar' });
@@ -88,7 +91,7 @@ test('flushing child loggers', async () => {
 
   expect(fetch).toHaveBeenCalledTimes(3);
 
-  const mockedFetch = fetch as jest.Mock<typeof fetch>;
+  const mockedFetch = fetch as vitest.Mock<typeof fetch>;
   const sentPayload = mockedFetch.mock.calls[2][1]?.body?.toString();
   const payload = JSON.parse(sentPayload ? sentPayload : '{}');
   expect(Object.keys(payload[0].fields).length).toEqual(2);
@@ -100,15 +103,15 @@ test('flushing child loggers', async () => {
 });
 
 test('throwing exception', async () => {
-  global.fetch = jest.fn(async () => {
+  global.fetch = vitest.fn(async () => {
     const resp = new Response('', { status: 200 });
     return Promise.resolve(resp);
-  }) as jest.Mock<typeof fetch>;
+  }) as vitest.Mock<typeof fetch>;
   const err = new Error('test');
   log.error('hello, world!', err);
   await log.flush();
   expect(fetch).toHaveBeenCalledTimes(1);
-  const mockedFetch = fetch as jest.Mock<typeof fetch>;
+  const mockedFetch = fetch as vitest.Mock<typeof fetch>;
   const sentPayload = mockedFetch.mock.calls[0][1]?.body?.toString();
   const payload = JSON.parse(sentPayload ? sentPayload : '{}');
   expect(Object.keys(payload[0].fields).length).toEqual(3); // { name, message, stack }

@@ -1,16 +1,19 @@
-// set axiom env vars before importing logger
-process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT = 'https://example.co/api/test';
-process.env.NEXT_PUBLIC_AXIOM_LOG_LEVEL = 'error';
-import { test, expect, jest } from '@jest/globals';
+import { test, expect, vi } from 'vitest';
 import { log, Logger, LogLevel } from '../src/logger';
 
-jest.useFakeTimers();
+vi.hoisted(() => {
+  // stub axiom env vars before importing logger
+  vi.stubEnv('NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT', 'https://example.co/api/test');
+  vi.stubEnv('NEXT_PUBLIC_AXIOM_LOG_LEVEL', 'error');
+});
+
+vi.useFakeTimers();
 
 test('log levels', async () => {
-  global.fetch = jest.fn(async () => {
+  global.fetch = vi.fn(async () => {
     const resp = new Response('', { status: 200 });
     return Promise.resolve(resp);
-  }) as jest.Mock<typeof fetch>;
+  }) as vitest.Mock<typeof fetch>;
 
   log.info('test');
   await log.flush();
