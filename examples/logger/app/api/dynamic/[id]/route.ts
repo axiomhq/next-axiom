@@ -1,4 +1,4 @@
-import { AxiomRequest, withAxiom } from 'next-axiom';
+import { withAxiom } from 'next-axiom';
 
 export const runtime = 'edge';
 

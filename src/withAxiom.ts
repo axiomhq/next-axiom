@@ -5,7 +5,9 @@ import { Logger, RequestReport } from './logger';
 import { type NextRequest, type NextResponse } from 'next/server';
 import { EndpointType } from './shared';
 
-export function withAxiomNextConfig(nextConfig: NextConfig): NextConfig {
+export function withAxiomNextConfig<T extends NextConfig>(
+  nextConfig: T
+): Omit<T, 'rewrites'> & Pick<NextConfig, 'rewrites'> {
   return {
     ...nextConfig,
     rewrites: async () => {
@@ -49,13 +51,13 @@ export function withAxiomNextConfig(nextConfig: NextConfig): NextConfig {
 }
 
 export type AxiomRequest = NextRequest & { log: Logger };
-type NextHandler<T = any> = (
-  req: AxiomRequest,
-  arg?: T
-) => Promise<Response> | Promise<NextResponse> | NextResponse | Response;
+type AxiomHandler<
+  Args = any,
+  Res extends Response | NextResponse = Response | NextResponse
+> = (req: AxiomRequest, arg?: Args) => Promise<Res> | Res;
 
-export function withAxiomRouteHandler(handler: NextHandler): NextHandler {
-  return async (req: Request | NextRequest, arg: any) => {
+export function withAxiomRouteHandler<T extends AxiomHandler>(handler: T): T {
+  return (async (req, arg) => {
     let region = '';
     if ('geo' in req) {
       region = req.geo?.region ?? '';
@@ -72,13 +74,14 @@ export function withAxiomRouteHandler(handler: NextHandler): NextHandler {
       region,
     };
 
-    const logger = new Logger({ req: report, source: isEdgeRuntime ? 'edge' : 'lambda' });
-    const axiomContext = req as AxiomRequest;
-    const args = arg;
-    axiomContext.log = logger;
+    const logger = new Logger({
+      req: report,
+      source: isEdgeRuntime ? 'edge' : 'lambda',
+    });
+    req.log = logger;
 
     try {
-      const result = await handler(axiomContext, args);
+      const result = await handler(req, arg);
       await logger.flush();
       if (isEdgeRuntime) {
         logEdgeReport(report);
@@ -93,24 +96,26 @@ export function withAxiomRouteHandler(handler: NextHandler): NextHandler {
       }
       throw error;
     }
-  };
+  }) as T;
 }
 
 function logEdgeReport(report: RequestReport) {
   console.log(`AXIOM_EDGE_REPORT::${JSON.stringify(report)}`);
 }
 
-type WithAxiomParam = NextConfig | NextHandler;
-
-function isNextConfig(param: WithAxiomParam): param is NextConfig {
+function isNextConfig(param: NextConfig | AxiomHandler): param is NextConfig {
   return typeof param == 'object';
 }
 
 // withAxiom can be called either with NextConfig, which will add proxy rewrites
 // to improve deliverability of Web-Vitals and logs.
-export function withAxiom(param: NextHandler): NextHandler;
-export function withAxiom(param: NextConfig): NextConfig;
-export function withAxiom(param: WithAxiomParam) {
+export function withAxiom<T extends AxiomHandler>(
+  param: T
+): ReturnType<typeof withAxiomRouteHandler<T>>;
+export function withAxiom<T extends NextConfig>(
+  param: T
+): ReturnType<typeof withAxiomNextConfig<T>>;
+export function withAxiom<T extends NextConfig | AxiomHandler>(param: T) {
   if (typeof param == 'function') {
     return withAxiomRouteHandler(param);
   } else if (isNextConfig(param)) {
