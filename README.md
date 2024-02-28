@@ -26,7 +26,7 @@ Make sure you have the [Axiom Vercel integration](https://www.axiom.co/vercel) i
 - In your Next.js project, run install `next-axiom` as follows:
 
 ```sh
-npm install --save next-axiom
+npm install --save next-axiom@0
 ```
 
 - In the `next.config.js` file, wrap your Next.js config in `withAxiom` as follows:
@@ -62,8 +62,6 @@ module.exports = withAxiom({
 ## Usage
 
 ### Web Vitals
-
-> **Warning**: Web-Vitals are not yet supported in Next.js 13 and above. Please use Next.js 12 or below. We [submitted a patch](https://github.com/vercel/next.js/pull/47319) and as soon as Next.js 13.2.5 is out, we'll add support here.
 
 Go to `pages/_app.js` or `pages/_app.ts` and add the following line to report web vitals:
 
