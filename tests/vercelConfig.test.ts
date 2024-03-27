@@ -29,15 +29,10 @@ test('logging to console when running on lambda', async () => {
 
   await logger.flush();
   expect(mockedConsole).toHaveBeenCalledTimes(1);
-  expect(mockedConsole).toHaveBeenCalledWith({
-    _time: time,
-    fields: {},
-    level: 'info',
-    message: 'hello, world!',
-    vercel: {
-      environment: 'test',
-      region: undefined,
-      source: 'lambda',
-    },
-  });
+
+  const calledWithPayload = JSON.parse(mockedConsole.mock.calls[0][0]);
+  expect(calledWithPayload.message).toEqual('hello, world!');
+  expect(calledWithPayload.level).toEqual('info');
+  expect(calledWithPayload._time).toEqual(time);
+  expect(calledWithPayload.vercel.source).toEqual('lambda');
 });

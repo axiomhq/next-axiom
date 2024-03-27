@@ -160,7 +160,7 @@ export class Logger {
     // to send logs to Axiom without HTTP.
     // This saves resources and time on lambda and edge functions
     if (isVercel && (this.config.source === 'edge' || this.config.source === 'lambda')) {
-      this.logEvents.forEach((ev) => console.log(ev));
+      this.logEvents.forEach((ev) => console.log(JSON.stringify(ev)));
       this.logEvents = [];
       return;
     }
