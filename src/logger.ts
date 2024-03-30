@@ -50,6 +50,7 @@ export type LoggerConfig = {
   autoFlush?: boolean;
   source?: string;
   req?: any;
+  prettyPrint?: typeof prettyPrint;
 };
 
 export class Logger {
@@ -60,6 +61,7 @@ export class Logger {
   public config: LoggerConfig = {
     autoFlush: true,
     source: 'frontend',
+    prettyPrint: prettyPrint,
   };
 
   constructor(public initConfig: LoggerConfig = {}) {
@@ -151,7 +153,7 @@ export class Logger {
     if (!config.isEnvVarsSet()) {
       // if AXIOM ingesting url is not set, fallback to printing to console
       // to avoid network errors in development environments
-      this.logEvents.forEach((ev) => prettyPrint(ev));
+      this.logEvents.forEach((ev) => (this.config.prettyPrint ? this.config.prettyPrint(ev) : prettyPrint(ev)));
       this.logEvents = [];
       return;
     }
