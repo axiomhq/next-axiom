@@ -47,7 +47,47 @@ no further configuration is required.
 
 Otherwise create a dataset and an API token in [Axiom settings](https://cloud.axiom.co/settings/profile), then export them as environment variables `NEXT_PUBLIC_AXIOM_DATASET` and `NEXT_PUBLIC_AXIOM_TOKEN`.
 
-## Usage
+
+## Capture traffic requests
+
+Create a `middleware.ts` in the root dir of your app:
+
+```typescript
+import { Logger } from 'next-axiom'
+import { NextResponse } from 'next/server'
+import type { NextFetchEvent, NextRequest } from 'next/server'
+
+const logger = new Logger({
+  source: 'traffic'
+});
+
+// This function can be marked `async` if using `await` inside
+export async function middleware(request: NextRequest, event: NextFetchEvent) {
+    const req = {
+        ip: request.ip,
+        region: request.geo?.region,
+        method: request.method,
+        host: request.nextUrl.host,
+        path: request.nextUrl.pathname,
+        scheme: request.nextUrl.protocol.split(":")[0],
+        referer: request.headers.get('Referer'),
+        userAgent: request.headers.get('user-agent'),
+        statusCode: 0,
+    }
+
+
+    const message = `[${request.method}] [middleware: "middleware"] ${request.nextUrl.pathname}`
+
+    logger.logHttpRequest(message, req, {})
+    event.waitUntil(logger.flush())
+
+    return NextResponse.next()
+}
+
+// See "Matching Paths" below to learn more
+export const config = {
+}
+```
 
 ### Web Vitals
 
@@ -145,6 +185,43 @@ export NEXT_PUBLIC_AXIOM_LOG_LEVEL=info
 ```
 
 You can also disable logging completely by setting the log level to `off`.
+
+
+### Capturing Errors
+
+To capture routing errors we can use the [Error Handling](https://nextjs.org/docs/app/building-your-application/routing/error-handling) mechanism of Next. 
+
+Create a new file named `error.ts` under your `/app` directory. Inside your component function use the logger to ingest the error to Axiom. e.g:
+
+```typescript
+"use client";
+
+import NavTable from "@/components/NavTable";
+import { useLogger } from "next-axiom";
+
+export default function Error({
+  error,
+}: {
+  error: Error & { digest?: string };
+}) {
+  const log = useLogger();
+  log.error(error.message, {
+    error: error.name,
+    cause: error.cause,
+    stack: error.stack,
+    digest: error.digest,
+  });
+
+  return <div className="p-8">
+    Ops! An Error has occurred: <p className="text-red-400 px-8 py-2 text-lg">`{ error.message }`</p>
+    
+    <div className="w-1/3 mt-8">
+        <NavTable />
+    </div>
+    
+    </div>;
+}
+```
 
 ## Upgrade to the App Router
 

@@ -38,7 +38,7 @@ export default class NetlifyConfig extends GenericConfig implements Provider {
     logEvent.netlify = {
       environment: this.environment,
       region: source === 'edge' ? process.env.DENO_REGION : process.env.AWS_REGION,
-      source: source + '-log',
+      source: source,
       siteId: netlifySiteId,
       buildId: netlifyBuildId,
       context: netlifyContext,
