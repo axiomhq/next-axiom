@@ -13,6 +13,7 @@ export interface LogEvent {
   _time: string;
   request?: RequestReport;
   git?: any,
+  source: string;
   platform?: PlatformInfo;
   vercel?: PlatformInfo;
   netlify?: NetlifyInfo;
@@ -111,6 +112,7 @@ export class Logger {
       level: LogLevel[level].toString(),
       message,
       _time: new Date(Date.now()).toISOString(),
+      source: this.config.source!,
       fields: this.config.args || {},
       "@axiom": {
         "next-axiom": Version,

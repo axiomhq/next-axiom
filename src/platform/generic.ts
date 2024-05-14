@@ -39,6 +39,7 @@ export default class GenericConfig implements Provider {
         environment: this.environment,
         source: 'web-vital',
       },
+      source: 'web-vital'
     }))
   }
 
@@ -48,6 +49,7 @@ export default class GenericConfig implements Provider {
       key = "vercel"
     }
 
+    logEvent.source = source;
     logEvent[key] = {
       environment: this.environment,
       region: this.region,
