@@ -32,6 +32,7 @@ export enum LogLevel {
 
 export interface RequestReport {
   startTime: number;
+  endTime: number;
   statusCode?: number;
   ip?: string | null;
   region?: string | null;

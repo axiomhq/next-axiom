@@ -66,37 +66,56 @@ export function withAxiomRouteHandler(handler: NextHandler): NextHandler {
     if (req instanceof NextRequest) {
       pathname = req.nextUrl.pathname
     } else if (req instanceof Request) {
-      pathname = req.url.substring(req.headers.get('host')?.length || 0)
+      // pathname = req.url.substring(req.headers.get('host')?.length || 0)
+      pathname = new URL(req.url).pathname
     }
 
     const report: RequestReport = {
       startTime: new Date().getTime(),
+      endTime: new Date().getTime(),
       path: pathname,
       method: req.method,
       host: req.headers.get('host'),
       userAgent: req.headers.get('user-agent'),
-      scheme: 'https',
+      scheme: req.url.split('://')[0],
       ip: req.headers.get('x-forwarded-for'),
       region,
     };
 
-    const logger = new Logger({ req: report, source: isEdgeRuntime ? 'edge-log' : 'lambda-log' });
+    // main logger, mainly used to log reporting on the incoming HTTP request
+    const logger = new Logger({ req: report, source: isEdgeRuntime ? 'edge' : 'lambda' });
+    // child logger to be used by the users within the handler
+    const log = logger.with({})
+    log.config.source = isEdgeRuntime ? 'edge-log' : 'lambda-log'
     const axiomContext = req as AxiomRequest;
     const args = arg;
-    axiomContext.log = logger;
+    axiomContext.log = log;
 
     try {
       const result = await handler(axiomContext, args);
-      logger.attachResponseStatus(result.status)
+      report.endTime = new Date().getTime();
+
+      // report log record
+      report.statusCode = result.status;
+      logger.logHttpRequest(`[${req.method}] ${report.path} ${report.statusCode} ${report.endTime - report.startTime}ms`, report, {});
+      // attach the response status to all children logs
+      log.attachResponseStatus(result.status)
+
+      // flush the logger along with the child logger
       await logger.flush();
       if (isEdgeRuntime && isVercelIntegration) {
         logEdgeReport(report);
       }
       return result;
     } catch (error: any) {
-      logger.error(error.message, { error })
-      // logger.error('Error in Next route handler', { error });
-      logger.attachResponseStatus(500);
+      report.endTime = new Date().getTime();
+      // report log record
+      report.statusCode = 500;
+      logger.logHttpRequest(`[${req.method}] ${report.path} ${report.statusCode} ${report.endTime - report.startTime}ms`, report, {});
+
+      log.error(error.message, { error })
+      log.attachResponseStatus(500);
+
       await logger.flush();
       if (isEdgeRuntime && isVercelIntegration) {
         logEdgeReport(report);
