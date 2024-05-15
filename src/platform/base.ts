@@ -1,5 +1,4 @@
 import { NextWebVitalsMetric } from 'next/app';
-import { RequestReport } from '../logger';
 import { EndpointType } from '../shared';
 
 // This is the base class for all platform providers. It contains all the different
@@ -16,7 +15,6 @@ export default interface Provider {
   getIngestURL(t: EndpointType): string;
   wrapWebVitalsObject(metrics: NextWebVitalsMetric[]): any;
   injectPlatformMetadata(logEvent: any, source: string): void;
-  generateRequestMeta(req: any): RequestReport;
   getLogsEndpoint(): string
   getWebVitalsEndpoint(): string
 }

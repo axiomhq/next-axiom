@@ -1,5 +1,5 @@
 import { GetServerSidePropsContext, NextApiRequest } from "next";
-import { LogEvent, RequestReport } from "../logger";
+import { LogEvent } from "../logger";
 import { EndpointType } from "../shared";
 import type Provider from "./base";
 import { isBrowser, isVercel } from "../config";
@@ -20,7 +20,7 @@ export default class GenericConfig implements Provider {
   }
 
   getIngestURL(_: EndpointType): string {
-    return `${this.axiomUrl}/api/v1/datasets/${this.dataset}/ingest`;
+    return `${this.axiomUrl}/v1/datasets/${this.dataset}/ingest`;
   }
 
   getLogsEndpoint(): string {
@@ -67,19 +67,6 @@ export default class GenericConfig implements Provider {
         ref: process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF,
       }
     }
-  }
-
-  generateRequestMeta(req: NextApiRequest | GetServerSidePropsContext['req']): RequestReport {
-    return {
-      startTime: new Date().getTime(),
-      path: req.url!,
-      method: req.method!,
-      host: this.getHeaderOrDefault(req, 'host', ''),
-      userAgent: this.getHeaderOrDefault(req, 'user-agent', ''),
-      scheme: 'https',
-      ip: this.getHeaderOrDefault(req, 'x-forwarded-for', ''),
-      region: this.region,
-    };
   }
 
   getHeaderOrDefault(req: NextApiRequest | GetServerSidePropsContext['req'], headerName: string, defaultValue: any) {
