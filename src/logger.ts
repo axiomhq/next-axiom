@@ -1,6 +1,9 @@
+import { NextRequest } from 'next/server';
 import { config, isBrowser, isVercelIntegration, Version } from './config';
 import { NetlifyInfo } from './platform/netlify';
 import { isNoPrettyPrint, throttle } from './shared';
+
+
 
 const url = config.getLogsEndpoint();
 
@@ -17,8 +20,8 @@ export interface LogEvent {
   platform?: PlatformInfo;
   vercel?: PlatformInfo;
   netlify?: NetlifyInfo;
-  "@axiom": {
-    "next-axiom": string,
+  "@app": {
+    "next-axiom-version": string;
   }
 }
 
@@ -41,6 +44,7 @@ export interface RequestReport {
   method: string;
   scheme: string;
   userAgent?: string | null;
+  durationMs?: number;
 }
 
 export interface PlatformInfo {
@@ -115,8 +119,8 @@ export class Logger {
       _time: new Date(Date.now()).toISOString(),
       source: this.config.source!,
       fields: this.config.args || {},
-      "@axiom": {
-        "next-axiom": Version,
+      "@app": {
+        "next-axiom-version": Version,
       }
     };
 
@@ -144,13 +148,30 @@ export class Logger {
     return logEvent;
   }
 
-  logHttpRequest(message: string, request: any, args: any) {
-    const logEvent = this._transformEvent(LogLevel.info, message, args);
+  logHttpRequest(level: LogLevel, message: string, request: any, args: any) {
+    const logEvent = this._transformEvent(level, message, args);
     logEvent.request = request;
     this.logEvents.push(logEvent);
     if (this.config.autoFlush) {
       this.throttledSendLogs();
     }
+  }
+
+  middleware(request: NextRequest) {
+    const req = {
+      ip: request.ip,
+      region: request.geo?.region,
+      method: request.method,
+      host: request.nextUrl.hostname,
+      path: request.nextUrl.pathname,
+      scheme: request.nextUrl.protocol.split(":")[0],
+      referer: request.headers.get('Referer'),
+      userAgent: request.headers.get('user-agent'),
+    }
+
+    const message = `[${request.method}] [middleware: "middleware"] ${request.nextUrl.pathname}`
+
+    return this.logHttpRequest(LogLevel.info, message, req, {})
   }
 
   private _log = (level: LogLevel, message: string, args: { [key: string]: any } = {}) => {

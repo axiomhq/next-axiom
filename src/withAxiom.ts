@@ -1,7 +1,7 @@
 import { NextConfig } from 'next';
 import { Rewrite } from 'next/dist/lib/load-custom-routes';
 import { config, isEdgeRuntime, isVercelIntegration } from './config';
-import { Logger, RequestReport } from './logger';
+import { LogLevel, Logger, RequestReport } from './logger';
 import { NextRequest, type NextResponse } from 'next/server';
 import { EndpointType } from './shared';
 
@@ -97,7 +97,8 @@ export function withAxiomRouteHandler(handler: NextHandler): NextHandler {
 
       // report log record
       report.statusCode = result.status;
-      logger.logHttpRequest(`[${req.method}] ${report.path} ${report.statusCode} ${report.endTime - report.startTime}ms`, report, {});
+      report.durationMs = report.endTime - report.startTime;
+      logger.logHttpRequest(LogLevel.info, `[${req.method}] ${report.path} ${report.statusCode} ${report.endTime - report.startTime}ms`, report, {});
       // attach the response status to all children logs
       log.attachResponseStatus(result.status)
 
@@ -111,7 +112,8 @@ export function withAxiomRouteHandler(handler: NextHandler): NextHandler {
       report.endTime = new Date().getTime();
       // report log record
       report.statusCode = 500;
-      logger.logHttpRequest(`[${req.method}] ${report.path} ${report.statusCode} ${report.endTime - report.startTime}ms`, report, {});
+      report.durationMs = report.endTime - report.startTime;
+      logger.logHttpRequest(LogLevel.error, `[${req.method}] ${report.path} ${report.statusCode} ${report.endTime - report.startTime}ms`, report, {});
 
       log.error(error.message, { error })
       log.attachResponseStatus(500);
