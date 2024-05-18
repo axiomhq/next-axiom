@@ -146,6 +146,19 @@ export NEXT_PUBLIC_AXIOM_LOG_LEVEL=info
 
 You can also disable logging completely by setting the log level to `off`.
 
+#### Custom printing to console
+
+Printing logs to the console can be customized through the `prettyPrint` configuration. It is a function taking a `LogEvent` as parameter.
+The following example prints the event message without any formatting:
+
+```typescript
+const logger = new Logger({
+  prettyPrint: (event) => {
+    console.log(event.message);
+  },
+});
+```
+
 ## Upgrade to the App Router
 
 next-axiom switched to support the App Router starting with version 1.0. If you are upgrading a Pages Router app with next-axiom v0.x to the App Router, you will need to make the following changes:
