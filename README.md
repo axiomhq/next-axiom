@@ -57,32 +57,13 @@ import { Logger } from 'next-axiom'
 import { NextResponse } from 'next/server'
 import type { NextFetchEvent, NextRequest } from 'next/server'
 
-const logger = new Logger({
-  source: 'traffic'
-});
-
-// This function can be marked `async` if using `await` inside
 export async function middleware(request: NextRequest, event: NextFetchEvent) {
-    const req = {
-        ip: request.ip,
-        region: request.geo?.region,
-        method: request.method,
-        host: request.nextUrl.host,
-        path: request.nextUrl.pathname,
-        scheme: request.nextUrl.protocol.split(":")[0],
-        referer: request.headers.get('Referer'),
-        userAgent: request.headers.get('user-agent'),
-        statusCode: 0,
-    }
+    const logger = new Logger({ source: 'middleware' }); // traffic, request
+    logger.middleware(request)
 
-
-    const message = `[${request.method}] [middleware: "middleware"] ${request.nextUrl.pathname}`
-
-    logger.logHttpRequest(message, req, {})
     event.waitUntil(logger.flush())
-
     return NextResponse.next()
-}
+
 
 // See "Matching Paths" below to learn more
 export const config = {
@@ -191,35 +172,50 @@ You can also disable logging completely by setting the log level to `off`.
 
 To capture routing errors we can use the [Error Handling](https://nextjs.org/docs/app/building-your-application/routing/error-handling) mechanism of Next. 
 
-Create a new file named `error.ts` under your `/app` directory. Inside your component function use the logger to ingest the error to Axiom. e.g:
+Create a new file named `error.tsx` under your `/app` directory. Inside your component function use the logger to ingest the error to Axiom. e.g:
 
 ```typescript
 "use client";
 
 import NavTable from "@/components/NavTable";
+import { LogLevel } from "@/next-axiom/logger";
 import { useLogger } from "next-axiom";
+import { usePathname } from "next/navigation";
 
-export default function Error({
+export default function ErrorPage({
   error,
 }: {
   error: Error & { digest?: string };
 }) {
-  const log = useLogger();
-  log.error(error.message, {
-    error: error.name,
-    cause: error.cause,
-    stack: error.stack,
-    digest: error.digest,
-  });
+  const pathname = usePathname()
+  const log = useLogger({ source: "error.tsx" });
+  let status =  error.message == 'Invalid URL' ? 404 : 500;
 
-  return <div className="p-8">
-    Ops! An Error has occurred: <p className="text-red-400 px-8 py-2 text-lg">`{ error.message }`</p>
-    
-    <div className="w-1/3 mt-8">
+  log.logHttpRequest(
+    LogLevel.error,
+    error.message,
+    {
+      host: window.location.href,
+      path: pathname,
+      statusCode: status,
+    },
+    {
+      error: error.name,
+      cause: error.cause,
+      stack: error.stack,
+      digest: error.digest,
+    },
+  );
+
+  return (
+    <div className="p-8">
+      Ops! An Error has occurred:{" "}
+      <p className="text-red-400 px-8 py-2 text-lg">`{error.message}`</p>
+      <div className="w-1/3 mt-8">
         <NavTable />
+      </div>
     </div>
-    
-    </div>;
+  );
 }
 ```
 
