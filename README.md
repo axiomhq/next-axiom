@@ -45,7 +45,7 @@ module.exports = withAxiom({
 If you are using the [Vercel integration](https://www.axiom.co/vercel),
 no further configuration is required.
 
-Otherwise create a dataset and an API token in [Axiom settings](https://cloud.axiom.co/settings/profile), then export them as environment variables `NEXT_PUBLIC_AXIOM_DATASET` and `NEXT_PUBLIC_AXIOM_TOKEN`.
+Otherwise create a dataset and an API token in [Axiom settings](https://app.axiom.co/settings/profile), then export them as environment variables `NEXT_PUBLIC_AXIOM_DATASET` and `NEXT_PUBLIC_AXIOM_TOKEN`.
 
 ## Usage
 
