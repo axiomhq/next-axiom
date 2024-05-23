@@ -1,5 +1,5 @@
 import { test, expect, vi } from 'vitest';
-import { config } from '../src/config';
+import { config, isVercelIntegration } from '../src/config';
 import { EndpointType } from '../src/shared';
 import { Logger } from '../src/logger';
 
@@ -22,7 +22,7 @@ test('logging to console when running on lambda', async () => {
   const time = new Date(Date.now()).toISOString();
 
   const logger = new Logger({
-    source: 'lambda',
+    source: 'lambda-log',
   });
 
   logger.info('hello, world!');
@@ -34,5 +34,5 @@ test('logging to console when running on lambda', async () => {
   expect(calledWithPayload.message).toEqual('hello, world!');
   expect(calledWithPayload.level).toEqual('info');
   expect(calledWithPayload._time).toEqual(time);
-  expect(calledWithPayload.vercel.source).toEqual('lambda');
+  expect(calledWithPayload.vercel.source).toEqual('lambda-log');
 });
