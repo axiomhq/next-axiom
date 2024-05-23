@@ -184,7 +184,9 @@ const logger = new Logger({
 
 To capture routing errors we can use the [Error Handling](https://nextjs.org/docs/app/building-your-application/routing/error-handling) mechanism of Next. 
 
-Create a new file named `error.tsx` under your `/app` directory. Inside your component function use the logger to ingest the error to Axiom. e.g:
+Create a new file named `error.tsx` under your `/app` directory. Inside your component function use the logger to ingest the error to Axiom. 
+
+Example:
 
 ```typescript
 "use client";
