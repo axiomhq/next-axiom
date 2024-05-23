@@ -54,7 +54,6 @@ type NextHandler<T = any> = (
   arg?: T
 ) => Promise<Response> | Promise<NextResponse> | NextResponse | Response;
 
-
 export function withAxiomRouteHandler(handler: NextHandler): NextHandler {
   return async (req: Request | NextRequest, arg: any) => {
     let region = '';
@@ -62,12 +61,12 @@ export function withAxiomRouteHandler(handler: NextHandler): NextHandler {
       region = req.geo?.region ?? '';
     }
 
-    let pathname = ''
+    let pathname = '';
     if (req instanceof NextRequest) {
-      pathname = req.nextUrl.pathname
+      pathname = req.nextUrl.pathname;
     } else if (req instanceof Request) {
       // pathname = req.url.substring(req.headers.get('host')?.length || 0)
-      pathname = new URL(req.url).pathname
+      pathname = new URL(req.url).pathname;
     }
 
     const report: RequestReport = {
@@ -85,8 +84,8 @@ export function withAxiomRouteHandler(handler: NextHandler): NextHandler {
     // main logger, mainly used to log reporting on the incoming HTTP request
     const logger = new Logger({ req: report, source: isEdgeRuntime ? 'edge' : 'lambda' });
     // child logger to be used by the users within the handler
-    const log = logger.with({})
-    log.config.source = isEdgeRuntime ? 'edge-log' : 'lambda-log'
+    const log = logger.with({});
+    log.config.source = isEdgeRuntime ? 'edge-log' : 'lambda-log';
     const axiomContext = req as AxiomRequest;
     const args = arg;
     axiomContext.log = log;
@@ -98,9 +97,14 @@ export function withAxiomRouteHandler(handler: NextHandler): NextHandler {
       // report log record
       report.statusCode = result.status;
       report.durationMs = report.endTime - report.startTime;
-      logger.logHttpRequest(LogLevel.info, `[${req.method}] ${report.path} ${report.statusCode} ${report.endTime - report.startTime}ms`, report, {});
+      logger.logHttpRequest(
+        LogLevel.info,
+        `[${req.method}] ${report.path} ${report.statusCode} ${report.endTime - report.startTime}ms`,
+        report,
+        {}
+      );
       // attach the response status to all children logs
-      log.attachResponseStatus(result.status)
+      log.attachResponseStatus(result.status);
 
       // flush the logger along with the child logger
       await logger.flush();
@@ -113,9 +117,14 @@ export function withAxiomRouteHandler(handler: NextHandler): NextHandler {
       // report log record
       report.statusCode = 500;
       report.durationMs = report.endTime - report.startTime;
-      logger.logHttpRequest(LogLevel.error, `[${req.method}] ${report.path} ${report.statusCode} ${report.endTime - report.startTime}ms`, report, {});
+      logger.logHttpRequest(
+        LogLevel.error,
+        `[${req.method}] ${report.path} ${report.statusCode} ${report.endTime - report.startTime}ms`,
+        report,
+        {}
+      );
 
-      log.error(error.message, { error })
+      log.error(error.message, { error });
       log.attachResponseStatus(500);
 
       await logger.flush();

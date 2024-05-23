@@ -3,8 +3,6 @@ import { config, isBrowser, isVercelIntegration, Version } from './config';
 import { NetlifyInfo } from './platform/netlify';
 import { isNoPrettyPrint, throttle } from './shared';
 
-
-
 const url = config.getLogsEndpoint();
 
 const LOG_LEVEL = process.env.NEXT_PUBLIC_AXIOM_LOG_LEVEL || 'debug';
@@ -15,14 +13,14 @@ export interface LogEvent {
   fields: any;
   _time: string;
   request?: RequestReport;
-  git?: any,
+  git?: any;
   source: string;
   platform?: PlatformInfo;
   vercel?: PlatformInfo;
   netlify?: NetlifyInfo;
-  "@app": {
-    "next-axiom-version": string;
-  }
+  '@app': {
+    'next-axiom-version': string;
+  };
 }
 
 export enum LogLevel {
@@ -78,7 +76,6 @@ export class Logger {
     autoFlush: true,
     source: 'frontend-log',
     prettyPrint: prettyPrint,
-
   };
 
   constructor(public initConfig: LoggerConfig = {}) {
@@ -122,9 +119,9 @@ export class Logger {
       _time: new Date(Date.now()).toISOString(),
       source: this.config.source!,
       fields: this.config.args || {},
-      "@app": {
-        "next-axiom-version": Version,
-      }
+      '@app': {
+        'next-axiom-version': Version,
+      },
     };
 
     // check if passed args is an object, if its not an object, add it to fields.args
@@ -149,7 +146,7 @@ export class Logger {
     }
 
     return logEvent;
-  }
+  };
 
   logHttpRequest(level: LogLevel, message: string, request: any, args: any) {
     const logEvent = this._transformEvent(level, message, args);
@@ -167,21 +164,21 @@ export class Logger {
       method: request.method,
       host: request.nextUrl.hostname,
       path: request.nextUrl.pathname,
-      scheme: request.nextUrl.protocol.split(":")[0],
+      scheme: request.nextUrl.protocol.split(':')[0],
       referer: request.headers.get('Referer'),
       userAgent: request.headers.get('user-agent'),
-    }
+    };
 
-    const message = `[${request.method}] [middleware: "middleware"] ${request.nextUrl.pathname}`
+    const message = `[${request.method}] [middleware: "middleware"] ${request.nextUrl.pathname}`;
 
-    return this.logHttpRequest(LogLevel.info, message, req, {})
+    return this.logHttpRequest(LogLevel.info, message, req, {});
   }
 
   private _log = (level: LogLevel, message: string, args: { [key: string]: any } = {}) => {
     if (level < this.logLevel) {
       return;
     }
-    const logEvent = this._transformEvent(level, message, args)
+    const logEvent = this._transformEvent(level, message, args);
 
     this.logEvents.push(logEvent);
     if (this.config.autoFlush) {
