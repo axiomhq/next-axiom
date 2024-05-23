@@ -50,7 +50,7 @@ Otherwise create a dataset and an API token in [Axiom settings](https://app.axio
 
 ## Capture traffic requests
 
-Create a `middleware.ts` in the root dir of your app:
+Create or edit the `middleware.ts` in the root directory of your app:
 
 ```typescript
 import { Logger } from 'next-axiom'
@@ -58,11 +58,12 @@ import { NextResponse } from 'next/server'
 import type { NextFetchEvent, NextRequest } from 'next/server'
 
 export async function middleware(request: NextRequest, event: NextFetchEvent) {
-    const logger = new Logger({ source: 'middleware' }); // traffic, request
+    const logger = new Logger({ source: 'middleware' });
     logger.middleware(request)
 
     event.waitUntil(logger.flush())
     return NextResponse.next()
+}
 
 
 export const config = {
@@ -183,7 +184,7 @@ const logger = new Logger({
 
 To capture routing errors we can use the [Error Handling](https://nextjs.org/docs/app/building-your-application/routing/error-handling) mechanism of Next. 
 
-Create a new file named `error.tsx` under your `/app` directory. Inside your component function use the logger to ingest the error to Axiom. 
+Create or edit the `error.tsx` file under your `/app` directory. Inside your component function use the logger to ingest the error to Axiom. 
 
 Example:
 
