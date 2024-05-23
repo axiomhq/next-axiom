@@ -45,7 +45,7 @@ module.exports = withAxiom({
 If you are using the [Vercel integration](https://www.axiom.co/vercel),
 no further configuration is required.
 
-Otherwise create a dataset and an API token in [Axiom settings](https://cloud.axiom.co/settings/profile), then export them as environment variables `NEXT_PUBLIC_AXIOM_DATASET` and `NEXT_PUBLIC_AXIOM_TOKEN`.
+Otherwise create a dataset and an API token in [Axiom settings](https://app.axiom.co/settings/profile), then export them as environment variables `NEXT_PUBLIC_AXIOM_DATASET` and `NEXT_PUBLIC_AXIOM_TOKEN`.
 
 
 ## Capture traffic requests
@@ -166,6 +166,18 @@ export NEXT_PUBLIC_AXIOM_LOG_LEVEL=info
 ```
 
 You can also disable logging completely by setting the log level to `off`.
+
+#### Custom printing to console
+
+Printing logs to the console can be customized through the `prettyPrint` configuration. It is a function taking a `LogEvent` as parameter.
+The following example prints the event message without any formatting:
+
+```typescript
+const logger = new Logger({
+  prettyPrint: (event) => {
+    console.log(event.message);
+  },
+});
 
 
 ### Capturing Errors
