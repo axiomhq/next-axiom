@@ -47,7 +47,28 @@ no further configuration is required.
 
 Otherwise create a dataset and an API token in [Axiom settings](https://app.axiom.co/settings/profile), then export them as environment variables `NEXT_PUBLIC_AXIOM_DATASET` and `NEXT_PUBLIC_AXIOM_TOKEN`.
 
-## Usage
+
+## Capture traffic requests
+
+Create or edit the `middleware.ts` in the root directory of your app:
+
+```typescript
+import { Logger } from 'next-axiom'
+import { NextResponse } from 'next/server'
+import type { NextFetchEvent, NextRequest } from 'next/server'
+
+export async function middleware(request: NextRequest, event: NextFetchEvent) {
+    const logger = new Logger({ source: 'middleware' });
+    logger.middleware(request)
+
+    event.waitUntil(logger.flush())
+    return NextResponse.next()
+}
+
+
+export const config = {
+}
+```
 
 ### Web Vitals
 
@@ -157,6 +178,55 @@ const logger = new Logger({
     console.log(event.message);
   },
 });
+
+
+### Capturing Errors
+
+To capture routing errors we can use the [Error Handling](https://nextjs.org/docs/app/building-your-application/routing/error-handling) mechanism of Next. 
+
+Create or edit the `error.tsx` file under your `/app` directory. Inside your component function use the logger to ingest the error to Axiom. 
+
+Example:
+
+```typescript
+"use client";
+
+import NavTable from "@/components/NavTable";
+import { LogLevel } from "@/next-axiom/logger";
+import { useLogger } from "next-axiom";
+import { usePathname } from "next/navigation";
+
+export default function ErrorPage({
+  error,
+}: {
+  error: Error & { digest?: string };
+}) {
+  const pathname = usePathname()
+  const log = useLogger({ source: "error.tsx" });
+  let status =  error.message == 'Invalid URL' ? 404 : 500;
+
+  log.logHttpRequest(
+    LogLevel.error,
+    error.message,
+    {
+      host: window.location.href,
+      path: pathname,
+      statusCode: status,
+    },
+    {
+      error: error.name,
+      cause: error.cause,
+      stack: error.stack,
+      digest: error.digest,
+    },
+  );
+
+  return (
+    <div>
+      Ops! An Error has occurred:{" "}
+    </div>
+  );
+}
 ```
 
 ## Upgrade to the App Router

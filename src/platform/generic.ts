@@ -1,8 +1,8 @@
 import { GetServerSidePropsContext, NextApiRequest } from "next";
-import { LogEvent, RequestReport } from "../logger";
+import { LogEvent } from "../logger";
 import { EndpointType } from "../shared";
 import type Provider from "./base";
-import { isBrowser } from "../config";
+import { isBrowser, isVercel } from "../config";
 
 // This is the generic config class for all platforms that doesn't have a special
 // implementation (e.g: vercel, netlify). All config classes extends this one.
@@ -20,7 +20,7 @@ export default class GenericConfig implements Provider {
   }
 
   getIngestURL(_: EndpointType): string {
-    return `${this.axiomUrl}/api/v1/datasets/${this.dataset}/ingest`;
+    return `${this.axiomUrl}/v1/datasets/${this.dataset}/ingest`;
   }
 
   getLogsEndpoint(): string {
@@ -33,34 +33,40 @@ export default class GenericConfig implements Provider {
 
   wrapWebVitalsObject(metrics: any[]): any {
     return metrics.map(m => ({
-        webVital: m,
-        _time: new Date().getTime(),
-        platform: {
-          environment: this.environment,
-          source: 'web-vital',
-        },
+      webVital: m,
+      _time: new Date().getTime(),
+      platform: {
+        environment: this.environment,
+        source: 'web-vital',
+      },
+      source: 'web-vital'
     }))
   }
 
   injectPlatformMetadata(logEvent: LogEvent, source: string) {
-    logEvent.platform = {
+    let key: "platform" | "vercel" | "netlify" = "platform"
+    if (isVercel) {
+      key = "vercel"
+    }
+
+    logEvent.source = source;
+    logEvent[key] = {
       environment: this.environment,
       region: this.region,
-      source: source + '-log',
+      source: source,
     };
-  }
 
-  generateRequestMeta(req: NextApiRequest | GetServerSidePropsContext['req']): RequestReport {
-    return {
-      startTime: new Date().getTime(),
-      path: req.url!,
-      method: req.method!,
-      host: this.getHeaderOrDefault(req, 'host', ''),
-      userAgent: this.getHeaderOrDefault(req, 'user-agent', ''),
-      scheme: 'https',
-      ip: this.getHeaderOrDefault(req, 'x-forwarded-for', ''),
-      region: this.region,
-    };
+    if (isVercel) {
+      logEvent[key]!.region = process.env.VERCEL_REGION;
+      logEvent[key]!.deploymentId = process.env.VERCEL_DEPLOYMENT_ID;
+      logEvent[key]!.deploymentUrl = process.env.NEXT_PUBLIC_VERCEL_URL;
+      logEvent[key]!.project = process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL;
+      logEvent.git = {
+        commit: process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA,
+        repo: process.env.NEXT_PUBLIC_VERCEL_GIT_REPO_SLUG,
+        ref: process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF,
+      }
+    }
   }
 
   getHeaderOrDefault(req: NextApiRequest | GetServerSidePropsContext['req'], headerName: string, defaultValue: any) {

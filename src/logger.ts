@@ -1,4 +1,5 @@
-import { config, isBrowser, isVercel, Version } from './config';
+import { NextRequest } from 'next/server';
+import { config, isBrowser, isVercelIntegration, Version } from './config';
 import { NetlifyInfo } from './platform/netlify';
 import { isNoPrettyPrint, throttle } from './shared';
 
@@ -12,9 +13,14 @@ export interface LogEvent {
   fields: any;
   _time: string;
   request?: RequestReport;
+  git?: any;
+  source: string;
   platform?: PlatformInfo;
   vercel?: PlatformInfo;
   netlify?: NetlifyInfo;
+  '@app': {
+    'next-axiom-version': string;
+  };
 }
 
 export enum LogLevel {
@@ -27,6 +33,7 @@ export enum LogLevel {
 
 export interface RequestReport {
   startTime: number;
+  endTime: number;
   statusCode?: number;
   ip?: string | null;
   region?: string | null;
@@ -35,6 +42,7 @@ export interface RequestReport {
   method: string;
   scheme: string;
   userAgent?: string | null;
+  durationMs?: number;
 }
 
 export interface PlatformInfo {
@@ -42,6 +50,12 @@ export interface PlatformInfo {
   region?: string;
   route?: string;
   source?: string;
+  deploymentId?: string;
+  deploymentUrl?: string;
+  commit?: string;
+  project?: string;
+  repo?: string;
+  ref?: string;
 }
 
 export type LoggerConfig = {
@@ -60,7 +74,7 @@ export class Logger {
   public logLevel: LogLevel = LogLevel.debug;
   public config: LoggerConfig = {
     autoFlush: true,
-    source: 'frontend',
+    source: 'frontend-log',
     prettyPrint: prettyPrint,
   };
 
@@ -98,15 +112,16 @@ export class Logger {
     return new Logger({ ...this.config, req: { ...this.config.req, ...req } });
   };
 
-  _log = (level: LogLevel, message: string, args: { [key: string]: any } = {}) => {
-    if (level < this.logLevel) {
-      return;
-    }
+  private _transformEvent = (level: LogLevel, message: string, args: { [key: string]: any } = {}) => {
     const logEvent: LogEvent = {
       level: LogLevel[level].toString(),
       message,
       _time: new Date(Date.now()).toISOString(),
+      source: this.config.source!,
       fields: this.config.args || {},
+      '@app': {
+        'next-axiom-version': Version,
+      },
     };
 
     // check if passed args is an object, if its not an object, add it to fields.args
@@ -129,6 +144,41 @@ export class Logger {
         logEvent.vercel.route = this.config.req.path;
       }
     }
+
+    return logEvent;
+  };
+
+  logHttpRequest(level: LogLevel, message: string, request: any, args: any) {
+    const logEvent = this._transformEvent(level, message, args);
+    logEvent.request = request;
+    this.logEvents.push(logEvent);
+    if (this.config.autoFlush) {
+      this.throttledSendLogs();
+    }
+  }
+
+  middleware(request: NextRequest) {
+    const req = {
+      ip: request.ip,
+      region: request.geo?.region,
+      method: request.method,
+      host: request.nextUrl.hostname,
+      path: request.nextUrl.pathname,
+      scheme: request.nextUrl.protocol.split(':')[0],
+      referer: request.headers.get('Referer'),
+      userAgent: request.headers.get('user-agent'),
+    };
+
+    const message = `[${request.method}] [middleware: "middleware"] ${request.nextUrl.pathname}`;
+
+    return this.logHttpRequest(LogLevel.info, message, req, {});
+  }
+
+  private _log = (level: LogLevel, message: string, args: { [key: string]: any } = {}) => {
+    if (level < this.logLevel) {
+      return;
+    }
+    const logEvent = this._transformEvent(level, message, args);
 
     this.logEvents.push(logEvent);
     if (this.config.autoFlush) {
@@ -161,7 +211,7 @@ export class Logger {
     // if vercel integration is enabled, we can utilize the log drain
     // to send logs to Axiom without HTTP.
     // This saves resources and time on lambda and edge functions
-    if (isVercel && (this.config.source === 'edge' || this.config.source === 'lambda')) {
+    if (isVercelIntegration && (this.config.source === 'edge-log' || this.config.source === 'lambda-log')) {
       this.logEvents.forEach((ev) => console.log(JSON.stringify(ev)));
       this.logEvents = [];
       return;
@@ -190,7 +240,7 @@ export class Logger {
       if (typeof fetch === 'undefined') {
         const fetch = await require('whatwg-fetch');
         return fetch(url, reqOptions).catch(console.error);
-      } else if (isBrowser && isVercel && navigator.sendBeacon) {
+      } else if (isBrowser && isVercelIntegration && navigator.sendBeacon) {
         // sendBeacon fails if message size is greater than 64kb, so
         // we fall back to fetch.
         // Navigator has to be bound to ensure it does not error in some browsers
