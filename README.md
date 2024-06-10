@@ -178,7 +178,7 @@ const logger = new Logger({
     console.log(event.message);
   },
 });
-
+```
 
 ### Capturing Errors
 
