@@ -21,60 +21,57 @@ For more information, check out the [official documentation](https://axiom.co/do
 
 This library allows you to send Web Vitals as well as structured logs from your Next.js application to Axiom.
 
-## Installation
+> Using the Pages Router? Use version `0.*` which continues to receive security patches. Here's the [README for `0.x`](https://github.com/axiomhq/next-axiom/blob/v0.x/README.md).
 
-> **Note**
-> Using the Pages Router? Use version `0.*`, which will continue to get security patches. Here's the [README for `0.x`](https://github.com/axiomhq/next-axiom/blob/v0.x/README.md). 
+## Prerequisites
 
-In your Next.js project, install next-axiom:
+- [Create an Axiom account](https://app.axiom.co/).
+- [Create a dataset in Axiom](/docs/reference/datasets) where you send your data.
+- [Create an API token in Axiom](/docs/reference/tokens) with permissions to create, read, update, and delete datasets.
+- [A new or existing Next.js app](https://nextjs.org/).
 
-```sh
-npm install --save next-axiom
-```
+## Install next-axiom
 
-In the `next.config.ts` file, wrap your Next.js config in `withAxiom` as follows:
+1. In your terminal, go to the root folder of your Next.js app, and then run `npm install --save next-axiom` to install the latest version of next-axiom.
+2. Add the following environment variables to your Next.js app. For more information, see the [Vercel documentation](https://vercel.com/docs/projects/environment-variables).
+    - `NEXT_PUBLIC_AXIOM_DATASET` is the name of the Axiom dataset where you want to send data.
+    - `NEXT_PUBLIC_AXIOM_TOKEN` is the Axiom API token you have generated.
+3. In the `next.config.ts` file, wrap your Next.js configuration in `withAxiom`:
 
 ```js
 const { withAxiom } = require('next-axiom');
 
 module.exports = withAxiom({
-  // ... your existing config
+  // Your existing configuration.
 });
 ```
 
-If you are using the [Vercel integration](https://www.axiom.co/vercel),
-no further configuration is required.
-
-Otherwise create a dataset and an API token in [Axiom settings](https://app.axiom.co/settings/profile), then export them as environment variables `NEXT_PUBLIC_AXIOM_DATASET` and `NEXT_PUBLIC_AXIOM_TOKEN`.
-
-
 ## Capture traffic requests
 
-Create or edit the `middleware.ts` in the root directory of your app:
+To capture traffic requests, create a `middleware.ts` file in the root folder of your Next.js app:
 
-```typescript
+```ts
 import { Logger } from 'next-axiom'
 import { NextResponse } from 'next/server'
 import type { NextFetchEvent, NextRequest } from 'next/server'
 
 export async function middleware(request: NextRequest, event: NextFetchEvent) {
-    const logger = new Logger({ source: 'middleware' });
+    const logger = new Logger({ source: 'middleware' }); // traffic, request
     logger.middleware(request)
 
     event.waitUntil(logger.flush())
     return NextResponse.next()
-}
 
-
+// For more information, see Matching Paths below
 export const config = {
 }
 ```
 
-### Web Vitals
+## Web Vitals
 
-Go to `app/layout.tsx` and add the Web Vitals component:
+To send Web Vitals to Axiom, add the `AxiomWebVitals` component from next-axiom to the `app/layout.tsx` file:
 
-```tsx
+```ts
 import { AxiomWebVitals } from 'next-axiom';
 
 export default function RootLayout() {
@@ -88,25 +85,24 @@ export default function RootLayout() {
 }
 ```
 
-> **Note**: WebVitals are only sent from production deployments.
+Web Vitals are only sent from production deployments.
 
-### Logs
+## Logs
 
-Send logs to Axiom from different parts of your application. Each log function call takes a message and an optional fields object.
+Send logs to Axiom from different parts of your app. Each log function call takes a message and an optional `fields` object.
 
-```typescript
-log.debug('Login attempt', { user: 'j_doe', status: 'success' }); // results in {"message": "Login attempt", "fields": {"user": "j_doe", "status": "success"}}
+```ts
+log.debug('Login attempt', { user: 'j_doe', status: 'success' }); // Results in {"message": "Login attempt", "fields": {"user": "j_doe", "status": "success"}}
 log.info('Payment completed', { userID: '123', amount: '25USD' });
 log.warn('API rate limit exceeded', { endpoint: '/users/1', rateLimitRemaining: 0 });
 log.error('System Error', { code: '500', message: 'Internal server error' });
 ```
 
-#### Route Handlers
+### Route handlers
 
-Wrapping your Route Handlers in `withAxiom` will add a logger to your
-request and automatically log exceptions:
+Wrap your route handlers in `withAxiom` to add a logger to your request and log exceptions automatically:
 
-```typescript
+```ts
 import { withAxiom, AxiomRequest } from 'next-axiom';
 
 export const GET = withAxiom((req: AxiomRequest) => {
@@ -120,11 +116,11 @@ export const GET = withAxiom((req: AxiomRequest) => {
 });
 ```
 
-#### Client Components
+### Client components
 
-For Client Components, you can add a logger to your component with `useLogger`:
+To send logs from client components, add `useLogger` from next-axiom to your component:
 
-```tsx
+```ts
 'use client';
 import { useLogger } from 'next-axiom';
 
@@ -135,11 +131,11 @@ export default function ClientComponent() {
 }
 ```
 
-#### Server Components
+### Server components
 
-For Server Components, create a logger and make sure to call flush before returning:
+To send logs from server components, add `Logger` from next-axiom to your component, and call flush before returning:
 
-```tsx
+```ts
 import { Logger } from 'next-axiom';
 
 export default async function ServerComponent() {
@@ -153,42 +149,31 @@ export default async function ServerComponent() {
 }
 ```
 
-#### Log Levels
+### Log levels
 
-The log level defines the lowest level of logs sent to Axiom.
-The default is debug, resulting in all logs being sent.
-Available levels are (from lowest to highest): `debug`, `info`, `warn`, `error`
+The log level defines the lowest level of logs sent to Axiom. Choose one of the following levels (from lowest to highest):
 
-For example, if you don't want debug logs to be sent to Axiom:
+- `debug` is the default setting. It means that you send all logs to Axiom.
+- `info`
+- `warn`
+- `error` means that you only send the highest-level logs to Axiom.
+- `off` means that you don't send any logs to Axiom.
+
+For example, to send all logs except for debug logs to Axiom:
 
 ```sh
 export NEXT_PUBLIC_AXIOM_LOG_LEVEL=info
 ```
 
-You can also disable logging completely by setting the log level to `off`.
+## Capture errors
 
-#### Custom printing to console
+To capture routing errors, use the [error handling mechanism of Next.js](https://nextjs.org/docs/app/building-your-application/routing/error-handling):
 
-Printing logs to the console can be customized through the `prettyPrint` configuration. It is a function taking a `LogEvent` as parameter.
-The following example prints the event message without any formatting:
+1. Go to the `app` folder.
+2. Create an `error.tsx` file.
+3. Inside your component function, add `useLogger` from next-axiom to send the error to Axiom. For example:
 
-```typescript
-const logger = new Logger({
-  prettyPrint: (event) => {
-    console.log(event.message);
-  },
-});
-```
-
-### Capturing Errors
-
-To capture routing errors we can use the [Error Handling](https://nextjs.org/docs/app/building-your-application/routing/error-handling) mechanism of Next. 
-
-Create or edit the `error.tsx` file under your `/app` directory. Inside your component function use the logger to ingest the error to Axiom. 
-
-Example:
-
-```typescript
+```ts
 "use client";
 
 import NavTable from "@/components/NavTable";
@@ -222,8 +207,12 @@ export default function ErrorPage({
   );
 
   return (
-    <div>
+    <div className="p-8">
       Ops! An Error has occurred:{" "}
+      <p className="text-red-400 px-8 py-2 text-lg">`{error.message}`</p>
+      <div className="w-1/3 mt-8">
+        <NavTable />
+      </div>
     </div>
   );
 }
