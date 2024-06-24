@@ -1,8 +1,6 @@
 "use client";
 
-import NavTable from "@/components/NavTable";
-import { LogLevel } from "@/next-axiom/logger";
-import { useLogger } from "next-axiom";
+import { useLogger, LogLevel } from "next-axiom";
 import { usePathname } from "next/navigation";
 
 export default function ErrorPage({
