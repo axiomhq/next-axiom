@@ -1,7 +1,7 @@
-import { initTRPC } from "@trpc/server";
-import { type NextRequest } from "next/server";
-import { type AxiomRequest, Logger } from "next-axiom";
-import { type createTRPCContext } from "./trpc";
+import { initTRPC } from '@trpc/server';
+import { type NextRequest } from 'next/server';
+import { type AxiomRequest, Logger } from 'next-axiom';
+import { type createTRPCContext } from './trpc';
 
 export type NextAxiomTRPCMiddlewareCtx = {
   /**
@@ -34,7 +34,7 @@ export function createAxiomPlugin() {
 
       if (!isAxiomRequest(req)) {
         throw new Error(
-          "`nextAxiomTRPCMiddleware` could not find logger. Did you forget to wrap your route handler in `withAxiom`? See: TODO: link to docs"
+          '`nextAxiomTRPCMiddleware` could not find logger. Did you forget to wrap your route handler in `withAxiom`? See: TODO: link to docs',
         );
       }
 
