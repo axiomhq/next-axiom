@@ -1,18 +1,24 @@
-"use client";
+'use client';
 
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { useLogger } from 'next-axiom';
 
-import { api } from "~/trpc/react";
+import { api } from '~/trpc/react';
 
 export function CreatePost() {
   const router = useRouter();
-  const [name, setName] = useState("");
+  const logger = useLogger();
+  const [name, setName] = useState('');
 
   const createPost = api.post.create.useMutation({
-    onSuccess: () => {
+    onSuccess: (input, res) => {
       router.refresh();
-      setName("");
+      logger.info(
+        'Sending a multiline log from the frontend\nThis is the second line',
+        { input, res },
+      );
+      setName('');
     },
   });
 
@@ -30,7 +36,7 @@ export function CreatePost() {
         onChange={(e) => setName(e.target.value)}
       />
       <button type="submit" disabled={createPost.isLoading}>
-        {createPost.isLoading ? "Submitting..." : "Submit"}
+        {createPost.isLoading ? 'Submitting...' : 'Submit'}
       </button>
     </form>
   );
