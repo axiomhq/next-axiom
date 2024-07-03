@@ -11,7 +11,6 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@t3-oss/env-nextjs": "^0.7.3",
     "@tanstack/react-query": "^4.36.1",
     "@trpc/client": "^10.45.2",
     "@trpc/next": "^10.45.2",
