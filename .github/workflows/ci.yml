@@ -8,7 +8,7 @@ on:
     branches:
       - main
     tags:
-      - "v*"
+      - 'v*'
 
 jobs:
   check-format:
@@ -48,9 +48,11 @@ jobs:
           node-version: ${{ matrix.node }}
       - run: npm install
       - run: npm run build
+      # build examples
+      - run: cd examples/logger && npm install && npm run build
   publish:
     name: Publish
-    needs: 
+    needs:
       - check-format
       - build
     runs-on: ubuntu-latest
@@ -60,8 +62,8 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: ${{ env.NODEVERSION }}
-          cache: "npm"
-          registry-url: "https://registry.npmjs.org"
+          cache: 'npm'
+          registry-url: 'https://registry.npmjs.org'
       - run: npm install
       - run: npm publish --access public
         env:
