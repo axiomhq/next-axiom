@@ -1,18 +1,21 @@
 import { usePathname } from 'next/navigation';
 import { Logger, LoggerConfig } from './logger';
 import { useEffect, useMemo } from 'react';
-import { useDeepMemo } from './util';
+import { useDeepCompareMemo } from 'use-deep-compare';
 
 export function useLogger(config: LoggerConfig = {}): Logger {
   const path = usePathname();
 
-  const memoizedConfig = useDeepMemo({
-    ...config,
-    args: {
-      ...(config.args ?? {}),
-      path,
-    },
-  });
+  const memoizedConfig = useDeepCompareMemo(
+    () => ({
+      ...config,
+      args: {
+        ...(config.args ?? {}),
+        path,
+      },
+    }),
+    [config, path]
+  );
 
   const logger = useMemo(() => new Logger(memoizedConfig), [memoizedConfig]);
 
