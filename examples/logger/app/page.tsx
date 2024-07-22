@@ -9,6 +9,10 @@ function Home() {
 
   logger.info('Hello from client', { foo: 'bar' });
 
+  const logFromEventHandler = () => {
+    logger.info('Hello from event handler', { foo: 'bar' });
+  };
+
   return (
     <main className={styles.main}>
       <h1>
@@ -17,6 +21,7 @@ function Home() {
       <h1>
         <Link href="/worker">Worker</Link>
       </h1>
+      <button onClick={logFromEventHandler}>Log from event handler</button>
     </main>
   );
 }
