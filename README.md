@@ -223,6 +223,14 @@ export default function ErrorPage({
 }
 ```
 
+## Improve API routes logging performance (Vercel)
+
+If you have Vercel's integration enabled and don't mind the log drain cost, you
+can make use of the log drain feature to send logs from API routes to Axiom.
+This would tell next-axiom to use `console.log()` to send logs to Vercel's log drain instead of sending the logs directly to Axiom and waiting for the logger's http flush request to complete.
+
+To enable this feature, set the `AXIOM_ENABLE_VERCEL_LOGDRAIN` environment variable to `true`.
+
 ## Upgrade to the App Router
 
 next-axiom switched to support the App Router starting with version 1.0. If you are upgrading a Pages Router app with next-axiom v0.x to the App Router, you will need to make the following changes:

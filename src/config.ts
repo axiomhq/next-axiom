@@ -10,6 +10,8 @@ declare global {
 export const Version = require('../package.json').version;
 // detect if Vercel integration & logdrain is enabled
 export const isVercelIntegration = process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT || process.env.AXIOM_INGEST_ENDPOINT;
+export const enableMakeUseOfVercelLogdrain =
+  process.env.NEXT_PUBLIC_AXIOM_ENABLE_VERCEL_LOGDRAIN || process.env.AXIOM_ENABLE_VERCEL_LOGDRAIN;
 // detect if app is running on the Vercel platform
 export const isVercel = process.env.NEXT_PUBLIC_VERCEL || process.env.VERCEL;
 export const isNetlify = process.env.NETLIFY == 'true';

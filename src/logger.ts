@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { config, isBrowser, isVercelIntegration, Version } from './config';
+import { config, isBrowser, isVercelIntegration, enableMakeUseOfVercelLogdrain, Version } from './config';
 import { NetlifyInfo } from './platform/netlify';
 import { isNoPrettyPrint, throttle } from './shared';
 
@@ -211,8 +211,12 @@ export class Logger {
     // if vercel integration is enabled, we can utilize the log drain
     // to send logs to Axiom without HTTP.
     // This saves resources and time on lambda and edge functions
-    if (isVercelIntegration && (this.config.source === 'edge-log' || this.config.source === 'lambda-log')) {
-      this.logEvents.forEach((ev) => console.log(JSON.stringify(ev)));
+    if (
+      isVercelIntegration &&
+      enableMakeUseOfVercelLogdrain &&
+      (this.config.source === 'edge-log' || this.config.source === 'lambda-log')
+    ) {
+      this.logEvents.forEach((ev) => console.log(ev));
       this.logEvents = [];
       return;
     }
