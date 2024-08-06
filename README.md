@@ -181,7 +181,6 @@ To capture routing errors, use the [error handling mechanism of Next.js](https:/
 ```ts
 "use client";
 
-import NavTable from "@/components/NavTable";
 import { LogLevel } from "@/next-axiom/logger";
 import { useLogger } from "next-axiom";
 import { usePathname } from "next/navigation";
