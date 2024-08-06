@@ -48,7 +48,7 @@
     "typescript": "^5.1.6"
   },
   "dependencies": {
-    "remeda": "^1.29.0",
+    "use-deep-compare": "^1.2.1",
     "vitest": "^1.2.2",
     "whatwg-fetch": "^3.6.2"
   }
