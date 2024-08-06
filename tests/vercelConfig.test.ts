@@ -6,6 +6,7 @@ import { Logger } from '../src/logger';
 vi.hoisted(() => {
   process.env.NEXT_PUBLIC_AXIOM_URL = undefined;
   process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT = 'https://api.axiom.co/v1/integrations/vercel';
+  process.env.AXIOM_ENABLE_VERCEL_LOGDRAIN = 'true';
 });
 
 test('reading vercel ingest endpoint', () => {
@@ -16,7 +17,7 @@ test('reading vercel ingest endpoint', () => {
   expect(url).toEqual('https://api.axiom.co/v1/integrations/vercel?type=logs');
 });
 
-test('logging to console when running on lambda', async () => {
+test('logging to console when running on vercel/lambda', async () => {
   vi.useFakeTimers();
   const mockedConsole = vi.spyOn(console, 'log');
   const time = new Date(Date.now()).toISOString();

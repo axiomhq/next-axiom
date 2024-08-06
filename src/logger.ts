@@ -216,7 +216,7 @@ export class Logger {
       enableMakeUseOfVercelLogdrain &&
       (this.config.source === 'edge-log' || this.config.source === 'lambda-log')
     ) {
-      this.logEvents.forEach((ev) => console.log(ev));
+      this.logEvents.forEach((ev) => console.log(JSON.stringify(ev)));
       this.logEvents = [];
       return;
     }
