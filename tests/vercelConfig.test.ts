@@ -1,5 +1,5 @@
 import { test, expect, vi } from 'vitest';
-import { config, isVercelIntegration } from '../src/config';
+import { config } from '../src/config';
 import { EndpointType } from '../src/shared';
 import { Logger } from '../src/logger';
 
@@ -16,10 +16,13 @@ test('reading vercel ingest endpoint', () => {
   expect(url).toEqual('https://api.axiom.co/v1/integrations/vercel?type=logs');
 });
 
-test('logging to console when running on lambda', async () => {
+test('logging to Axiom when running on lambda', async () => {
   vi.useFakeTimers();
   const mockedConsole = vi.spyOn(console, 'log');
-  const time = new Date(Date.now()).toISOString();
+  global.fetch = vi.fn(async () => {
+    const resp = new Response('', { status: 200 });
+    return Promise.resolve(resp);
+  });
 
   const logger = new Logger({
     source: 'lambda-log',
@@ -28,11 +31,6 @@ test('logging to console when running on lambda', async () => {
   logger.info('hello, world!');
 
   await logger.flush();
-  expect(mockedConsole).toHaveBeenCalledTimes(1);
-
-  const calledWithPayload = JSON.parse(mockedConsole.mock.calls[0][0]);
-  expect(calledWithPayload.message).toEqual('hello, world!');
-  expect(calledWithPayload.level).toEqual('info');
-  expect(calledWithPayload._time).toEqual(time);
-  expect(calledWithPayload.vercel.source).toEqual('lambda-log');
+  expect(mockedConsole).toHaveBeenCalledTimes(0);
+  expect(fetch).toHaveBeenCalledTimes(1);
 });
