@@ -208,15 +208,6 @@ export class Logger {
       return;
     }
 
-    // if vercel integration is enabled, we can utilize the log drain
-    // to send logs to Axiom without HTTP.
-    // This saves resources and time on lambda and edge functions
-    if (isVercelIntegration && (this.config.source === 'edge-log' || this.config.source === 'lambda-log')) {
-      this.logEvents.forEach((ev) => console.log(JSON.stringify(ev)));
-      this.logEvents = [];
-      return;
-    }
-
     const method = 'POST';
     const keepalive = true;
     const body = JSON.stringify(this.logEvents);
