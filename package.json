@@ -18,7 +18,8 @@
     "prepare": "npm run build",
     "format": "prettier --write src/*.ts tests/*.ts",
     "check-format": "prettier -c src/*.ts tests/*.ts",
-    "test": "vitest run tests --coverage"
+    "test": "vitest run tests --coverage",
+    "test:watch": "vitest tests --coverage --ui"
   },
   "repository": {
     "type": "git",
@@ -49,7 +50,7 @@
     "vitest": "^2.1.5"
   },
   "dependencies": {
-    "whatwg-fetch": "^3.6.2",
-    "use-deep-compare": "^1.2.1"
+    "use-deep-compare": "^1.2.1",
+    "whatwg-fetch": "^3.6.2"
   }
 }
