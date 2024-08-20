@@ -1,8 +1,8 @@
-import { GetServerSidePropsContext, NextApiRequest } from "next";
-import { LogEvent } from "../logger";
-import { EndpointType } from "../shared";
-import type Provider from "./base";
-import { isBrowser, isVercel } from "../config";
+import { GetServerSidePropsContext, NextApiRequest } from 'next';
+import { LogEvent } from '../logger';
+import { EndpointType } from '../shared';
+import type Provider from './base';
+import { isBrowser, isVercel } from '../config';
 
 // This is the generic config class for all platforms that doesn't have a special
 // implementation (e.g: vercel, netlify). All config classes extends this one.
@@ -16,6 +16,10 @@ export default class GenericConfig implements Provider {
   region = process.env.REGION || undefined;
 
   isEnvVarsSet(): boolean {
+    if (isBrowser) {
+      return !!(this.axiomUrl && this.dataset);
+    }
+
     return !!(this.axiomUrl && this.dataset && this.token);
   }
 
@@ -32,21 +36,21 @@ export default class GenericConfig implements Provider {
   }
 
   wrapWebVitalsObject(metrics: any[]): any {
-    return metrics.map(m => ({
+    return metrics.map((m) => ({
       webVital: m,
       _time: new Date().getTime(),
       platform: {
         environment: this.environment,
         source: 'web-vital',
       },
-      source: 'web-vital'
-    }))
+      source: 'web-vital',
+    }));
   }
 
   injectPlatformMetadata(logEvent: LogEvent, source: string) {
-    let key: "platform" | "vercel" | "netlify" = "platform"
+    let key: 'platform' | 'vercel' | 'netlify' = 'platform';
     if (isVercel) {
-      key = "vercel"
+      key = 'vercel';
     }
 
     logEvent.source = source;
@@ -65,7 +69,7 @@ export default class GenericConfig implements Provider {
         commit: process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA,
         repo: process.env.NEXT_PUBLIC_VERCEL_GIT_REPO_SLUG,
         ref: process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF,
-      }
+      };
     }
   }
 
