@@ -7,3 +7,4 @@ dist/
 .vscode/
 coverage/
 .envrc
+/.env
