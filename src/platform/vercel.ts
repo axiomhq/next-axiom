@@ -25,7 +25,7 @@ export default class VercelConfig extends GenericConfig implements Provider {
   }
 
   getWebVitalsEndpoint(): string {
-    if (this.customEndpoint) {
+    if (isBrowser && this.customEndpoint) {
       return this.customEndpoint
     }
 
@@ -33,7 +33,7 @@ export default class VercelConfig extends GenericConfig implements Provider {
   }
 
   getLogsEndpoint(): string {
-    if (this.customEndpoint) {
+    if (isBrowser && this.customEndpoint) {
       return this.customEndpoint
     }
 
