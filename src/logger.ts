@@ -3,7 +3,7 @@ import { config, isBrowser, isVercelIntegration, Version } from './config';
 import { NetlifyInfo } from './platform/netlify';
 import { isNoPrettyPrint, throttle } from './shared';
 
-const url = config.getLogsEndpoint();
+const logsEndpoint = config.getLogsEndpoint();
 
 const LOG_LEVEL = process.env.NEXT_PUBLIC_AXIOM_LOG_LEVEL || 'debug';
 
@@ -65,6 +65,7 @@ export type LoggerConfig = {
   source?: string;
   req?: any;
   prettyPrint?: typeof prettyPrint;
+  baseUrl?: string;
 };
 
 export class Logger {
@@ -212,6 +213,12 @@ export class Logger {
       this.logEvents.forEach((ev) => (this.config.prettyPrint ? this.config.prettyPrint(ev) : prettyPrint(ev)));
       this.logEvents = [];
       return;
+    }
+
+    let url = logsEndpoint;
+    if (!isBrowser && logsEndpoint.startsWith('/') && this.config.baseUrl) {
+      // We have a function with a relative path, prepend the base URL
+      url = new URL(logsEndpoint, this.config.baseUrl).href;
     }
 
     const method = 'POST';

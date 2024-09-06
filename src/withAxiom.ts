@@ -69,6 +69,10 @@ export function withAxiomRouteHandler(handler: NextHandler): NextHandler {
       pathname = new URL(req.url).pathname;
     }
 
+    let reqUrl = new URL(req.url);
+    let scheme = req.headers.get('x-forwarded-proto') || reqUrl.protocol.substring(0, reqUrl.protocol.length - 1);
+    let baseUrl = `${scheme}://${reqUrl.host}`;
+
     const report: RequestReport = {
       startTime: new Date().getTime(),
       endTime: new Date().getTime(),
@@ -82,7 +86,7 @@ export function withAxiomRouteHandler(handler: NextHandler): NextHandler {
     };
 
     // main logger, mainly used to log reporting on the incoming HTTP request
-    const logger = new Logger({ req: report, source: isEdgeRuntime ? 'edge' : 'lambda' });
+    const logger = new Logger({ req: report, source: isEdgeRuntime ? 'edge' : 'lambda', baseUrl: baseUrl });
     // child logger to be used by the users within the handler
     const log = logger.with({});
     log.config.source = isEdgeRuntime ? 'edge-log' : 'lambda-log';
