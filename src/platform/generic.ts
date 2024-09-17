@@ -14,9 +14,10 @@ export default class GenericConfig implements Provider {
   environment: string = process.env.NODE_ENV;
   axiomUrl = process.env.NEXT_PUBLIC_AXIOM_URL || process.env.AXIOM_URL || 'https://api.axiom.co';
   region = process.env.REGION || undefined;
+  customEndpoint: string | undefined = process.env.NEXT_PUBLIC_AXIOM_CUSTOM_ENDPOINT;
 
   isEnvVarsSet(): boolean {
-    return !!(this.axiomUrl && this.dataset && this.token);
+    return !!(this.axiomUrl && this.dataset && this.token) || !!this.customEndpoint;
   }
 
   getIngestURL(_: EndpointType): string {
@@ -24,10 +25,18 @@ export default class GenericConfig implements Provider {
   }
 
   getLogsEndpoint(): string {
+    if (isBrowser && this.customEndpoint) {
+      return this.customEndpoint
+    }
+
     return isBrowser ? `${this.proxyPath}/logs` : this.getIngestURL(EndpointType.logs);
   }
 
   getWebVitalsEndpoint(): string {
+    if (isBrowser && this.customEndpoint) {
+      return this.customEndpoint
+    }
+
     return isBrowser ? `${this.proxyPath}/web-vitals` : this.getIngestURL(EndpointType.webVitals);
   }
 

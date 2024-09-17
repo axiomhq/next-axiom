@@ -200,9 +200,15 @@ export class Logger {
       return;
     }
 
+    // To send logs over the network, we need one of:
+    //
+    // - Axiom URL and Axiom dataset and Axiom token
+    // - Axiom Vercel ingest URL
+    // - Custom endpoint
+    //
+    // We fall back to printing to console to avoid network errors in
+    // development environments.
     if (!config.isEnvVarsSet()) {
-      // if AXIOM ingesting url is not set, fallback to printing to console
-      // to avoid network errors in development environments
       this.logEvents.forEach((ev) => (this.config.prettyPrint ? this.config.prettyPrint(ev) : prettyPrint(ev)));
       this.logEvents = [];
       return;

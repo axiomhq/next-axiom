@@ -14,8 +14,8 @@ export default class VercelConfig extends GenericConfig implements Provider {
   token = undefined;
   axiomUrl = ingestEndpoint;
 
-  isEnvVarsSet (): boolean {
-    return ingestEndpoint != undefined && ingestEndpoint != '';
+  isEnvVarsSet(): boolean {
+    return (ingestEndpoint != undefined && ingestEndpoint != '') || !!this.customEndpoint;
   }
 
   getIngestURL(t: EndpointType) {
@@ -25,10 +25,18 @@ export default class VercelConfig extends GenericConfig implements Provider {
   }
 
   getWebVitalsEndpoint(): string {
+    if (isBrowser && this.customEndpoint) {
+      return this.customEndpoint
+    }
+
     return `${this.proxyPath}/web-vitals`;
   }
 
   getLogsEndpoint(): string {
+    if (isBrowser && this.customEndpoint) {
+      return this.customEndpoint
+    }
+
     return isBrowser ? `${this.proxyPath}/logs` : this.getIngestURL(EndpointType.logs);
   }
 
