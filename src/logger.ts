@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server';
 import { config, isBrowser, isVercelIntegration, Version } from './config';
 import { NetlifyInfo } from './platform/netlify';
 import { isNoPrettyPrint, throttle } from './shared';
+import { RequestJSON } from './withAxiom';
 
 const url = config.getLogsEndpoint();
 
@@ -43,6 +44,7 @@ export interface RequestReport {
   scheme: string;
   userAgent?: string | null;
   durationMs?: number;
+  details?: RequestJSON;
 }
 
 export interface PlatformInfo {

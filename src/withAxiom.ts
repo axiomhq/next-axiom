@@ -48,13 +48,177 @@ export function withAxiomNextConfig(nextConfig: NextConfig): NextConfig {
   };
 }
 
+export interface RequestJSON {
+  method: string;
+  url: string;
+  headers: Record<string, string>;
+  params: Record<string, string>;
+  cookies: Record<string, string>;
+  nextUrl?: {
+    basePath: string;
+    buildId?: string;
+    defaultLocale?: string;
+    domainLocale?: {
+      defaultLocale: string;
+      domain: string;
+      locales?: string[];
+    };
+    hash: string;
+    host: string;
+    hostname: string;
+    href: string;
+    locale?: string;
+    origin: string;
+    password: string;
+    pathname: string;
+    port: string;
+    protocol: string;
+    search: string;
+    searchParams: Record<string, string>;
+    username: string;
+  };
+  ip?: string;
+  geo?: {
+    city?: string;
+    country?: string;
+    region?: string;
+    latitude?: string;
+    longitude?: string;
+  };
+  body?: any;
+  cache: {
+    mode: RequestCache;
+    credentials: RequestCredentials;
+    redirect: RequestRedirect;
+    referrerPolicy: ReferrerPolicy;
+    integrity: string;
+  };
+  mode: RequestMode;
+  destination: RequestDestination;
+  referrer: string;
+  keepalive: boolean;
+  signal: {
+    aborted: boolean;
+    reason: any;
+  };
+}
+
+/**
+ * Transforms a Next.js Request object into a JSON-serializable object
+ */
+export async function requestToJSON(request: Request | NextRequest): Promise<RequestJSON> {
+  // Get all headers
+  const headers: Record<string, string> = {};
+  request.headers.forEach((value, key) => {
+    headers[key] = value;
+  });
+
+  const url = new URL(request.url);
+  const params: Record<string, string> = {};
+  url.searchParams.forEach((value, key) => {
+    params[key] = value;
+  });
+
+  let cookiesData: Record<string, string> = {};
+  if (request instanceof NextRequest) {
+    request.cookies.getAll().forEach((cookie) => {
+      cookiesData[cookie.name] = cookie.value;
+    });
+  } else {
+    const cookieHeader = headers['cookie'];
+    if (cookieHeader) {
+      cookiesData = Object.fromEntries(
+        cookieHeader.split(';').map((cookie) => {
+          const [key, value] = cookie.trim().split('=');
+          return [key, value];
+        })
+      );
+    }
+  }
+
+  let nextUrlData: RequestJSON['nextUrl'] | undefined;
+  if (request instanceof NextRequest) {
+    const nextUrl = request.nextUrl;
+    nextUrlData = {
+      basePath: nextUrl.basePath,
+      buildId: nextUrl.buildId,
+      hash: nextUrl.hash,
+      host: nextUrl.host,
+      hostname: nextUrl.hostname,
+      href: nextUrl.href,
+      origin: nextUrl.origin,
+      password: nextUrl.password,
+      pathname: nextUrl.pathname,
+      port: nextUrl.port,
+      protocol: nextUrl.protocol,
+      search: nextUrl.search,
+      searchParams: Object.fromEntries(nextUrl.searchParams.entries()),
+      username: nextUrl.username,
+    };
+  }
+
+  let body: RequestJSON['body'] | undefined;
+  if (request.body) {
+    try {
+      const clonedRequest = request.clone();
+      try {
+        body = await clonedRequest.json();
+      } catch {
+        body = await clonedRequest.text();
+      }
+    } catch (error) {
+      console.warn('Could not parse request body:', error);
+    }
+  }
+
+  const cache: RequestJSON['cache'] = {
+    mode: request.cache,
+    credentials: request.credentials,
+    redirect: request.redirect,
+    referrerPolicy: request.referrerPolicy,
+    integrity: request.integrity,
+  };
+
+  let geoData: Pick<RequestJSON, 'geo' | 'ip'> | undefined;
+  if (request instanceof NextRequest) {
+    geoData = {
+      ip: request.ip,
+      geo: request.geo,
+    };
+  }
+
+  return {
+    method: request.method,
+    url: request.url,
+    headers,
+    params,
+    cookies: cookiesData,
+    nextUrl: nextUrlData,
+    ...geoData,
+    body,
+    cache,
+    mode: request.mode,
+    destination: request.destination,
+    referrer: request.referrer,
+    keepalive: request.keepalive,
+    signal: {
+      aborted: request.signal.aborted,
+      reason: request.signal.reason,
+    },
+  };
+}
+
 export type AxiomRequest = NextRequest & { log: Logger };
 type NextHandler<T = any> = (
   req: AxiomRequest,
   arg?: T
 ) => Promise<Response> | Promise<NextResponse> | NextResponse | Response;
 
-export function withAxiomRouteHandler(handler: NextHandler): NextHandler {
+type AxiomRouteHandlerConfig = {
+  details?: boolean | (keyof RequestJSON)[];
+};
+
+export function withAxiomRouteHandler(handler: NextHandler, config?: AxiomRouteHandlerConfig): NextHandler {
   return async (req: Request | NextRequest, arg: any) => {
     let region = '';
     if ('geo' in req) {
@@ -69,6 +233,8 @@ export function withAxiomRouteHandler(handler: NextHandler): NextHandler {
       pathname = new URL(req.url).pathname;
     }
 
+    const details = Array.isArray(config?.details) || config?.details === true ? await requestToJSON(req) : undefined;
+
     const report: RequestReport = {
       startTime: new Date().getTime(),
       endTime: new Date().getTime(),
@@ -79,6 +245,13 @@ export function withAxiomRouteHandler(handler: NextHandler): NextHandler {
       scheme: req.url.split('://')[0],
       ip: req.headers.get('x-forwarded-for'),
       region,
+      details: Array.isArray(config?.details)
+        ? (Object.fromEntries(
+            Object.entries(details as RequestJSON).filter(([key]) =>
+              (config?.details as (keyof RequestJSON)[]).includes(key as keyof RequestJSON)
+            )
+          ) as RequestJSON)
+        : details,
     };
 
     // main logger, mainly used to log reporting on the incoming HTTP request
