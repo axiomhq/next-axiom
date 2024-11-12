@@ -121,6 +121,19 @@ export const GET = withAxiom((req: AxiomRequest) => {
 });
 ```
 
+Route handlers also accept a configuration object as the second argument. This object can contain the following properties:
+
+- `details`: It accepts a boolean or an array of keys. If pass `true`, it will add the request details to the log (method, URL, headers, etc.). If you pass an array of strings, it will only log the specified keys.
+
+```ts
+export const GET = withAxiom(
+  async () => {
+    return new Response("Hello World!");
+  },
+  { details: ['body', 'nextUrl'] } // { details: true } is also valid
+);
+```
+
 ### Client components
 
 To send logs from client components, add `useLogger` from next-axiom to your component:
