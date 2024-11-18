@@ -44,7 +44,7 @@ export interface RequestReport {
   scheme: string;
   userAgent?: string | null;
   durationMs?: number;
-  details?: RequestJSON;
+  logReq?: RequestJSON;
 }
 
 export interface PlatformInfo {
