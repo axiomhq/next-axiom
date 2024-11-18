@@ -121,9 +121,9 @@ export const GET = withAxiom((req: AxiomRequest) => {
 });
 ```
 
-Route handlers also accept a configuration object as the second argument. This object can contain the following properties:
+Route handlers accept a configuration object as the second argument. This object can contain the following properties:
 
-- `details`: It accepts a boolean or an array of keys. If pass `true`, it will add the request details to the log (method, URL, headers, etc.). If you pass an array of strings, it will only log the specified keys.
+- `details`: Accepts a boolean or an array of keys. If you pass `true`, it will add the request details to the log (method, URL, headers, etc.). If you pass an array of strings, it will only add the specified keys. See [Request](https://developer.mozilla.org/en-US/docs/Web/API/Request/url) and [NextRequest](https://nextjs.org/docs/app/api-reference/functions/next-request) for documentation on the available keys.
 
 ```ts
 export const GET = withAxiom(
