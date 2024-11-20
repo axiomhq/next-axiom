@@ -52,7 +52,6 @@ export interface RequestJSON {
   method: string;
   url: string;
   headers: Record<string, string>;
-  params: Record<string, string>;
   cookies: Record<string, string>;
   nextUrl?: {
     basePath: string;
@@ -111,12 +110,6 @@ export async function requestToJSON(request: Request | NextRequest): Promise<Req
   const headers: Record<string, string> = {};
   request.headers.forEach((value, key) => {
     headers[key] = value;
-  });
-
-  const url = new URL(request.url);
-  const params: Record<string, string> = {};
-  url.searchParams.forEach((value, key) => {
-    params[key] = value;
   });
 
   let cookiesData: Record<string, string> = {};
@@ -193,7 +186,6 @@ export async function requestToJSON(request: Request | NextRequest): Promise<Req
     method: request.method,
     url: request.url,
     headers,
-    params,
     cookies: cookiesData,
     nextUrl: nextUrlData,
     ip,
