@@ -240,7 +240,7 @@ export function withAxiomRouteHandler(handler: NextHandler, config?: AxiomRouteH
       scheme: req.url.split('://')[0],
       ip: req.headers.get('x-forwarded-for'),
       region,
-      logReq: Array.isArray(config?.logReq)
+      requestDetails: Array.isArray(config?.logReq)
         ? (Object.fromEntries(
             Object.entries(logReq as RequestJSON).filter(([key]) =>
               (config?.logReq as (keyof RequestJSON)[]).includes(key as keyof RequestJSON)
