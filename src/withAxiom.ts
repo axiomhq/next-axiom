@@ -2,7 +2,7 @@ import { NextConfig } from 'next';
 import { Rewrite } from 'next/dist/lib/load-custom-routes';
 import { config, isEdgeRuntime, isVercelIntegration } from './config';
 import { LogLevel, Logger, RequestReport } from './logger';
-import { NextRequest, type NextResponse } from 'next/server';
+import { type NextRequest, type NextResponse } from 'next/server';
 import { EndpointType } from './shared';
 
 export function withAxiomNextConfig(nextConfig: NextConfig): NextConfig {
@@ -120,7 +120,7 @@ export async function requestToJSON(request: Request | NextRequest): Promise<Req
   });
 
   let cookiesData: Record<string, string> = {};
-  if (request instanceof NextRequest) {
+  if ('cookies' in request) {
     request.cookies.getAll().forEach((cookie) => {
       cookiesData[cookie.name] = cookie.value;
     });
@@ -137,7 +137,7 @@ export async function requestToJSON(request: Request | NextRequest): Promise<Req
   }
 
   let nextUrlData: RequestJSON['nextUrl'] | undefined;
-  if (request instanceof NextRequest) {
+  if ('nextUrl' in request) {
     const nextUrl = request.nextUrl;
     nextUrlData = {
       basePath: nextUrl.basePath,
@@ -179,12 +179,14 @@ export async function requestToJSON(request: Request | NextRequest): Promise<Req
     integrity: request.integrity,
   };
 
-  let geoData: Pick<RequestJSON, 'geo' | 'ip'> | undefined;
-  if (request instanceof NextRequest) {
-    geoData = {
-      ip: request.ip,
-      geo: request.geo,
-    };
+  let ip: string | undefined;
+  if ('ip' in request) {
+    ip = request.ip;
+  }
+
+  let geo: NextRequest['geo'] | undefined;
+  if ('geo' in request) {
+    geo = request.geo;
   }
 
   return {
@@ -194,7 +196,8 @@ export async function requestToJSON(request: Request | NextRequest): Promise<Req
     params,
     cookies: cookiesData,
     nextUrl: nextUrlData,
-    ...geoData,
+    ip,
+    geo,
     body,
     cache,
     mode: request.mode,
@@ -226,7 +229,7 @@ export function withAxiomRouteHandler(handler: NextHandler, config?: AxiomRouteH
     }
 
     let pathname = '';
-    if (req instanceof NextRequest) {
+    if ('nextUrl' in req) {
       pathname = req.nextUrl.pathname;
     } else if (req instanceof Request) {
       // pathname = req.url.substring(req.headers.get('host')?.length || 0)
