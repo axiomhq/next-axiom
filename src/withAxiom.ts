@@ -210,7 +210,7 @@ type NextHandler<T = any> = (
 ) => Promise<Response> | Promise<NextResponse> | NextResponse | Response;
 
 type AxiomRouteHandlerConfig = {
-  logReq?: boolean | (keyof RequestJSON)[];
+  logRequestDetails?: boolean | (keyof RequestJSON)[];
 };
 
 export function withAxiomRouteHandler(handler: NextHandler, config?: AxiomRouteHandlerConfig): NextHandler {
@@ -228,7 +228,10 @@ export function withAxiomRouteHandler(handler: NextHandler, config?: AxiomRouteH
       pathname = new URL(req.url).pathname;
     }
 
-    const logReq = Array.isArray(config?.logReq) || config?.logReq === true ? await requestToJSON(req) : undefined;
+    const requestDetails =
+      Array.isArray(config?.logRequestDetails) || config?.logRequestDetails === true
+        ? await requestToJSON(req)
+        : undefined;
 
     const report: RequestReport = {
       startTime: new Date().getTime(),
@@ -240,13 +243,13 @@ export function withAxiomRouteHandler(handler: NextHandler, config?: AxiomRouteH
       scheme: req.url.split('://')[0],
       ip: req.headers.get('x-forwarded-for'),
       region,
-      requestDetails: Array.isArray(config?.logReq)
+      details: Array.isArray(config?.logRequestDetails)
         ? (Object.fromEntries(
-            Object.entries(logReq as RequestJSON).filter(([key]) =>
-              (config?.logReq as (keyof RequestJSON)[]).includes(key as keyof RequestJSON)
+            Object.entries(requestDetails as RequestJSON).filter(([key]) =>
+              (config?.logRequestDetails as (keyof RequestJSON)[]).includes(key as keyof RequestJSON)
             )
           ) as RequestJSON)
-        : logReq,
+        : requestDetails,
     };
 
     // main logger, mainly used to log reporting on the incoming HTTP request
