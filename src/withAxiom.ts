@@ -2,7 +2,7 @@ import { NextConfig } from 'next';
 import { Rewrite } from 'next/dist/lib/load-custom-routes';
 import { config, isEdgeRuntime, isVercelIntegration } from './config';
 import { LogLevel, Logger, RequestReport } from './logger';
-import { NextRequest, type NextResponse } from 'next/server';
+import { type NextRequest, type NextResponse } from 'next/server';
 import { EndpointType } from './shared';
 
 export function withAxiomNextConfig(nextConfig: NextConfig): NextConfig {
@@ -48,13 +48,172 @@ export function withAxiomNextConfig(nextConfig: NextConfig): NextConfig {
   };
 }
 
+export interface RequestJSON {
+  method: string;
+  url: string;
+  headers: Record<string, string>;
+  cookies: Record<string, string>;
+  nextUrl?: {
+    basePath: string;
+    buildId?: string;
+    defaultLocale?: string;
+    domainLocale?: {
+      defaultLocale: string;
+      domain: string;
+      locales?: string[];
+    };
+    hash: string;
+    host: string;
+    hostname: string;
+    href: string;
+    locale?: string;
+    origin: string;
+    password: string;
+    pathname: string;
+    port: string;
+    protocol: string;
+    search: string;
+    searchParams: Record<string, string>;
+    username: string;
+  };
+  ip?: string;
+  geo?: {
+    city?: string;
+    country?: string;
+    region?: string;
+    latitude?: string;
+    longitude?: string;
+  };
+  body?: any;
+  cache: {
+    mode: RequestCache;
+    credentials: RequestCredentials;
+    redirect: RequestRedirect;
+    referrerPolicy: ReferrerPolicy;
+    integrity: string;
+  };
+  mode: RequestMode;
+  destination: RequestDestination;
+  referrer: string;
+  keepalive: boolean;
+  signal: {
+    aborted: boolean;
+    reason: any;
+  };
+}
+
+/**
+ * Transforms a Next.js Request object into a JSON-serializable object
+ */
+export async function requestToJSON(request: Request | NextRequest): Promise<RequestJSON> {
+  // Get all headers
+  const headers: Record<string, string> = {};
+  request.headers.forEach((value, key) => {
+    headers[key] = value;
+  });
+
+  let cookiesData: Record<string, string> = {};
+  if ('cookies' in request) {
+    request.cookies.getAll().forEach((cookie) => {
+      cookiesData[cookie.name] = cookie.value;
+    });
+  } else {
+    const cookieHeader = headers['cookie'];
+    if (cookieHeader) {
+      cookiesData = Object.fromEntries(
+        cookieHeader.split(';').map((cookie) => {
+          const [key, value] = cookie.trim().split('=');
+          return [key, value];
+        })
+      );
+    }
+  }
+
+  let nextUrlData: RequestJSON['nextUrl'] | undefined;
+  if ('nextUrl' in request) {
+    const nextUrl = request.nextUrl;
+    nextUrlData = {
+      basePath: nextUrl.basePath,
+      buildId: nextUrl.buildId,
+      hash: nextUrl.hash,
+      host: nextUrl.host,
+      hostname: nextUrl.hostname,
+      href: nextUrl.href,
+      origin: nextUrl.origin,
+      password: nextUrl.password,
+      pathname: nextUrl.pathname,
+      port: nextUrl.port,
+      protocol: nextUrl.protocol,
+      search: nextUrl.search,
+      searchParams: Object.fromEntries(nextUrl.searchParams.entries()),
+      username: nextUrl.username,
+    };
+  }
+
+  let body: RequestJSON['body'] | undefined;
+  if (request.body) {
+    try {
+      const clonedRequest = request.clone();
+      try {
+        body = await clonedRequest.json();
+      } catch {
+        body = await clonedRequest.text();
+      }
+    } catch (error) {
+      console.warn('Could not parse request body:', error);
+    }
+  }
+
+  const cache: RequestJSON['cache'] = {
+    mode: request.cache,
+    credentials: request.credentials,
+    redirect: request.redirect,
+    referrerPolicy: request.referrerPolicy,
+    integrity: request.integrity,
+  };
+
+  let ip: string | undefined;
+  if ('ip' in request) {
+    ip = request.ip;
+  }
+
+  let geo: NextRequest['geo'] | undefined;
+  if ('geo' in request) {
+    geo = request.geo;
+  }
+
+  return {
+    method: request.method,
+    url: request.url,
+    headers,
+    cookies: cookiesData,
+    nextUrl: nextUrlData,
+    ip,
+    geo,
+    body,
+    cache,
+    mode: request.mode,
+    destination: request.destination,
+    referrer: request.referrer,
+    keepalive: request.keepalive,
+    signal: {
+      aborted: request.signal.aborted,
+      reason: request.signal.reason,
+    },
+  };
+}
+
 export type AxiomRequest = NextRequest & { log: Logger };
 type NextHandler<T = any> = (
   req: AxiomRequest,
   arg?: T
 ) => Promise<Response> | Promise<NextResponse> | NextResponse | Response;
 
-export function withAxiomRouteHandler(handler: NextHandler): NextHandler {
+type AxiomRouteHandlerConfig = {
+  logRequestDetails?: boolean | (keyof RequestJSON)[];
+};
+
+export function withAxiomRouteHandler(handler: NextHandler, config?: AxiomRouteHandlerConfig): NextHandler {
   return async (req: Request | NextRequest, arg: any) => {
     let region = '';
     if ('geo' in req) {
@@ -62,12 +221,17 @@ export function withAxiomRouteHandler(handler: NextHandler): NextHandler {
     }
 
     let pathname = '';
-    if (req instanceof NextRequest) {
+    if ('nextUrl' in req) {
       pathname = req.nextUrl.pathname;
     } else if (req instanceof Request) {
       // pathname = req.url.substring(req.headers.get('host')?.length || 0)
       pathname = new URL(req.url).pathname;
     }
+
+    const requestDetails =
+      Array.isArray(config?.logRequestDetails) || config?.logRequestDetails === true
+        ? await requestToJSON(req)
+        : undefined;
 
     const report: RequestReport = {
       startTime: new Date().getTime(),
@@ -79,6 +243,13 @@ export function withAxiomRouteHandler(handler: NextHandler): NextHandler {
       scheme: req.url.split('://')[0],
       ip: req.headers.get('x-forwarded-for'),
       region,
+      details: Array.isArray(config?.logRequestDetails)
+        ? (Object.fromEntries(
+            Object.entries(requestDetails as RequestJSON).filter(([key]) =>
+              (config?.logRequestDetails as (keyof RequestJSON)[]).includes(key as keyof RequestJSON)
+            )
+          ) as RequestJSON)
+        : requestDetails,
     };
 
     // main logger, mainly used to log reporting on the incoming HTTP request
@@ -148,14 +319,14 @@ function isNextConfig(param: WithAxiomParam): param is NextConfig {
 
 // withAxiom can be called either with NextConfig, which will add proxy rewrites
 // to improve deliverability of Web-Vitals and logs.
-export function withAxiom(param: NextHandler): NextHandler;
+export function withAxiom(param: NextHandler, config?: AxiomRouteHandlerConfig): NextHandler;
 export function withAxiom(param: NextConfig): NextConfig;
-export function withAxiom(param: WithAxiomParam) {
+export function withAxiom(param: WithAxiomParam, config?: AxiomRouteHandlerConfig) {
   if (typeof param == 'function') {
-    return withAxiomRouteHandler(param);
+    return withAxiomRouteHandler(param, config);
   } else if (isNextConfig(param)) {
     return withAxiomNextConfig(param);
   }
 
-  return withAxiomRouteHandler(param);
+  return withAxiomRouteHandler(param, config);
 }
