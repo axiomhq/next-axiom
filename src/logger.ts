@@ -1,8 +1,8 @@
 import { NextRequest } from 'next/server';
 import { config, isBrowser, isVercelIntegration, Version } from './config';
 import { NetlifyInfo } from './platform/netlify';
-import { isNoPrettyPrint, throttle } from './shared';
-import { RequestJSON } from './withAxiom';
+import { isNoPrettyPrint, requestToJSON, throttle } from './shared';
+import { RequestJSON } from './shared';
 
 const url = config.getLogsEndpoint();
 
@@ -159,7 +159,10 @@ export class Logger {
     }
   }
 
-  middleware(request: NextRequest) {
+  middleware<
+    TConfig extends { logRequestDetails?: boolean | (keyof RequestJSON)[] },
+    TReturn = TConfig['logRequestDetails'] extends boolean | (keyof RequestJSON)[] ? Promise<void> : void,
+  >(request: NextRequest, config?: TConfig): TReturn {
     const req = {
       ip: request.ip,
       region: request.geo?.region,
@@ -173,7 +176,23 @@ export class Logger {
 
     const message = `[${request.method}] [middleware: "middleware"] ${request.nextUrl.pathname}`;
 
-    return this.logHttpRequest(LogLevel.info, message, req, {});
+    if (config?.logRequestDetails) {
+      return requestToJSON(request).then((details) => {
+        const newReq = {
+          ...req,
+          details: Array.isArray(config.logRequestDetails)
+            ? (Object.fromEntries(
+                Object.entries(details as RequestJSON).filter(([key]) =>
+                  (config.logRequestDetails as (keyof RequestJSON)[]).includes(key as keyof RequestJSON)
+                )
+              ) as RequestJSON)
+            : details,
+        };
+        return this.logHttpRequest(LogLevel.info, message, newReq, {});
+      }) as TReturn;
+    }
+
+    return this.logHttpRequest(LogLevel.info, message, req, {}) as TReturn;
   }
 
   private _log = (level: LogLevel, message: string, args: { [key: string]: any } = {}) => {
