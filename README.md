@@ -72,6 +72,20 @@ export const config = {
 }
 ```
 
+`logger.middleware` accepts a configuration object as the second argument. This object can contain the following properties:
+
+- `logRequestDetails`: Accepts a boolean or an array of keys. If you pass `true`, it will add all the request details to the log (method, URL, headers, etc.). If you pass an array of strings, it will only add the specified keys. See [Request](https://developer.mozilla.org/en-US/docs/Web/API/Request/url) and [NextRequest](https://nextjs.org/docs/app/api-reference/functions/next-request) for documentation on the available keys. If `logRequestDetails` is enabled the function will return a Promise that needs to be awaited.
+
+```ts
+export async function middleware(request: NextRequest, event: NextFetchEvent) {
+  const logger = new Logger({ source: "middleware" });
+  await logger.middleware(request, { logRequestDetails: ["body", "nextUrl"] });
+
+  event.waitUntil(logger.flush());
+  return NextResponse.next();
+}
+```
+
 ## Web Vitals
 
 To send Web Vitals to Axiom, add the `AxiomWebVitals` component from next-axiom to the `app/layout.tsx` file:
@@ -123,7 +137,7 @@ export const GET = withAxiom((req: AxiomRequest) => {
 
 Route handlers accept a configuration object as the second argument. This object can contain the following properties:
 
-- `logRequestDetails`: Accepts a boolean or an array of keys. If you pass `true`, it will add the request details to the log (method, URL, headers, etc.). If you pass an array of strings, it will only add the specified keys. See [Request](https://developer.mozilla.org/en-US/docs/Web/API/Request/url) and [NextRequest](https://nextjs.org/docs/app/api-reference/functions/next-request) for documentation on the available keys.
+- `logRequestDetails`: Accepts a boolean or an array of keys. If you pass `true`, it will add all the request details to the log (method, URL, headers, etc.). If you pass an array of strings, it will only add the specified keys. See [Request](https://developer.mozilla.org/en-US/docs/Web/API/Request/url) and [NextRequest](https://nextjs.org/docs/app/api-reference/functions/next-request) for documentation on the available keys.
 
 ```ts
 export const GET = withAxiom(
