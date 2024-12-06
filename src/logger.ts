@@ -1,8 +1,7 @@
 import { NextRequest } from 'next/server';
 import { config, isBrowser, isVercelIntegration, Version } from './config';
 import { NetlifyInfo } from './platform/netlify';
-import { isNoPrettyPrint, requestToJSON, throttle } from './shared';
-import { RequestJSON } from './shared';
+import { isNoPrettyPrint, requestToJSON, throttle, type RequestJSON } from './shared';
 
 const url = config.getLogsEndpoint();
 
