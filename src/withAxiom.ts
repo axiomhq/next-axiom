@@ -1,6 +1,6 @@
 import { NextConfig } from 'next';
 import { Rewrite } from 'next/dist/lib/load-custom-routes';
-import { config, isEdgeRuntime, isVercelIntegration } from './config';
+import { config, isEdgeRuntime } from './config';
 import { LogLevel, Logger, RequestReport } from './logger';
 import { type NextRequest, type NextResponse } from 'next/server';
 import { EndpointType, RequestJSON, requestToJSON } from './shared';
@@ -124,9 +124,6 @@ export function withAxiomRouteHandler(handler: NextHandler, config?: AxiomRouteH
 
       // flush the logger along with the child logger
       await logger.flush();
-      if (isEdgeRuntime && isVercelIntegration) {
-        logEdgeReport(report);
-      }
       return result;
     } catch (error: any) {
       report.endTime = new Date().getTime();
@@ -144,16 +141,9 @@ export function withAxiomRouteHandler(handler: NextHandler, config?: AxiomRouteH
       log.attachResponseStatus(500);
 
       await logger.flush();
-      if (isEdgeRuntime && isVercelIntegration) {
-        logEdgeReport(report);
-      }
       throw error;
     }
   };
-}
-
-function logEdgeReport(report: RequestReport) {
-  console.log(`AXIOM_EDGE_REPORT::${JSON.stringify(report)}`);
 }
 
 type WithAxiomParam = NextConfig | NextHandler;
