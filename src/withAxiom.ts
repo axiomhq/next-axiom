@@ -90,10 +90,10 @@ export function withAxiomRouteHandler(handler: NextHandler, config?: AxiomRouteH
       region,
       details: Array.isArray(config?.logRequestDetails)
         ? (Object.fromEntries(
-            Object.entries(requestDetails as RequestJSON).filter(([key]) =>
-              (config?.logRequestDetails as (keyof RequestJSON)[]).includes(key as keyof RequestJSON)
-            )
-          ) as RequestJSON)
+          Object.entries(requestDetails as RequestJSON).filter(([key]) =>
+            (config?.logRequestDetails as (keyof RequestJSON)[]).includes(key as keyof RequestJSON)
+          )
+        ) as RequestJSON)
         : requestDetails,
     };
 
@@ -129,9 +129,28 @@ export function withAxiomRouteHandler(handler: NextHandler, config?: AxiomRouteH
       await logger.flush();
       return result;
     } catch (error: any) {
-      report.endTime = new Date().getTime();
+      let statusCode = 500
+      // handle navigation errors like notFound and redirect
+      if (error instanceof Error) {
+        if (error.message === 'NEXT_NOT_FOUND') {
+          statusCode = 404
+        } else if (error.message === 'NEXT_REDIRECT') {
+          // according to Next.js docs, values are: 307 (Temporary) or 308 (Permanent)
+          // see: https://nextjs.org/docs/app/api-reference/functions/redirect#why-does-redirect-use-307-and-308
+          // extract status code from digest, if exists
+          const e: Error & { digest?: string } = error;
+          if (e.digest) {
+            const d = e.digest.split(';');
+            statusCode = parseInt(d[3])
+          } else {
+            statusCode = 307
+          }
+        }
+      }
+
       // report log record
-      report.statusCode = 500;
+      report.endTime = new Date().getTime();
+      report.statusCode = statusCode;
       report.durationMs = report.endTime - report.startTime;
       if (!isVercelIntegration) {
         logger.logHttpRequest(
@@ -143,7 +162,7 @@ export function withAxiomRouteHandler(handler: NextHandler, config?: AxiomRouteH
       }
 
       log.error(error.message, { error });
-      log.attachResponseStatus(500);
+      log.attachResponseStatus(statusCode);
 
       await logger.flush();
       throw error;
