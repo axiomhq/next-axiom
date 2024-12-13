@@ -56,6 +56,9 @@ type NextHandler<T = any> = (
 
 type AxiomRouteHandlerConfig = {
   logRequestDetails?: boolean | (keyof RequestJSON)[];
+  // override default log levels for notFound and redirect
+  NotFoundLogLevel?: LogLevel; // defaults to LogLevel.warn
+  RedirectLogLevel?: LogLevel; // defaults to LogLevel.info
 };
 
 export function withAxiomRouteHandler(handler: NextHandler, config?: AxiomRouteHandlerConfig): NextHandler {
@@ -113,10 +116,11 @@ export function withAxiomRouteHandler(handler: NextHandler, config?: AxiomRouteH
       // report log record
       report.statusCode = result.status;
       report.durationMs = report.endTime - report.startTime;
+      // record the request
       if (!isVercelIntegration) {
         logger.logHttpRequest(
           LogLevel.info,
-          `[${req.method}] ${report.path} ${report.statusCode} ${report.endTime - report.startTime}ms`,
+          `${req.method} ${report.path} ${report.statusCode} in ${report.endTime - report.startTime}ms`,
           report,
           {}
         );
@@ -129,12 +133,18 @@ export function withAxiomRouteHandler(handler: NextHandler, config?: AxiomRouteH
       await logger.flush();
       return result;
     } catch (error: any) {
+      // capture request endTime first for more accurate reporting
+      report.endTime = new Date().getTime();
+      // set default values for statusCode and logLevel
       let statusCode = 500
+      let logLevel = LogLevel.error
       // handle navigation errors like notFound and redirect
       if (error instanceof Error) {
         if (error.message === 'NEXT_NOT_FOUND') {
+          logLevel = config?.NotFoundLogLevel ?? LogLevel.warn
           statusCode = 404
         } else if (error.message === 'NEXT_REDIRECT') {
+          logLevel = config?.RedirectLogLevel ?? LogLevel.info
           // according to Next.js docs, values are: 307 (Temporary) or 308 (Permanent)
           // see: https://nextjs.org/docs/app/api-reference/functions/redirect#why-does-redirect-use-307-and-308
           // extract status code from digest, if exists
@@ -149,19 +159,21 @@ export function withAxiomRouteHandler(handler: NextHandler, config?: AxiomRouteH
       }
 
       // report log record
-      report.endTime = new Date().getTime();
       report.statusCode = statusCode;
       report.durationMs = report.endTime - report.startTime;
+
+      // record the request
       if (!isVercelIntegration) {
         logger.logHttpRequest(
-          LogLevel.error,
-          `[${req.method}] ${report.path} ${report.statusCode} ${report.endTime - report.startTime}ms`,
+          logLevel,
+          `${req.method} ${report.path} ${report.statusCode} in ${report.endTime - report.startTime}ms`,
           report,
           {}
         );
       }
 
-      log.error(error.message, { error });
+      // forward the error message as a log event
+      log.log(logLevel, error.message, { error });
       log.attachResponseStatus(statusCode);
 
       await logger.flush();

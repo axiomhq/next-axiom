@@ -90,16 +90,16 @@ export class Logger {
   }
 
   debug = (message: string, args: { [key: string]: any } = {}) => {
-    this._log(LogLevel.debug, message, args);
+    this.log(LogLevel.debug, message, args);
   };
   info = (message: string, args: { [key: string]: any } = {}) => {
-    this._log(LogLevel.info, message, args);
+    this.log(LogLevel.info, message, args);
   };
   warn = (message: string, args: { [key: string]: any } = {}) => {
-    this._log(LogLevel.warn, message, args);
+    this.log(LogLevel.warn, message, args);
   };
   error = (message: string, args: { [key: string]: any } = {}) => {
-    this._log(LogLevel.error, message, args);
+    this.log(LogLevel.error, message, args);
   };
 
   with = (args: { [key: string]: any }) => {
@@ -173,7 +173,7 @@ export class Logger {
       userAgent: request.headers.get('user-agent'),
     };
 
-    const message = `[${request.method}] [middleware: "middleware"] ${request.nextUrl.pathname}`;
+    const message = `${request.method} ${request.nextUrl.pathname}`;
 
     if (config?.logRequestDetails) {
       return requestToJSON(request).then((details) => {
@@ -194,7 +194,7 @@ export class Logger {
     return this.logHttpRequest(LogLevel.info, message, req, {}) as TReturn;
   }
 
-  private _log = (level: LogLevel, message: string, args: { [key: string]: any } = {}) => {
+  log = (level: LogLevel, message: string, args: { [key: string]: any } = {}) => {
     if (level < this.logLevel) {
       return;
     }

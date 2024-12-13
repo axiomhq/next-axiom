@@ -139,12 +139,24 @@ Route handlers accept a configuration object as the second argument. This object
 
 - `logRequestDetails`: Accepts a boolean or an array of keys. If you pass `true`, it will add all the request details to the log (method, URL, headers, etc.). If you pass an array of strings, it will only add the specified keys. See [Request](https://developer.mozilla.org/en-US/docs/Web/API/Request/url) and [NextRequest](https://nextjs.org/docs/app/api-reference/functions/next-request) for documentation on the available keys.
 
+
+- `NotFoundLogLevel`: Override the log level for NOT_FOUND errors. Defaults to `warn`.
+
+- `RedirectLogLevel`: Override the log level for NEXT_REDIRECT errors. Defaults to `info`.
+
+
+Config example: 
+
 ```ts
 export const GET = withAxiom(
   async () => {
     return new Response("Hello World!");
   },
-  { logRequestDetails: ['body', 'nextUrl'] } // { logRequestDetails: true } is also valid
+  { 
+    logRequestDetails: ['body', 'nextUrl'], // { logRequestDetails: true } is also valid
+    NotFoundLogLevel: 'error',
+    RedirectLogLevel: 'debug',
+  }
 );
 ```
 
