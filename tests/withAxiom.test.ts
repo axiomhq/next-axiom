@@ -1,4 +1,4 @@
-import { test, expect } from 'vitest';
+import { test, expect, vi } from 'vitest';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { NextFetchEvent, NextRequest, NextResponse } from 'next/server';
 import { withAxiom } from '../src/withAxiom';
@@ -24,7 +24,16 @@ test('withAxiom(NextMiddleware)', async () => {
     return NextResponse.next();
   });
   expect(handler).toBeInstanceOf(Function);
-  // TODO: Make sure we don't have a NextApiHandler
+  // TODO: Make sure we don't have a NextConfig
+});
+
+test('withAxiom(NextMiddleware)', async () => {
+  process.env.LAMBDA_TASK_ROOT = 'lol'; // shhh this is AWS Lambda, I promise
+  const handler = withAxiom((_req: NextRequest, _ev: NextFetchEvent) => {
+    return NextResponse.next();
+  });
+  expect(handler).toBeInstanceOf(Function);
+  // TODO: Make sure we don't have a NextConfig
 });
 
 test('withAxiom(NextConfig) with fallback rewrites (regression test for #21)', async () => {
