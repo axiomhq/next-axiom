@@ -57,8 +57,8 @@ type NextHandler<T = any> = (
 type AxiomRouteHandlerConfig = {
   logRequestDetails?: boolean | (keyof RequestJSON)[];
   // override default log levels for notFound and redirect
-  NotFoundLogLevel?: LogLevel; // defaults to LogLevel.warn
-  RedirectLogLevel?: LogLevel; // defaults to LogLevel.info
+  notFoundLogLevel?: LogLevel; // defaults to LogLevel.warn
+  redirectLogLevel?: LogLevel; // defaults to LogLevel.info
 };
 
 export function withAxiomRouteHandler(handler: NextHandler, config?: AxiomRouteHandlerConfig): NextHandler {
@@ -141,10 +141,10 @@ export function withAxiomRouteHandler(handler: NextHandler, config?: AxiomRouteH
       // handle navigation errors like notFound and redirect
       if (error instanceof Error) {
         if (error.message === 'NEXT_NOT_FOUND') {
-          logLevel = config?.NotFoundLogLevel ?? LogLevel.warn;
+          logLevel = config?.notFoundLogLevel ?? LogLevel.warn;
           statusCode = 404;
         } else if (error.message === 'NEXT_REDIRECT') {
-          logLevel = config?.RedirectLogLevel ?? LogLevel.info;
+          logLevel = config?.redirectLogLevel ?? LogLevel.info;
           // according to Next.js docs, values are: 307 (Temporary) or 308 (Permanent)
           // see: https://nextjs.org/docs/app/api-reference/functions/redirect#why-does-redirect-use-307-and-308
           // extract status code from digest, if exists
