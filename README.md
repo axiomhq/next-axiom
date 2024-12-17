@@ -72,6 +72,20 @@ export const config = {
 }
 ```
 
+`logger.middleware` accepts a configuration object as the second argument. This object can contain the following properties:
+
+- `logRequestDetails`: Accepts a boolean or an array of keys. If you pass `true`, it will add all the request details to the log (method, URL, headers, etc.). If you pass an array of strings, it will only add the specified keys. See [Request](https://developer.mozilla.org/en-US/docs/Web/API/Request/url) and [NextRequest](https://nextjs.org/docs/app/api-reference/functions/next-request) for documentation on the available keys. If `logRequestDetails` is enabled the function will return a Promise that needs to be awaited.
+
+```ts
+export async function middleware(request: NextRequest, event: NextFetchEvent) {
+  const logger = new Logger({ source: "middleware" });
+  await logger.middleware(request, { logRequestDetails: ["body", "nextUrl"] });
+
+  event.waitUntil(logger.flush());
+  return NextResponse.next();
+}
+```
+
 ## Web Vitals
 
 To send Web Vitals to Axiom, add the `AxiomWebVitals` component from next-axiom to the `app/layout.tsx` file:
@@ -119,6 +133,31 @@ export const GET = withAxiom((req: AxiomRequest) => {
 
   return NextResponse.json({ hello: 'world' });
 });
+```
+
+Route handlers accept a configuration object as the second argument. This object can contain the following properties:
+
+- `logRequestDetails`: Accepts a boolean or an array of keys. If you pass `true`, it will add all the request details to the log (method, URL, headers, etc.). If you pass an array of strings, it will only add the specified keys. See [Request](https://developer.mozilla.org/en-US/docs/Web/API/Request/url) and [NextRequest](https://nextjs.org/docs/app/api-reference/functions/next-request) for documentation on the available keys.
+
+
+- `NotFoundLogLevel`: Override the log level for NOT_FOUND errors. Defaults to `warn`.
+
+- `RedirectLogLevel`: Override the log level for NEXT_REDIRECT errors. Defaults to `info`.
+
+
+Config example: 
+
+```ts
+export const GET = withAxiom(
+  async () => {
+    return new Response("Hello World!");
+  },
+  { 
+    logRequestDetails: ['body', 'nextUrl'], // { logRequestDetails: true } is also valid
+    NotFoundLogLevel: 'error',
+    RedirectLogLevel: 'debug',
+  }
+);
 ```
 
 ### Client components
