@@ -1,6 +1,6 @@
 import { NextFetchEvent, NextRequest, NextResponse } from 'next/server';
 import { expect, test, vi, vitest } from 'vitest';
-import { middleware } from '../src/middleware';
+import { axiomMiddleware } from '../src/middleware';
 
 vi.hoisted(() => {
   // set axiom env vars before importing logger
@@ -12,7 +12,7 @@ test('middleware processes web vital requests', async () => {
   const context = {
     waitUntil: vitest.fn(),
   } as unknown as NextFetchEvent;
-  const response = (await middleware(
+  const response = (await axiomMiddleware()(
     new NextRequest('http://localhost/_axiom/web-vitals', {
       method: 'POST',
     }),
@@ -27,7 +27,7 @@ test('middleware processes logs requests', async () => {
   const context = {
     waitUntil: vitest.fn(),
   } as unknown as NextFetchEvent;
-  const response = (await middleware(
+  const response = (await axiomMiddleware()(
     new NextRequest('http://localhost/_axiom/logs', {
       method: 'POST',
     }),
@@ -42,7 +42,7 @@ test('middleware ignores non-axiom requests', async () => {
   const context = {
     waitUntil: vitest.fn(),
   } as unknown as NextFetchEvent;
-  const response = await middleware(
+  const response = await axiomMiddleware()(
     new NextRequest('http://localhost/', {
       method: 'GET',
     }),
@@ -56,7 +56,7 @@ test('all logs from the browser are sent to the server', async () => {
   const context = {
     waitUntil: vitest.fn(),
   } as unknown as NextFetchEvent;
-  const response = (await middleware(
+  const response = (await axiomMiddleware()(
     new NextRequest('http://localhost/_axiom/logs', {
       method: 'POST',
       body: JSON.stringify({ logs: ['hello, world!'] }),
