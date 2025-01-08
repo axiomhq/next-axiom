@@ -209,6 +209,26 @@ For example, to send all logs except for debug logs to Axiom:
 export NEXT_PUBLIC_AXIOM_LOG_LEVEL=info
 ```
 
+## Middleware tunneling (beta)
+
+Axiom supports using `middleware.ts` files to proxy logs and webVitals to Axiom, this avoids the need to declare the `AXIOM_TOKEN` as a public environment variable.
+
+To enable this feature, in your middleware.ts file, add the following code:
+
+```ts
+import { axiomMiddleware } from 'next-axiom';
+
+export const middleware = axiomMiddleware();
+
+export const config = {
+  matcher: '/_axiom/:path*', // Makes it so that the middleware only fires for requests that match this path
+};
+```
+
+and in your environment variables, change the `NEXT_PUBLIC_AXIOM_TOKEN` to `AXIOM_TOKEN`.
+
+This will proxy all requests to `/_axiom/logs` and `/_axiom/web-vitals` to Axiom using the middleware as a proxy layer.
+
 ## Capture errors
 
 To capture routing errors, use the [error handling mechanism of Next.js](https://nextjs.org/docs/app/building-your-application/routing/error-handling):
