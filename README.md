@@ -213,7 +213,7 @@ export NEXT_PUBLIC_AXIOM_LOG_LEVEL=info
 
 Axiom supports using `middleware.ts` files to proxy logs and webVitals to Axiom, this avoids the need to declare the `AXIOM_TOKEN` as a public environment variable.
 
-To enable this feature, in your middleware.ts file, add the following code:
+To enable this feature, add the following code to your `middleware.ts` file:
 
 ```ts
 import { axiomMiddleware } from 'next-axiom';
@@ -221,10 +221,27 @@ import { axiomMiddleware } from 'next-axiom';
 export const middleware = axiomMiddleware();
 
 export const config = {
-  matcher: '/_axiom/:path*', // Makes it so that the middleware only fires for requests that match this path
+  matcher: '/_axiom/:path*', // Makes it so that the middleware only fires for requests that match this path, if you are using a custom middleware, see the example below
 };
 ```
 
+You can also pass your own middleware to the Axiom Middleware:
+
+```ts
+import { axiomMiddleware } from 'next-axiom';
+
+const myMiddleware = (request, event) => {
+  // Do something with the request
+  return NextResponse.next();
+};
+
+export const middleware = axiomMiddleware(myMiddleware);
+
+export const config = {
+  /** This is an example matcher you might want to use if you are using a custom middleware reference the [Next.js docs](https://nextjs.org/docs/app/building-your-application/routing/middleware#matcher) for more information */
+  matcher: '/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)', 
+};
+```
 and in your environment variables, change the `NEXT_PUBLIC_AXIOM_TOKEN` to `AXIOM_TOKEN`.
 
 This will proxy all requests to `/_axiom/logs` and `/_axiom/web-vitals` to Axiom using the middleware as a proxy layer.
