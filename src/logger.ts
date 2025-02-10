@@ -344,7 +344,7 @@ export function prettyPrint(ev: LogEvent) {
   console.log.apply(console, [msgString, ...args]);
 }
 
-function jsonFriendlyErrorReplacer(key: string, value: any) {
+function jsonFriendlyErrorReplacer(key: string, value: any): any {
   if (value instanceof Error) {
     return {
       // Pull all enumerable properties, supporting properties on custom Errors
@@ -353,7 +353,7 @@ function jsonFriendlyErrorReplacer(key: string, value: any) {
       name: value.name,
       message: value.message,
       stack: value.stack,
-      cause: jsonFriendlyErrorReplacer(undefined, value.cause),
+      cause: jsonFriendlyErrorReplacer("", value.cause),
     };
   }
 
