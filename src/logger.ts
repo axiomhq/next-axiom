@@ -127,7 +127,13 @@ export class Logger {
 
     // check if passed args is an object, if its not an object, add it to fields.args
     if (args instanceof Error) {
-      logEvent.fields = { ...logEvent.fields, message: args.message, stack: args.stack, name: args.name, cause: args.cause };
+      logEvent.fields = {
+        ...logEvent.fields,
+        message: args.message,
+        stack: args.stack,
+        name: args.name,
+        cause: args.cause,
+      };
     } else if (typeof args === 'object' && args !== null && Object.keys(args).length > 0) {
       const parsedArgs = JSON.parse(JSON.stringify(args, jsonFriendlyErrorReplacer));
       logEvent.fields = { ...logEvent.fields, ...parsedArgs };
@@ -353,7 +359,7 @@ function jsonFriendlyErrorReplacer(key: string, value: any): any {
       name: value.name,
       message: value.message,
       stack: value.stack,
-      cause: jsonFriendlyErrorReplacer("", value.cause),
+      cause: jsonFriendlyErrorReplacer('', value.cause),
     };
   }
 
