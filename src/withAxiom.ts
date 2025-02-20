@@ -65,7 +65,7 @@ export function withAxiomRouteHandler(handler: NextHandler, config?: AxiomRouteH
   return async (req: Request | NextRequest, arg: any) => {
     if (!(req instanceof Request)) {
       throw new Error(
-        "Request must be an instance of Request \n make sure you are using next.js's app router, for pages router use next-axiom@0.*"
+        "Request must be an instance of Request \nIf you are using Next.js's Pages Router, please use next-axiom@0.*"
       );
     }
 
