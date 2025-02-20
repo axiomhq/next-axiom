@@ -63,6 +63,12 @@ type AxiomRouteHandlerConfig = {
 
 export function withAxiomRouteHandler(handler: NextHandler, config?: AxiomRouteHandlerConfig): NextHandler {
   return async (req: Request | NextRequest, arg: any) => {
+    if (!(req instanceof Request)) {
+      throw new Error(
+        "Request must be an instance of Request \n make sure you are using next.js's app router, for pages router use next-axiom@0.*"
+      );
+    }
+
     let region = '';
     if ('geo' in req) {
       region = req.geo?.region ?? '';
