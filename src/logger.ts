@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server';
 import { config, isBrowser, isVercelIntegration, Version } from './config';
 import { NetlifyInfo } from './platform/netlify';
-import { isNoPrettyPrint, throttle } from './shared';
+import { isNoPrettyPrint, requestToJSON, throttle, type RequestJSON } from './shared';
 
 const url = config.getLogsEndpoint();
 
@@ -43,6 +43,7 @@ export interface RequestReport {
   scheme: string;
   userAgent?: string | null;
   durationMs?: number;
+  details?: RequestJSON;
 }
 
 export interface PlatformInfo {
@@ -89,16 +90,16 @@ export class Logger {
   }
 
   debug = (message: string, args: { [key: string]: any } = {}) => {
-    this._log(LogLevel.debug, message, args);
+    this.log(LogLevel.debug, message, args);
   };
   info = (message: string, args: { [key: string]: any } = {}) => {
-    this._log(LogLevel.info, message, args);
+    this.log(LogLevel.info, message, args);
   };
   warn = (message: string, args: { [key: string]: any } = {}) => {
-    this._log(LogLevel.warn, message, args);
+    this.log(LogLevel.warn, message, args);
   };
   error = (message: string, args: { [key: string]: any } = {}) => {
-    this._log(LogLevel.error, message, args);
+    this.log(LogLevel.error, message, args);
   };
 
   with = (args: { [key: string]: any }) => {
@@ -157,7 +158,10 @@ export class Logger {
     }
   }
 
-  middleware(request: NextRequest) {
+  middleware<
+    TConfig extends { logRequestDetails?: boolean | (keyof RequestJSON)[] },
+    TReturn = TConfig['logRequestDetails'] extends boolean | (keyof RequestJSON)[] ? Promise<void> : void,
+  >(request: NextRequest, config?: TConfig): TReturn {
     const req = {
       ip: request.ip,
       region: request.geo?.region,
@@ -169,12 +173,28 @@ export class Logger {
       userAgent: request.headers.get('user-agent'),
     };
 
-    const message = `[${request.method}] [middleware: "middleware"] ${request.nextUrl.pathname}`;
+    const message = `${request.method} ${request.nextUrl.pathname}`;
 
-    return this.logHttpRequest(LogLevel.info, message, req, {});
+    if (config?.logRequestDetails) {
+      return requestToJSON(request).then((details) => {
+        const newReq = {
+          ...req,
+          details: Array.isArray(config.logRequestDetails)
+            ? (Object.fromEntries(
+                Object.entries(details as RequestJSON).filter(([key]) =>
+                  (config.logRequestDetails as (keyof RequestJSON)[]).includes(key as keyof RequestJSON)
+                )
+              ) as RequestJSON)
+            : details,
+        };
+        return this.logHttpRequest(LogLevel.info, message, newReq, {});
+      }) as TReturn;
+    }
+
+    return this.logHttpRequest(LogLevel.info, message, req, {}) as TReturn;
   }
 
-  private _log = (level: LogLevel, message: string, args: { [key: string]: any } = {}) => {
+  log = (level: LogLevel, message: string, args: { [key: string]: any } = {}) => {
     if (level < this.logLevel) {
       return;
     }
