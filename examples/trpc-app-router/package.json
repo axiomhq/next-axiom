@@ -17,7 +17,7 @@
     "@trpc/react-query": "^10.45.2",
     "@trpc/server": "^10.45.2",
     "next": "^14.2.12",
-    "next-axiom": "^1.9.1",
+    "next-axiom": "workspace:*",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "superjson": "^1.13.3",
@@ -37,5 +37,5 @@
   "ct3aMetadata": {
     "initVersion": "7.23.2"
   },
-  "packageManager": "npm@10.5.0"
+  "packageManager": "pnpm@10"
 }

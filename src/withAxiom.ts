@@ -1,6 +1,7 @@
 import { NextConfig } from 'next';
+import { waitUntil } from '@vercel/functions';
 import { Rewrite } from 'next/dist/lib/load-custom-routes';
-import { config, isEdgeRuntime, isVercelIntegration } from './config';
+import { config, isEdgeRuntime, isVercel, isVercelIntegration } from './config';
 import { LogLevel, Logger, RequestReport } from './logger';
 import { type NextRequest, type NextResponse } from 'next/server';
 import { EndpointType, RequestJSON, requestToJSON } from './shared';
@@ -130,7 +131,11 @@ export function withAxiomRouteHandler(handler: NextHandler, config?: AxiomRouteH
       log.attachResponseStatus(result.status);
 
       // flush the logger along with the child logger
-      await logger.flush();
+      if (isVercel) {
+        waitUntil(logger.flush());
+      } else {
+        await logger.flush();
+      }
       return result;
     } catch (error: any) {
       // capture request endTime first for more accurate reporting
@@ -176,7 +181,11 @@ export function withAxiomRouteHandler(handler: NextHandler, config?: AxiomRouteH
       log.log(logLevel, error.message, { error });
       log.attachResponseStatus(statusCode);
 
-      await logger.flush();
+      if (isVercel) {
+        waitUntil(logger.flush());
+      } else {
+        await logger.flush();
+      }
       throw error;
     }
   };

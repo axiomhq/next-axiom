@@ -16,21 +16,29 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
       - uses: actions/setup-node@v3
         with:
           node-version: 18
-      - run: npm install
-      - run: npm run check-format
+          cache: 'pnpm'
+      - run: pnpm install
+      - run: pnpm run check-format
   unittests:
     name: Check Tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
       - uses: actions/setup-node@v3
         with:
           node-version: 18
-      - run: npm install
-      - run: npm test
+          cache: 'pnpm'
+      - run: pnpm install
+      - run: pnpm test
   build:
     name: Build
     runs-on: ubuntu-latest
@@ -43,29 +51,37 @@ jobs:
           - 22.x
     steps:
       - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
       - uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node }}
-      - run: npm install
-      - run: npm run build
+          cache: 'pnpm'
+      - run: pnpm install
+      - run: pnpm run build
       # build examples
-      - run: cd examples/logger && npm install && npm run build
+      - run: cd examples/logger && pnpm install && pnpm run build
   publish:
     name: Publish
     needs:
       - check-format
+      - unittests
       - build
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')
     steps:
       - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
       - uses: actions/setup-node@v3
         with:
           node-version: ${{ env.NODEVERSION }}
-          cache: 'npm'
+          cache: 'pnpm'
           registry-url: 'https://registry.npmjs.org'
-      - run: npm install
-      - run: npm publish --access public
+      - run: pnpm install
+      - run: pnpm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTOMATION_TOKEN }}
       - uses: softprops/action-gh-release@v1
