@@ -50,7 +50,7 @@ export function withAxiomNextConfig(nextConfig: NextConfig): NextConfig {
 }
 
 export type AxiomRequest = NextRequest & { log: Logger };
-type NextHandler<T = any> = (
+export type NextHandler<T = any> = (
   req: AxiomRequest,
   arg?: T
 ) => Promise<Response> | Promise<NextResponse> | NextResponse | Response;
