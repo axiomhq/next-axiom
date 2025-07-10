@@ -54,5 +54,5 @@
     "use-deep-compare": "^1.2.1",
     "whatwg-fetch": "^3.6.2"
   },
-  "packageManager": "pnpm@10"
+  "packageManager": "pnpm@10.11.0"
 }
