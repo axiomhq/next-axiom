@@ -10,18 +10,22 @@ on:
     tags:
       - 'v*'
 
+env:
+  PNPM_VERSION: 10.11.0
+  NODE_VERSION: 22
+
 jobs:
   check-format:
     name: Check format
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: pnpm/action-setup@v2
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
         with:
-          version: 8
-      - uses: actions/setup-node@v3
+          version: ${{ env.PNPM_VERSION }}
+      - uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: ${{ env.NODE_VERSION }}
           cache: 'pnpm'
       - run: pnpm install
       - run: pnpm run check-format
@@ -29,13 +33,13 @@ jobs:
     name: Check Tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: pnpm/action-setup@v2
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
         with:
-          version: 8
-      - uses: actions/setup-node@v3
+          version: ${{ env.PNPM_VERSION }}
+      - uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: ${{ env.NODE_VERSION }}
           cache: 'pnpm'
       - run: pnpm install
       - run: pnpm test
@@ -45,16 +49,15 @@ jobs:
     strategy:
       matrix:
         node:
-          - 18.x
-          - 19.x
           - 20.x
           - 22.x
+          - 24.x
     steps:
-      - uses: actions/checkout@v3
-      - uses: pnpm/action-setup@v2
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
         with:
-          version: 8
-      - uses: actions/setup-node@v3
+          version: ${{ env.PNPM_VERSION }}
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node }}
           cache: 'pnpm'
@@ -71,13 +74,13 @@ jobs:
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')
     steps:
-      - uses: actions/checkout@v3
-      - uses: pnpm/action-setup@v2
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
         with:
-          version: 8
-      - uses: actions/setup-node@v3
+          version: ${{ env.PNPM_VERSION }}
+      - uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.NODEVERSION }}
+          node-version: ${{ env.NODE_VERSION }}
           cache: 'pnpm'
           registry-url: 'https://registry.npmjs.org'
       - run: pnpm install
