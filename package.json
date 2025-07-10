@@ -15,7 +15,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "prepare": "npm run build",
+    "prepare": "pnpm run build",
     "format": "prettier --write src/*.ts tests/*.ts",
     "check-format": "prettier -c src/*.ts tests/*.ts",
     "test": "vitest run tests --coverage"
@@ -43,13 +43,16 @@
     "@types/node": "^20.4.2",
     "@types/react": "^18.2.15",
     "@vitest/coverage-v8": "^2.1.5",
+    "next": "^14.2.12",
     "prettier": "^3.0.0",
     "ts-node": "^10.9.1",
     "typescript": "^5.1.6",
     "vitest": "^2.1.5"
   },
   "dependencies": {
-    "whatwg-fetch": "^3.6.2",
-    "use-deep-compare": "^1.2.1"
-  }
+    "@vercel/functions": "^2.2.2",
+    "use-deep-compare": "^1.2.1",
+    "whatwg-fetch": "^3.6.2"
+  },
+  "packageManager": "pnpm@10"
 }
