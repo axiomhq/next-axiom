@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "next": "^14.2.10",
-    "next-axiom": "file:../..",
+    "next-axiom": "workspace:*",
     "react": "18.2.0",
     "react-dom": "18.2.0"
   },
