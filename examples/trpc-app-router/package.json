@@ -16,7 +16,7 @@
     "@trpc/next": "^10.45.2",
     "@trpc/react-query": "^10.45.2",
     "@trpc/server": "^10.45.2",
-    "next": "^14.2.12",
+    "next": "^16.1.5",
     "next-axiom": "workspace:*",
     "react": "18.2.0",
     "react-dom": "18.2.0",
